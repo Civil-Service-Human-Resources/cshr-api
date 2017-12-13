@@ -1,6 +1,5 @@
 package uk.gov.cshr.vcm.controller;
 
-import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -9,14 +8,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/vacancy", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -29,12 +22,10 @@ public class VacancyController {
         this.vacancyRepository = vacancyRepository;
     }
 
-
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<List<Vacancy>> findAll() {
-        Iterable<Vacancy> source = vacancyRepository.findAll();
-        List<Vacancy> vacancies = Lists.newArrayList(source);
+        List<Vacancy> vacancies = vacancyRepository.findAll();
         return ResponseEntity.ok().body(vacancies);
     }
 
@@ -65,5 +56,11 @@ public class VacancyController {
         vacancyRepository.delete(vacancyId);
         return ResponseEntity.noContent().build();
 
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/search/location/{location}/keyword/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Vacancy>> search(@PathVariable String location, @PathVariable String keyword) {
+        List<Vacancy> vacancies = vacancyRepository.search(location, keyword);
+        return ResponseEntity.ok().body(vacancies);
     }
 }

@@ -11,6 +11,7 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "vacancies")
 public class Vacancy  implements Serializable {
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
