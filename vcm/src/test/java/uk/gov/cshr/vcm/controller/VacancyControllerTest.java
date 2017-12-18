@@ -56,16 +56,16 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
     private Vacancy vacancy1 = Vacancy.builder()
             .id(1L)
-            .title("testVacancy1")
-            .description("testDescription1")
-            .location("testLocation1")
+            .title("testTile1 SearchQueryTitle")
+            .description("testDescription1 SearchQueryDescription")
+            .location("testLocation1 SearchQueryLocation")
             .salaryMin(0)
             .salaryMax(10)
             .build();
 
     private Vacancy vacancy2 = Vacancy.builder()
             .id(2L)
-            .title("testVacancy1")
+            .title("testTitle1")
             .description("testDescription1")
             .location("testLocation1")
             .salaryMin(0)
@@ -199,6 +199,25 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
     }
 
+    @Test
+    public void testSearchTitle() throws Exception {
+        // Given
+        String path = "/vacancy/search/location/searchQueryLocation/keyword/search";
 
+        // When
+        ResultActions sendRequest = mvc.perform(get(path));
+
+        // Then
+        sendRequest
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id", is(toIntExact(this.vacancy1.getId()))))
+                .andExpect(jsonPath("$[0].description", is(this.vacancy1.getDescription())))
+                .andExpect(jsonPath("$[0].location", is(this.vacancy1.getLocation())))
+                .andExpect(jsonPath("$[0].salaryMin", is(this.vacancy1.getSalaryMin())))
+                .andExpect(jsonPath("$[0].salaryMax", is(this.vacancy1.getSalaryMax())));
+
+    }
 
 }
