@@ -1,4 +1,5 @@
 target/
+!.mvn/wrapper/maven-wrapper.jar
 
 ### STS ###
 .apt_generated
@@ -7,7 +8,6 @@ target/
 .project
 .settings
 .springBeans
-.mvn/
 
 ### IntelliJ IDEA ###
 .idea
@@ -22,6 +22,3 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
-
-### Misc ###
-.DS_Store
