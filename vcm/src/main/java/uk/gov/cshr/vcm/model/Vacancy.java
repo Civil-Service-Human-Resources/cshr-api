@@ -23,8 +23,14 @@ public class Vacancy  implements Serializable {
 
     private @NonNull String location;
 
+    private @NonNull String grade;
+
+    private @NonNull String closingDate;
+
     private int salaryMin;
 
     private int salaryMax;
+
+    private int numberVacancies;
 
 }
