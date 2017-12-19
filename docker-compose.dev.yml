@@ -1,0 +1,18 @@
+version: "2"
+
+services:
+  api:
+    ports:
+      - "8080:8080"
+
+  db:
+    ports:
+      - "5432:5432"
+
+  test:
+    image: maven:3.5-jdk-8
+    working_dir: "/usr/src/app"
+    volumes:
+      - "~/.m2:/root/.m2"
+      - "./:/usr/src/app"
+    command: "mvn test"
