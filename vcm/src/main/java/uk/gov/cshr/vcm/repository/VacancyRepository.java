@@ -7,9 +7,14 @@ import org.springframework.stereotype.Repository;
 import uk.gov.cshr.vcm.model.Vacancy;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface VacancyRepository extends JpaRepository<Vacancy, Long> {
+
+    default public Optional<Vacancy> findById(Long id) {
+        return Optional.ofNullable(this.findOne(id));
+    }
 
     /**
      * Entry point for search queries

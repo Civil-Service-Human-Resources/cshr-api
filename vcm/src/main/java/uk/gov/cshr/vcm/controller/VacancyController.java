@@ -10,6 +10,7 @@ import uk.gov.cshr.vcm.repository.VacancyRepository;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/vacancy", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -32,10 +33,11 @@ public class VacancyController {
     @RequestMapping(method = RequestMethod.GET, value = "/{vacancyId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Vacancy> findById(@PathVariable Long vacancyId) {
 
-        Vacancy vacancy = vacancyRepository.findOne(vacancyId);
+        Optional<Vacancy> foundVacancy = vacancyRepository.findById(vacancyId);
 
-        if (vacancy == null) return ResponseEntity.notFound().build();
-        else return ResponseEntity.ok().body(vacancy);
+        ResponseEntity<Vacancy> notFound = ResponseEntity.notFound().build();
+
+        return foundVacancy.map(vacancy -> ResponseEntity.ok().body(vacancy)).orElse(notFound);
     }
 
     @RequestMapping(method = RequestMethod.POST)
