@@ -24,10 +24,8 @@ import java.nio.charset.Charset;
 
 import static java.lang.Math.toIntExact;
 import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = VcmApplication.class)
 @ContextConfiguration
@@ -174,9 +172,9 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 "\"location\":\"" + expectedVacancy.getLocation() + "\"," +
                 "\"grade\":\"" + expectedVacancy.getGrade() + "\"," +
                 "\"closingDate\":\"" + expectedVacancy.getClosingDate() + "\"," +
-                "\"salaryMin\":\"" + expectedVacancy.getSalaryMin() + "\"," +
-                "\"salaryMax\":\"" + expectedVacancy.getSalaryMax() + "\"," +
-                "\"numberVacancies\":\"" + expectedVacancy.getNumberVacancies() + "\"" +
+                "\"salaryMin\":" + expectedVacancy.getSalaryMin() + "," +
+                "\"salaryMax\":" + expectedVacancy.getSalaryMax() + "," +
+                "\"numberVacancies\":" + expectedVacancy.getNumberVacancies() + "" +
                 "}";
 
         // When
@@ -196,6 +194,82 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8));
 
         Assertions.assertThat(storedVacancy).isEqualToIgnoringGivenFields(expectedVacancy, "id");
+    }
+
+
+    @Test
+    public void testUpdate() throws Exception {
+        // Given
+        String path = "/vacancy/" + vacancy1.getId();
+
+        String newTitle = "newTitle";
+        String newDescription = "newDescription";
+        String newLocation = "newLocation";
+        String newGrade = "newGrade";
+        String newClosingDate = "newClosingDate";
+        int newSalaryMin = 99;
+        int newSalaryMax = 999;
+        int newNumberVacancies = 9;
+
+        String requestBody = "{" +
+                "\"title\":\"" + newTitle + "\"," +
+                "\"description\":\"" + newDescription + "\"," +
+                "\"location\":\"" + newLocation + "\"," +
+                "\"grade\":\"" + newGrade + "\"," +
+                "\"closingDate\":\"" + newClosingDate + "\"," +
+                "\"salaryMin\":" + newSalaryMin + "," +
+                "\"salaryMax\":" + newSalaryMax + "," +
+                "\"numberVacancies\":" + newNumberVacancies + "" +
+                "}";
+
+        // When
+        ResultActions sendRequest = mvc.perform(put(path).contentType(APPLICATION_JSON_UTF8).content(requestBody));
+
+        // Then
+        sendRequest
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.title", is(newTitle)))
+                .andExpect(jsonPath("$.description", is(newDescription)))
+                .andExpect(jsonPath("$.location", is(newLocation)))
+                .andExpect(jsonPath("$.grade", is(newGrade)))
+                .andExpect(jsonPath("$.salaryMin", is(newSalaryMin)))
+                .andExpect(jsonPath("$.salaryMax", is(newSalaryMax)))
+                .andExpect(jsonPath("$.numberVacancies", is(newNumberVacancies)));
+
+    }
+
+    @Test
+    public void testUpdateNotFound() throws Exception {
+        // Given
+        String path = "/vacancy/-1";
+
+        String newTitle = "newTitle";
+        String newDescription = "newDescription";
+        String newLocation = "newLocation";
+        String newGrade = "newGrade";
+        String newClosingDate = "newClosingDate";
+        int newSalaryMin = 99;
+        int newSalaryMax = 999;
+        int newNumberVacancies = 9;
+
+        String requestBody = "{" +
+                "\"title\":\"" + newTitle + "\"," +
+                "\"description\":\"" + newDescription + "\"," +
+                "\"location\":\"" + newLocation + "\"," +
+                "\"grade\":\"" + newGrade + "\"," +
+                "\"closingDate\":\"" + newClosingDate + "\"," +
+                "\"salaryMin\":" + newSalaryMin + "," +
+                "\"salaryMax\":" + newSalaryMax + "," +
+                "\"numberVacancies\":" + newNumberVacancies + "" +
+                "}";
+
+        // When
+        ResultActions sendRequest = mvc.perform(put(path).contentType(APPLICATION_JSON_UTF8).content(requestBody));
+
+        // Then
+        sendRequest.andExpect(status().isNotFound());
+
     }
 
     private long getResourceIdFromUrl(String locationUrl) {

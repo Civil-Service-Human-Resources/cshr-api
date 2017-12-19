@@ -52,6 +52,21 @@ public class VacancyController {
         return ResponseEntity.created(location).body(savedVacancy);
     }
 
+    @RequestMapping(method = RequestMethod.PUT, value = "/{vacancyId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Vacancy> update(@PathVariable Long vacancyId, @RequestBody Vacancy vacancyUpdate) {
+
+        Optional<Vacancy> foundVacancy = vacancyRepository.findById(vacancyId);
+
+        ResponseEntity<Vacancy> notFound = ResponseEntity.notFound().build();
+
+        return foundVacancy.map((Vacancy vacancy) -> {
+            // Attention, mutable state on the argument
+            vacancyUpdate.setId(vacancy.getId());
+            vacancyRepository.save(vacancyUpdate);
+            return ResponseEntity.ok().body(vacancy);
+        }).orElse(notFound);
+    }
+
     @RequestMapping(method = RequestMethod.DELETE, value = "/{vacancyId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Vacancy> deleteById(@PathVariable Long vacancyId) {
 
