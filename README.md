@@ -8,8 +8,7 @@
 ## Setup
 
 * Clone this repository 
-* Copy `.env_dev` file to `.env`
-* Run `make` or `docker-compose build`
+* Run `make` or `./bin/build.sh` - this will setup `.env` file, create docker bridge network and build docker images. 
 
 ## Running API
 
