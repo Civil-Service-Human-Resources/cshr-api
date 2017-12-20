@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -e
-
 if [ ! -f ".env" ]; then
     cp .env_dev .env
 fi
