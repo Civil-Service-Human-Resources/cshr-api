@@ -15,6 +15,10 @@
 
 `make run` or `docker-compose up api`
 
+## Stopping API
+
+`make stop` or `docker-compose stop api`
+
 ## Running Tests
 `make test` or `docker-compose run --rm test`
 
