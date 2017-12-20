@@ -26,7 +26,23 @@ public class Vacancy  implements Serializable {
 
     private @NonNull String grade;
 
+    private @NonNull String role;
+
+    private @NonNull String responsibilities;
+
+    private @NonNull String workingHours;
+
     private @NonNull String closingDate;
+
+    private @NonNull String contactName;
+
+    private @NonNull String contactDepartment;
+
+    private @NonNull String contactEmail;
+
+    private @NonNull String contactTelephone;
+
+    private @NonNull String eligibility;
 
     private int salaryMin;
 
