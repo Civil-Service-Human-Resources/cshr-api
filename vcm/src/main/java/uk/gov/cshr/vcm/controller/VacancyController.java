@@ -1,6 +1,8 @@
 package uk.gov.cshr.vcm.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +27,8 @@ public class VacancyController {
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<List<Vacancy>> findAll() {
-        List<Vacancy> vacancies = vacancyRepository.findAll();
+    public ResponseEntity<Page<Vacancy>> findAll(Pageable pageable) {
+        Page<Vacancy> vacancies = vacancyRepository.findAll(pageable);
         return ResponseEntity.ok().body(vacancies);
     }
 
@@ -76,8 +78,8 @@ public class VacancyController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/search/location/{location}/keyword/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Vacancy>> search(@PathVariable String location, @PathVariable String keyword) {
-        List<Vacancy> vacancies = vacancyRepository.search(location, keyword);
+    public ResponseEntity<Page<Vacancy>> search(@PathVariable String location, @PathVariable String keyword, Pageable pageable) {
+        Page<Vacancy> vacancies = vacancyRepository.findByLocationContainsOrTitleContainsOrDescriptionContainsAllIgnoreCase(location, keyword, keyword, pageable);
         return ResponseEntity.ok().body(vacancies);
     }
 }
