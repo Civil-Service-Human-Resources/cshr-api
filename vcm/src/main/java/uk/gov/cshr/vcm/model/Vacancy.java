@@ -13,7 +13,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Table(name = "vacancies")
 @SequenceGenerator(name = "vacancies_sequence", sequenceName = "vacancies_sequence", allocationSize = 1)
-public class Vacancy  implements Serializable {
+public class Vacancy {
 
     @Id @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "vacancies_sequence")
     private Long id;

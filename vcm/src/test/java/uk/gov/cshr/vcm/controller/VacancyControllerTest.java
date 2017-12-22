@@ -151,39 +151,40 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
         sendRequest
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id", is(toIntExact(this.vacancy1.getId()))))
-                .andExpect(jsonPath("$[0].description", is(this.vacancy1.getDescription())))
-                .andExpect(jsonPath("$[0].location", is(this.vacancy1.getLocation())))
-                .andExpect(jsonPath("$[0].grade", is(this.vacancy1.getGrade())))
-                .andExpect(jsonPath("$[0].role", is(this.vacancy1.getRole())))
-                .andExpect(jsonPath("$[0].responsibilities", is(this.vacancy1.getResponsibilities())))
-                .andExpect(jsonPath("$[0].workingHours", is(this.vacancy1.getWorkingHours())))
-                .andExpect(jsonPath("$[0].closingDate", is(this.vacancy1.getClosingDate())))
-                .andExpect(jsonPath("$[0].contactName", is(this.vacancy1.getContactName())))
-                .andExpect(jsonPath("$[0].contactDepartment", is(this.vacancy1.getContactDepartment())))
-                .andExpect(jsonPath("$[0].contactEmail", is(this.vacancy1.getContactEmail())))
-                .andExpect(jsonPath("$[0].contactTelephone", is(this.vacancy1.getContactTelephone())))
-                .andExpect(jsonPath("$[0].eligibility", is(this.vacancy1.getEligibility())))
-                .andExpect(jsonPath("$[0].salaryMin", is(this.vacancy1.getSalaryMin())))
-                .andExpect(jsonPath("$[0].salaryMax", is(this.vacancy1.getSalaryMax())))
-                .andExpect(jsonPath("$[0].numberVacancies", is(this.vacancy1.getNumberVacancies())))
-                .andExpect(jsonPath("$[1].id", is(toIntExact(this.vacancy2.getId()))))
-                .andExpect(jsonPath("$[1].description", is(this.vacancy2.getDescription())))
-                .andExpect(jsonPath("$[1].location", is(this.vacancy2.getLocation())))
-                .andExpect(jsonPath("$[1].grade", is(this.vacancy2.getGrade())))
-                .andExpect(jsonPath("$[1].role", is(this.vacancy2.getRole())))
-                .andExpect(jsonPath("$[1].responsibilities", is(this.vacancy2.getResponsibilities())))
-                .andExpect(jsonPath("$[1].workingHours", is(this.vacancy2.getWorkingHours())))
-                .andExpect(jsonPath("$[1].closingDate", is(this.vacancy2.getClosingDate())))
-                .andExpect(jsonPath("$[1].contactName", is(this.vacancy2.getContactName())))
-                .andExpect(jsonPath("$[1].contactDepartment", is(this.vacancy2.getContactDepartment())))
-                .andExpect(jsonPath("$[1].contactEmail", is(this.vacancy2.getContactEmail())))
-                .andExpect(jsonPath("$[1].contactTelephone", is(this.vacancy2.getContactTelephone())))
-                .andExpect(jsonPath("$[1].eligibility", is(this.vacancy2.getEligibility())))
-                .andExpect(jsonPath("$[1].salaryMin", is(this.vacancy2.getSalaryMin())))
-                .andExpect(jsonPath("$[1].salaryMax", is(this.vacancy2.getSalaryMax())))
-                .andExpect(jsonPath("$[1].numberVacancies", is(this.vacancy2.getNumberVacancies())));
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.totalElements", is(2)))
+                .andExpect(jsonPath("$.content[0].id", is(toIntExact(this.vacancy1.getId()))))
+                .andExpect(jsonPath("$.content[0].description", is(this.vacancy1.getDescription())))
+                .andExpect(jsonPath("$.content[0].location", is(this.vacancy1.getLocation())))
+                .andExpect(jsonPath("$.content[0].grade", is(this.vacancy1.getGrade())))
+                .andExpect(jsonPath("$.content[0].role", is(this.vacancy1.getRole())))
+                .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy1.getResponsibilities())))
+                .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy1.getWorkingHours())))
+                .andExpect(jsonPath("$.content[0].closingDate", is(this.vacancy1.getClosingDate())))
+                .andExpect(jsonPath("$.content[0].contactName", is(this.vacancy1.getContactName())))
+                .andExpect(jsonPath("$.content[0].contactDepartment", is(this.vacancy1.getContactDepartment())))
+                .andExpect(jsonPath("$.content[0].contactEmail", is(this.vacancy1.getContactEmail())))
+                .andExpect(jsonPath("$.content[0].contactTelephone", is(this.vacancy1.getContactTelephone())))
+                .andExpect(jsonPath("$.content[0].eligibility", is(this.vacancy1.getEligibility())))
+                .andExpect(jsonPath("$.content[0].salaryMin", is(this.vacancy1.getSalaryMin())))
+                .andExpect(jsonPath("$.content[0].salaryMax", is(this.vacancy1.getSalaryMax())))
+                .andExpect(jsonPath("$.content[0].numberVacancies", is(this.vacancy1.getNumberVacancies())))
+                .andExpect(jsonPath("$.content[1].id", is(toIntExact(this.vacancy2.getId()))))
+                .andExpect(jsonPath("$.content[1].description", is(this.vacancy2.getDescription())))
+                .andExpect(jsonPath("$.content[1].location", is(this.vacancy2.getLocation())))
+                .andExpect(jsonPath("$.content[1].grade", is(this.vacancy2.getGrade())))
+                .andExpect(jsonPath("$.content[1].role", is(this.vacancy2.getRole())))
+                .andExpect(jsonPath("$.content[1].responsibilities", is(this.vacancy2.getResponsibilities())))
+                .andExpect(jsonPath("$.content[1].workingHours", is(this.vacancy2.getWorkingHours())))
+                .andExpect(jsonPath("$.content[1].closingDate", is(this.vacancy2.getClosingDate())))
+                .andExpect(jsonPath("$.content[1].contactName", is(this.vacancy2.getContactName())))
+                .andExpect(jsonPath("$.content[1].contactDepartment", is(this.vacancy2.getContactDepartment())))
+                .andExpect(jsonPath("$.content[1].contactEmail", is(this.vacancy2.getContactEmail())))
+                .andExpect(jsonPath("$.content[1].contactTelephone", is(this.vacancy2.getContactTelephone())))
+                .andExpect(jsonPath("$.content[1].eligibility", is(this.vacancy2.getEligibility())))
+                .andExpect(jsonPath("$.content[1].salaryMin", is(this.vacancy2.getSalaryMin())))
+                .andExpect(jsonPath("$.content[1].salaryMax", is(this.vacancy2.getSalaryMax())))
+                .andExpect(jsonPath("$.content[1].numberVacancies", is(this.vacancy2.getNumberVacancies())));
 
     }
 
@@ -322,9 +323,9 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void testSearchTitle() throws Exception {
+    public void testSearch() throws Exception {
         // Given
-        String path = "/vacancy/search/location/searchQueryLocation/keyword/search";
+        String path = "/vacancy/search/location/searchQueryLocation/keyword/search?page=0&size=1";
 
         // When
         ResultActions sendRequest = mvc.perform(get(path));
@@ -333,23 +334,44 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
         sendRequest
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].id", is(toIntExact(this.vacancy1.getId()))))
-                .andExpect(jsonPath("$[0].description", is(this.vacancy1.getDescription())))
-                .andExpect(jsonPath("$[0].location", is(this.vacancy1.getLocation())))
-                .andExpect(jsonPath("$[0].grade", is(this.vacancy1.getGrade())))
-                .andExpect(jsonPath("$[0].role", is(this.vacancy1.getRole())))
-                .andExpect(jsonPath("$[0].responsibilities", is(this.vacancy1.getResponsibilities())))
-                .andExpect(jsonPath("$[0].workingHours", is(this.vacancy1.getWorkingHours())))
-                .andExpect(jsonPath("$[0].closingDate", is(this.vacancy1.getClosingDate())))
-                .andExpect(jsonPath("$[0].contactName", is(this.vacancy1.getContactName())))
-                .andExpect(jsonPath("$[0].contactDepartment", is(this.vacancy1.getContactDepartment())))
-                .andExpect(jsonPath("$[0].contactEmail", is(this.vacancy1.getContactEmail())))
-                .andExpect(jsonPath("$[0].contactTelephone", is(this.vacancy1.getContactTelephone())))
-                .andExpect(jsonPath("$[0].eligibility", is(this.vacancy1.getEligibility())))
-                .andExpect(jsonPath("$[0].salaryMin", is(this.vacancy1.getSalaryMin())))
-                .andExpect(jsonPath("$[0].salaryMax", is(this.vacancy1.getSalaryMax())))
-                .andExpect(jsonPath("$[0].numberVacancies", is(this.vacancy1.getNumberVacancies())));
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.totalElements", is(1)))
+                .andExpect(jsonPath("$.content[0].id", is(toIntExact(this.vacancy1.getId()))))
+                .andExpect(jsonPath("$.content[0].description", is(this.vacancy1.getDescription())))
+                .andExpect(jsonPath("$.content[0].location", is(this.vacancy1.getLocation())))
+                .andExpect(jsonPath("$.content[0].grade", is(this.vacancy1.getGrade())))
+                .andExpect(jsonPath("$.content[0].role", is(this.vacancy1.getRole())))
+                .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy1.getResponsibilities())))
+                .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy1.getWorkingHours())))
+                .andExpect(jsonPath("$.content[0].closingDate", is(this.vacancy1.getClosingDate())))
+                .andExpect(jsonPath("$.content[0].contactName", is(this.vacancy1.getContactName())))
+                .andExpect(jsonPath("$.content[0].contactDepartment", is(this.vacancy1.getContactDepartment())))
+                .andExpect(jsonPath("$.content[0].contactEmail", is(this.vacancy1.getContactEmail())))
+                .andExpect(jsonPath("$.content[0].contactTelephone", is(this.vacancy1.getContactTelephone())))
+                .andExpect(jsonPath("$.content[0].eligibility", is(this.vacancy1.getEligibility())))
+                .andExpect(jsonPath("$.content[0].salaryMin", is(this.vacancy1.getSalaryMin())))
+                .andExpect(jsonPath("$.content[0].salaryMax", is(this.vacancy1.getSalaryMax())))
+                .andExpect(jsonPath("$.content[0].numberVacancies", is(this.vacancy1.getNumberVacancies())));
+
+    }
+
+    @Test
+    public void testFindAllPaginated() throws Exception {
+        // Given
+        String path = "/vacancy/?page=0&size=1";
+
+        // When
+        ResultActions sendRequest = mvc.perform(get(path));
+
+        // Then
+        sendRequest
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.totalElements", is(2)))
+                .andExpect(jsonPath("$.totalPages", is(2)))
+                .andExpect(jsonPath("$.size", is(1)))
+                .andExpect(jsonPath("$.numberOfElements", is(1)));
 
     }
 
