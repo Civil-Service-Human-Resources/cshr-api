@@ -85,7 +85,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             "}";
 
     private Vacancy vacancy1 = Vacancy.builder()
-            .id(1L)
+            .id(1)
             .title("testTile1 SearchQueryTitle")
             .description("testDescription1 SearchQueryDescription")
             .location("testLocation1 SearchQueryLocation")
@@ -105,7 +105,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             .build();
 
     private Vacancy vacancy2 = Vacancy.builder()
-            .id(2L)
+            .id(2)
             .title("testTitle2")
             .description("testDescription2")
             .location("testLocation2")
@@ -322,6 +322,11 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
     }
 
+
+    /**
+     * Current search implementation is primitive, this test will evolve with time
+     * @throws Exception
+     */
     @Test
     public void testSearch() throws Exception {
         // Given
