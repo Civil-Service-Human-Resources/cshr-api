@@ -2,7 +2,7 @@ version: "2"
 
 services:
   api:
-    image: cshr/api
+    image: cshr/cshr-api:${DOCKER_SERVICE_TAG}
     build:
       context: .
     depends_on:
