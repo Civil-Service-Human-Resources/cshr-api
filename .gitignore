@@ -25,3 +25,4 @@ nbdist/
 
 ### Docker ###
 .env
+docker-stack.yml
