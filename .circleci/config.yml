@@ -54,6 +54,33 @@ jobs:
               docker push "${image}":"${docker_tag}"
             done
 
+  deploy_to_uat:
+    environment:
+      - COMPOSE_FILE: "docker-compose.yml"
+    machine: true
+    steps:
+      - checkout
+
+      - run:
+          name: Generate a stack file
+          command: |
+            cp .env_dev .env
+            if [ "$CIRCLE_BRANCH" == "master" ]; then
+              export DOCKER_SERVICE_TAG="latest"
+            else
+              export DOCKER_SERVICE_TAG="$CIRCLE_BRANCH"
+            fi
+            docker-compose -f docker-compose.stack.yml config > docker-stack.yml
+
+      - add_ssh_keys
+
+      - run:
+          name: Deploy
+          command: |
+            scp -oStrictHostKeyChecking=no docker-stack.yml ${UAT_SSH_USER}@${UAT_HOSTNAME}:/home/${UAT_SSH_USER}/api-stack.yml
+            ssh -oStrictHostKeyChecking=no ${UAT_SSH_USER}@${UAT_HOSTNAME} docker stack deploy -c /home/${UAT_SSH_USER}/api-stack.yml api
+
+
 workflows:
   version: 2
   build_and_test:
@@ -67,4 +94,10 @@ workflows:
               only:
                 - master
                 - develop
-                - test
+      - deploy_to_uat:
+          requires:
+            - ship
+          filters:
+            branches:
+              only:
+                - develop
