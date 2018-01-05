@@ -1,5 +1,8 @@
 package uk.gov.cshr.vcm.service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -7,9 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.cshr.vcm.exception.LocationServiceException;
 import uk.gov.cshr.vcm.model.Coordinates;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This service is responsible for calling an external location lookup service to transform a place into a coordinates representing latitude and longitude.

@@ -1,41 +1,32 @@
 package uk.gov.cshr.vcm.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.nio.charset.Charset;
+import static org.junit.Assert.fail;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Fail;
-import org.junit.After;
 import org.junit.Assert;
-import static org.junit.Assert.fail;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import static org.mockito.BDDMockito.given;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
 import org.springframework.data.domain.Page;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 import uk.gov.cshr.vcm.VcmApplication;
 import uk.gov.cshr.vcm.exception.LocationServiceException;
 import uk.gov.cshr.vcm.model.Coordinates;
@@ -43,78 +34,25 @@ import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.model.Location;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
-import uk.gov.cshr.vcm.repository.DepartmentRepository;
-import uk.gov.cshr.vcm.repository.VacancyRepository;
-import uk.gov.cshr.vcm.service.LocationService;
 
-@Ignore
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = VcmApplication.class)
 @ContextConfiguration
 @WebAppConfiguration
 @TestExecutionListeners(MockitoTestExecutionListener.class)
-public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
-
-    public static final double BRISTOL_LATITUDE = 51.4549291;
-    public static final double BRISTOL_LONGITUDE = -2.6278111;
-
-    public static final double NEWCASTLE_LATITUDE = 54.9806308;
-    public static final double NEWCASTLE_LONGITUDE = -1.6167437;
-
-    public static final Coordinates BRISTOL = new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE);
-    public static final Coordinates NEWCASTLE = new Coordinates(NEWCASTLE_LONGITUDE, NEWCASTLE_LATITUDE);
-
-    final private MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
-            MediaType.APPLICATION_JSON.getSubtype(),
-            Charset.forName("utf8"));
-
-    @Inject
-    private WebApplicationContext webApplicationContext;
-
-    @Inject
-    private VacancyRepository vacancyRepository;
-
-    @Inject
-    private DepartmentRepository departmentRepository;
-
-    private MockMvc mockMvc;
-
-    @MockBean
-    private LocationService locationService;
-
+public class SalaryRangeTest extends SearchTestConfiguration {
     private static final Timestamp THIRTY_DAYS_FROM_NOW = getTime(30);
     private static final Timestamp ONE_DAY_AGO = getTime(-1);
-
-    private final List<Vacancy> createdVacancies = new ArrayList<>();
-    private final List<Department> createdDepartments = new ArrayList<>();
 
     private Department department;
 
     @Before
     public void before() throws LocationServiceException {
-
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
         department = departmentRepository.save(Department.builder().name("Department One").build());
-        createdDepartments.add(department);
 
-        given(locationService.find("bristol"))
-                .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE));
-
-        given(locationService.find("newcastle"))
-                .willReturn(new Coordinates(NEWCASTLE_LONGITUDE, NEWCASTLE_LATITUDE));
-    }
-
-    @After
-    public void after() {
-
-        for (Vacancy createdVacancy : createdVacancies) {
-            vacancyRepository.delete(createdVacancy);
-        }
-
-        for (Department createdDepartment : createdDepartments) {
-            departmentRepository.delete(createdDepartment);
-        }
+        initLocationService();
     }
 
     @Test
@@ -149,19 +87,11 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
 
         Assert.assertTrue("Expected results", !resultsList.isEmpty());
 
-        boolean vacancyFound = false;
-
         for (Vacancy vacancy : resultsList) {
-
-            if (vacancy.getSalaryMin().equals(14000)) {
-                vacancyFound = true;
-            }
-            else {
+            if (!vacancy.getSalaryMin().equals(14000)) {
                 Fail.fail("Vacancy with salary range " + vacancy.getSalaryMin() + "-" + vacancy.getSalaryMax() + "  when filtering for 30000-40000");
             }
         }
-
-        Assert.assertTrue(vacancyFound);
     }
 
     @Test
@@ -198,7 +128,7 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         Vacancy v3 = createVacancyWithSalaryRange(70001, 80000, department, BRISTOL);
 
         // will not be returned as max_salary will now be defaulted to min_salary
-        Vacancy v4 = createVacancyWithSalaryRange(10000, null, department, BRISTOL);
+        createVacancyWithSalaryRange(10000, null, department, BRISTOL);
 
         List<String> expectedVacancyIDs = Arrays.asList(
                 v1.getId().toString(),
@@ -219,7 +149,7 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
     @Test
     public void testMultipleLocations() throws Exception {
 
-        Vacancy newcastle = createVacancyWithSalaryRange(11000, null, department, NEWCASTLE);
+        createVacancyWithSalaryRange(11000, null, department, NEWCASTLE);
         Vacancy bristol = createVacancyWithSalaryRange(14000, null, department, BRISTOL);
 
         Page<Vacancy> result = findVancancies(10000, 20000, "newcastle");
@@ -249,7 +179,7 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
     @Test
     public void testMinNoMaxVacancy_noMinMaxSearch() throws Exception {
 
-        Vacancy newcastle = createVacancyWithSalaryRange(11000, null, department, NEWCASTLE);
+        createVacancyWithSalaryRange(11000, null, department, NEWCASTLE);
 
         Page<Vacancy> result = findVancancies(null, 5000, "newcastle");
         List<Vacancy> resultsList = result.getContent();
@@ -517,8 +447,7 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
     }
 
     private Vacancy getVacancyPrototype(Coordinates coordinates) {
-
-        Vacancy vacancyPrototype = Vacancy.builder()
+        return Vacancy.builder()
                 .title("testTile1 SearchQueryTitle")
                 .description("testDescription1 SearchQueryDescription")
                 .location("testLocation1 SearchQueryLocation")
@@ -539,8 +468,6 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
                 .latitude(coordinates.getLatitude())
                 .longitude(coordinates.getLongitude())
                 .build();
-
-        return vacancyPrototype;
     }
 
     private Vacancy createVacancyWithSalaryRange(Integer salaryMin, Integer salaryMax, Department department, Coordinates coordinates) {
@@ -550,7 +477,7 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         vacancy.setSalaryMin(salaryMin);
         vacancy.setSalaryMax(salaryMax);
         vacancyRepository.save(vacancy);
-        createdVacancies.add(vacancy);
+
         return vacancy;
     }
 }

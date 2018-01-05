@@ -1,5 +1,10 @@
 package uk.gov.cshr.vcm.service;
 
+import java.util.ArrayList;
+
+import javax.annotation.Resource;
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -12,10 +17,6 @@ import uk.gov.cshr.vcm.model.SearchParameters;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
-
-import javax.annotation.Resource;
-import javax.inject.Inject;
-import java.util.ArrayList;
 
 @Service
 public class SearchService {
@@ -42,7 +43,7 @@ public class SearchService {
             vacancies = vacancyRepository.search(searchParameters, pageable);
         } else {
             debug("No Coordinates for %s with radius of %d exist", vacancySearchParameters.getLocation().getPlace(), vacancySearchParameters.getLocation().getRadius());
-            vacancies = new PageImpl<>(new ArrayList<Vacancy>());
+            vacancies = new PageImpl<>(new ArrayList<Vacancy>(), pageable, 0);
         }
 
         return vacancies;

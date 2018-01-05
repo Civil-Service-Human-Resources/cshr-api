@@ -1,19 +1,20 @@
 package uk.gov.cshr.vcm.repository;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import uk.gov.cshr.vcm.model.SearchParameters;
 import uk.gov.cshr.vcm.model.Vacancy;
-
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This class is responsible for providing custom dynamic JPA queries for working with Vacancies
@@ -52,6 +53,7 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom {
         selectQuery.setParameter(SEARCH_FROM_LONGITUDE_VALUE, searchParameters.getLongitude());
         selectQuery.setParameter(SEARCH_FROM_LATITUDE_VALUE, searchParameters.getLatitude());
         selectQuery.setParameter(DISTANCE, searchParameters.getRadius());
+
         countQuery.setParameter(SEARCH_FROM_LONGITUDE_VALUE, searchParameters.getLongitude());
         countQuery.setParameter(SEARCH_FROM_LATITUDE_VALUE, searchParameters.getLatitude());
         countQuery.setParameter(DISTANCE, searchParameters.getRadius());

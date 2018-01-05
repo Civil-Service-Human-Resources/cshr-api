@@ -12,5 +12,4 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories("uk.gov.cshr.vcm.repository")
 @EnableAutoConfiguration
 public class RepositoryTestConfiguration {
-
 }
