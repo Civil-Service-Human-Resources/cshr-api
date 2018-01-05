@@ -1,19 +1,19 @@
 package uk.gov.cshr.vcm.controller;
 
 import org.assertj.core.api.Assertions;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 import uk.gov.cshr.vcm.VcmApplication;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = VcmApplication.class)
 @ContextConfiguration
 @WebAppConfiguration
-public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
+public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -124,8 +124,8 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             .numberVacancies(2)
             .build();
 
-    @BeforeMethod
-    void setup() {
+    @Before
+    public void setup() {
 
         this.mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
@@ -322,7 +322,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
     }
 
-
     /**
      * Current search implementation is primitive, this test will evolve with time
      * @throws Exception
@@ -330,7 +329,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
     @Test
     public void testSearch() throws Exception {
         // Given
-        String path = "/vacancy/search/location/searchQueryLocation/keyword/search?page=0&size=1";
+        String path = "/vacancy/search/location/searchQueryLocation/keyword/search?page=0&size=1&sort=id";
 
         // When
         ResultActions sendRequest = mvc.perform(get(path));
