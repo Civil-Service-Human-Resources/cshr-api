@@ -11,7 +11,6 @@ import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -79,7 +78,7 @@ public class VacancyController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/search/location/{location}/keyword/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<Vacancy>> search(@PathVariable String location, @PathVariable String keyword, Pageable pageable) {
-        Page<Vacancy> vacancies = vacancyRepository.findByLocationContainsOrTitleContainsOrDescriptionContainsAllIgnoreCase(location, keyword, keyword, pageable);
+        Page<Vacancy> vacancies = vacancyRepository.findByLocationContainsAndTitleContainsOrLocationContainsAndDescriptionContainsAllIgnoreCase(location, keyword, keyword, pageable);
         return ResponseEntity.ok().body(vacancies);
     }
 }

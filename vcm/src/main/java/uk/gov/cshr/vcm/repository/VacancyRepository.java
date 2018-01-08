@@ -20,8 +20,9 @@ public interface VacancyRepository extends PagingAndSortingRepository<Vacancy, L
     /**
      * Entry point for search queries
      * Currently uses Postgres implementation
+     *
      * @param location user's input for the search on location
-     * @param keyword user's input for the search on keyword
+     * @param keyword  user's input for the search on keyword
      * @return List of found vacancies
      */
     @Query(value = "SELECT * FROM vacancies WHERE location ILIKE %:location% AND CONCAT(title, ' ', description) ILIKE %:keyword% ORDER BY ?#{#pageable}",
@@ -29,7 +30,5 @@ public interface VacancyRepository extends PagingAndSortingRepository<Vacancy, L
             nativeQuery = true)
     Page<Vacancy> search(@Param("location") String location, @Param("keyword") String keyword, Pageable pageable);
 
-    Page<Vacancy> findByLocationContainsOrTitleContainsOrDescriptionContainsAllIgnoreCase(String location,  String title, String description, Pageable pageable);
-
-
+    Page<Vacancy> findByLocationContainsAndTitleContainsOrLocationContainsAndDescriptionContainsAllIgnoreCase(String location, String title, String description, Pageable pageable);
 }
