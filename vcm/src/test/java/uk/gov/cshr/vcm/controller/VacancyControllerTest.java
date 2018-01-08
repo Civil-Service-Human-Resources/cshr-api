@@ -325,6 +325,10 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
     /**
      * Current search implementation is primitive, this test will evolve with time
+     *
+     * The test has to be disabled for now until the h2 in memory database has been replaced by a postgres docker instance.
+     * The query in use is not supported by h2 db.
+     *
      * @throws Exception if any unexpected error occurs
      */
     @Test(enabled = false)
