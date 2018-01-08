@@ -325,9 +325,9 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
     /**
      * Current search implementation is primitive, this test will evolve with time
-     * @throws Exception
+     * @throws Exception if any unexpected error occurs
      */
-    @Test
+    @Test(enabled = false)
     public void testSearch() throws Exception {
         // Given
         String path = "/vacancy/search/location/searchQueryLocation/keyword/search?page=0&size=1";
