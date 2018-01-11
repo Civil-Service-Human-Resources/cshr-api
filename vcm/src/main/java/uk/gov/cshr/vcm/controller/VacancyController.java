@@ -79,6 +79,14 @@ public class VacancyController {
     @RequestMapping(method = RequestMethod.GET, value = "/search/location/{location}/keyword/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<Vacancy>> search(@PathVariable String location, @PathVariable String keyword, Pageable pageable) {
         Page<Vacancy> vacancies = vacancyRepository.search(location, keyword, pageable);
+
+        return ResponseEntity.ok().body(vacancies);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/search/location/{location}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Page<Vacancy>> search(@PathVariable String location, Pageable pageable) {
+        Page<Vacancy> vacancies = vacancyRepository.search(location, pageable);
+
         return ResponseEntity.ok().body(vacancies);
     }
 }
