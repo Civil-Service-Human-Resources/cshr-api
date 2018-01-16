@@ -1,5 +1,7 @@
 package uk.gov.cshr.vcm.controller;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +17,8 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/vacancy", produces = MediaType.APPLICATION_JSON_VALUE)
+@ResponseBody
+@Api(value = "vacancyservice", description = "Operations pertaining to vacancies for jobs in Government")
 public class VacancyController {
 
     private final VacancyRepository vacancyRepository;
@@ -25,13 +29,14 @@ public class VacancyController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    @ResponseBody
+    @ApiOperation(value = "Find all vacancies with support for pagination", nickname = "findAll")
     public ResponseEntity<Page<Vacancy>> findAll(Pageable pageable) {
         Page<Vacancy> vacancies = vacancyRepository.findAll(pageable);
         return ResponseEntity.ok().body(vacancies);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{vacancyId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Find a specific vacancy", nickname = "findById")
     public ResponseEntity<Vacancy> findById(@PathVariable Long vacancyId) {
 
         Optional<Vacancy> foundVacancy = vacancyRepository.findById(vacancyId);
@@ -42,6 +47,7 @@ public class VacancyController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
+    @ApiOperation(value="create", nickname = "create")
     public ResponseEntity<Vacancy> create(@RequestBody Vacancy vacancy) {
 
         Vacancy savedVacancy = vacancyRepository.save(vacancy);
@@ -54,6 +60,7 @@ public class VacancyController {
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/{vacancyId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "update", nickname = "update")
     public ResponseEntity<Vacancy> update(@PathVariable Long vacancyId, @RequestBody Vacancy vacancyUpdate) {
 
         Optional<Vacancy> foundVacancy = vacancyRepository.findById(vacancyId);
@@ -69,6 +76,7 @@ public class VacancyController {
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/{vacancyId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value="delete", nickname = "delete")
     public ResponseEntity<Vacancy> deleteById(@PathVariable Long vacancyId) {
 
         vacancyRepository.delete(vacancyId);
@@ -77,6 +85,7 @@ public class VacancyController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/search/location/{location}/keyword/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Search for vacancies by location and keyword with support for pagination", nickname = "searchByLocationAndKeyword")
     public ResponseEntity<Page<Vacancy>> search(@PathVariable String location, @PathVariable String keyword, Pageable pageable) {
         Page<Vacancy> vacancies = vacancyRepository.search(location, keyword, pageable);
 
@@ -84,6 +93,7 @@ public class VacancyController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/search/location/{location}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Search for vacancies by location", nickname = "searchByLocation")
     public ResponseEntity<Page<Vacancy>> search(@PathVariable String location, Pageable pageable) {
         Page<Vacancy> vacancies = vacancyRepository.search(location, pageable);
 
