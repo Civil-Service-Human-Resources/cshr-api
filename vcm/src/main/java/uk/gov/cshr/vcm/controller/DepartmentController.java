@@ -75,6 +75,5 @@ public class DepartmentController {
 
         departmentRepository.delete(departmentId);
         return ResponseEntity.noContent().build();
-
     }
 }
