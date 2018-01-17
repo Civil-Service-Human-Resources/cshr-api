@@ -8,7 +8,7 @@ services:
     depends_on:
       - db
     environment:
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILE}
+      SPRING_PROFILES_ACTIVE:
 
   db:
     image: postgres:10
