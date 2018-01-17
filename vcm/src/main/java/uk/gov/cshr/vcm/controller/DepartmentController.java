@@ -26,13 +26,14 @@ public class DepartmentController {
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
-	@ApiOperation(value = "Find all departments")
+	@ApiOperation(value = "Find all departments", nickname = "findAll")
     public ResponseEntity<Page<Department>> findAll(Pageable pageable) {
         Page<Department> departments = departmentRepository.findAll(pageable);
         return ResponseEntity.ok().body(departments);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{departmentId}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value = "Find a specific department", nickname = "findById")
     public ResponseEntity<Department> findById(@PathVariable Long departmentId) {
 
         Optional<Department> foundDepartment = departmentRepository.findById(departmentId);
