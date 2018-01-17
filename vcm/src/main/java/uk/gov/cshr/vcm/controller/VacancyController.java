@@ -14,7 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.cshr.vcm.model.Vacancy;
+import uk.gov.cshr.vcm.model.VacancySearchParameters;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
+
+import java.net.URI;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/vacancy", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -43,6 +47,7 @@ public class VacancyController {
     public ResponseEntity<Vacancy> findById(@PathVariable Long vacancyId) {
 
         Optional<Vacancy> foundVacancy = vacancyRepository.findById(vacancyId);
+        System.out.print("Test");
 
 		if ( ! foundVacancy.isPresent() ) {
 			log.debug("No vancancy found for id " + vacancyId);
@@ -105,6 +110,14 @@ public class VacancyController {
     @ApiOperation(value = "Search for vacancies by location", nickname = "searchByLocation")
     public ResponseEntity<Page<Vacancy>> search(@PathVariable String location, Pageable pageable) {
         Page<Vacancy> vacancies = vacancyRepository.search(location, pageable);
+
+        return ResponseEntity.ok().body(vacancies);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Search for vacancies by location and keyword with support for pagination", nickname = "search")
+    public ResponseEntity<Page<Vacancy>> search(@ApiParam(name = "searchParameters", value = "The values supplied to perform the search with", required = true) @RequestBody VacancySearchParameters searchParameters, Pageable pageable) {
+        Page<Vacancy> vacancies = vacancyRepository.search(searchParameters, pageable);
 
         return ResponseEntity.ok().body(vacancies);
     }

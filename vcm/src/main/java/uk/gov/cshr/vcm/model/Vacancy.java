@@ -13,6 +13,7 @@ import java.io.Serializable;
 @Table(name = "vacancies")
 @SequenceGenerator(name = "vacancies_sequence", sequenceName = "vacancies_sequence", allocationSize = 1)
 public class Vacancy implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "vacancies_sequence")
@@ -63,4 +64,7 @@ public class Vacancy implements Serializable {
 
     private int numberVacancies;
 
+    @OneToOne
+    @JoinColumn(name = "dept_id")
+    private Department department;
 }
