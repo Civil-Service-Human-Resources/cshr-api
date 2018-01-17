@@ -41,6 +41,8 @@ public class VacancyController {
 
         Optional<Vacancy> foundVacancy = vacancyRepository.findById(vacancyId);
 
+        // test change
+
         ResponseEntity<Vacancy> notFound = ResponseEntity.notFound().build();
 
         return foundVacancy.map(vacancy -> ResponseEntity.ok().body(vacancy)).orElse(notFound);
