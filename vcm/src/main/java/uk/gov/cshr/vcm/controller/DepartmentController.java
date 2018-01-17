@@ -3,6 +3,8 @@ package uk.gov.cshr.vcm.controller;
 import io.swagger.annotations.ApiOperation;
 import java.net.URI;
 import java.util.Optional;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +18,8 @@ import uk.gov.cshr.vcm.repository.DepartmentRepository;
 @RestController
 @RequestMapping(value = "/department", produces = MediaType.APPLICATION_JSON_VALUE)
 public class DepartmentController {
+
+	private static final Logger log = LogManager.getLogger(DepartmentController.class);
 
     private final DepartmentRepository departmentRepository;
 
@@ -38,6 +42,10 @@ public class DepartmentController {
 
         Optional<Department> foundDepartment = departmentRepository.findById(departmentId);
 
+		if ( ! foundDepartment.isPresent() ) {
+			log.debug("No department found for id " + departmentId);
+		}
+
         ResponseEntity<Department> notFound = ResponseEntity.notFound().build();
 
         return foundDepartment.map(department -> ResponseEntity.ok().body(department)).orElse(notFound);
@@ -59,6 +67,10 @@ public class DepartmentController {
     public ResponseEntity<Department> update(@PathVariable Long departmentId, @RequestBody Department departmentUpdate) {
 
         Optional<Department> foundDepartment = departmentRepository.findById(departmentId);
+
+		if ( ! foundDepartment.isPresent() ) {
+			log.error("No department found for id " + departmentId);
+		}
 
         ResponseEntity<Department> notFound = ResponseEntity.notFound().build();
 

@@ -2,6 +2,10 @@ package uk.gov.cshr.vcm.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import java.net.URI;
+import java.util.Optional;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,14 +16,13 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
 
-import java.net.URI;
-import java.util.Optional;
-
 @RestController
 @RequestMapping(value = "/vacancy", produces = MediaType.APPLICATION_JSON_VALUE)
 @ResponseBody
 @Api(value = "vacancyservice", description = "Operations pertaining to vacancies for jobs in Government")
 public class VacancyController {
+
+	private static final Logger log = LogManager.getLogger(VacancyController.class);
 
     private final VacancyRepository vacancyRepository;
 
@@ -41,8 +44,10 @@ public class VacancyController {
 
         Optional<Vacancy> foundVacancy = vacancyRepository.findById(vacancyId);
 
+		if ( ! foundVacancy.isPresent() ) {
+			log.debug("No vancancy found for id " + vacancyId);
+		}
         ResponseEntity<Vacancy> notFound = ResponseEntity.notFound().build();
-
         return foundVacancy.map(vacancy -> ResponseEntity.ok().body(vacancy)).orElse(notFound);
     }
 
@@ -64,6 +69,10 @@ public class VacancyController {
     public ResponseEntity<Vacancy> update(@PathVariable Long vacancyId, @RequestBody Vacancy vacancyUpdate) {
 
         Optional<Vacancy> foundVacancy = vacancyRepository.findById(vacancyId);
+
+		if ( ! foundVacancy.isPresent() ) {
+			log.error("No vacancy found for id " + vacancyId);
+		}
 
         ResponseEntity<Vacancy> notFound = ResponseEntity.notFound().build();
 
