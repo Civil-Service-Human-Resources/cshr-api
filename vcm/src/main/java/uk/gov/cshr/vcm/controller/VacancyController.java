@@ -40,6 +40,7 @@ public class VacancyController {
     public ResponseEntity<Vacancy> findById(@PathVariable Long vacancyId) {
 
         Optional<Vacancy> foundVacancy = vacancyRepository.findById(vacancyId);
+        System.out.print("Test");
 
         ResponseEntity<Vacancy> notFound = ResponseEntity.notFound().build();
 
