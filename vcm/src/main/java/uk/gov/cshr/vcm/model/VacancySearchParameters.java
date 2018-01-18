@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 @Builder
 @Data
@@ -20,4 +21,13 @@ public class VacancySearchParameters implements Serializable {
     private String keyword;
     @ApiModelProperty(value = "id of one or more departments to search vacancies for")
     private String[] department;
+
+    @Override
+    public String toString() {
+        return "VacancySearchParameters{" +
+                "location='" + location + '\'' +
+                ", keyword='" + keyword + '\'' +
+                ", department=" + Arrays.toString(department) +
+                '}';
+    }
 }

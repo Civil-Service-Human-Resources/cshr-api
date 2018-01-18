@@ -65,7 +65,6 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom {
         }
 
         if (vacancySearchParameters.getDepartment() != null && vacancySearchParameters.getDepartment().length > 0) {
-            System.out.println("INSIDE DEPT BUILDER. " + StringUtils.arrayToCommaDelimitedString(vacancySearchParameters.getDepartment()));
             query.append(" AND dept_id in (");
 
             for (int i = 0; i < vacancySearchParameters.getDepartment().length; i++) {

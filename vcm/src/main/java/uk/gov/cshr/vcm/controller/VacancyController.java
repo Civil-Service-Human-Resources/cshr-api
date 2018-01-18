@@ -2,8 +2,7 @@ package uk.gov.cshr.vcm.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import java.net.URI;
-import java.util.Optional;
+import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,6 +99,7 @@ public class VacancyController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/search/location/{location}/keyword/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Search for vacancies by location and keyword with support for pagination", nickname = "searchByLocationAndKeyword")
+    @Deprecated
     public ResponseEntity<Page<Vacancy>> search(@PathVariable String location, @PathVariable String keyword, Pageable pageable) {
         Page<Vacancy> vacancies = vacancyRepository.search(location, keyword, pageable);
 
@@ -108,6 +108,7 @@ public class VacancyController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/search/location/{location}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Search for vacancies by location", nickname = "searchByLocation")
+    @Deprecated
     public ResponseEntity<Page<Vacancy>> search(@PathVariable String location, Pageable pageable) {
         Page<Vacancy> vacancies = vacancyRepository.search(location, pageable);
 
@@ -117,6 +118,8 @@ public class VacancyController {
     @RequestMapping(method = RequestMethod.POST, value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Search for vacancies by location and keyword with support for pagination", nickname = "search")
     public ResponseEntity<Page<Vacancy>> search(@ApiParam(name = "searchParameters", value = "The values supplied to perform the search with", required = true) @RequestBody VacancySearchParameters searchParameters, Pageable pageable) {
+        log.debug("Starting search with vacancySearchParameters: " + searchParameters.toString());
+
         Page<Vacancy> vacancies = vacancyRepository.search(searchParameters, pageable);
 
         return ResponseEntity.ok().body(vacancies);
