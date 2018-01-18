@@ -4,8 +4,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.net.URI;
 import java.util.Optional;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,7 +22,7 @@ import uk.gov.cshr.vcm.repository.VacancyRepository;
 @Api(value = "vacancyservice", description = "Operations pertaining to vacancies for jobs in Government")
 public class VacancyController {
 
-	private static final Logger log = LogManager.getLogger(VacancyController.class);
+	private static final Logger log = LoggerFactory.getLogger(VacancyController.class);
 
     private final VacancyRepository vacancyRepository;
 
