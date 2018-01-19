@@ -11,7 +11,7 @@ import uk.gov.cshr.vcm.model.Vacancy;
 import java.util.Optional;
 
 @Repository
-public interface VacancyRepository extends PagingAndSortingRepository<Vacancy, Long> {
+public interface VacancyRepository extends PagingAndSortingRepository<Vacancy, Long>, VacancyRepositoryCustom {
 
     default Optional<Vacancy> findById(Long id) {
         return Optional.ofNullable(this.findOne(id));

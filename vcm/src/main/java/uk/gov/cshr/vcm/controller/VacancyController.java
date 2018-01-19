@@ -2,6 +2,9 @@ package uk.gov.cshr.vcm.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.cshr.vcm.model.Vacancy;
+import uk.gov.cshr.vcm.model.VacancySearchParameters;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
 
 import java.net.URI;
@@ -20,6 +24,8 @@ import java.util.Optional;
 @ResponseBody
 @Api(value = "vacancyservice", description = "Operations pertaining to vacancies for jobs in Government")
 public class VacancyController {
+
+	private static final Logger log = LoggerFactory.getLogger(VacancyController.class);
 
     private final VacancyRepository vacancyRepository;
 
@@ -42,8 +48,10 @@ public class VacancyController {
         Optional<Vacancy> foundVacancy = vacancyRepository.findById(vacancyId);
         System.out.print("Test");
 
+		if ( ! foundVacancy.isPresent() ) {
+			log.debug("No vancancy found for id " + vacancyId);
+		}
         ResponseEntity<Vacancy> notFound = ResponseEntity.notFound().build();
-
         return foundVacancy.map(vacancy -> ResponseEntity.ok().body(vacancy)).orElse(notFound);
     }
 
@@ -66,6 +74,10 @@ public class VacancyController {
 
         Optional<Vacancy> foundVacancy = vacancyRepository.findById(vacancyId);
 
+		if ( ! foundVacancy.isPresent() ) {
+			log.error("No vacancy found for id " + vacancyId);
+		}
+
         ResponseEntity<Vacancy> notFound = ResponseEntity.notFound().build();
 
         return foundVacancy.map((Vacancy vacancy) -> {
@@ -87,6 +99,7 @@ public class VacancyController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/search/location/{location}/keyword/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Search for vacancies by location and keyword with support for pagination", nickname = "searchByLocationAndKeyword")
+    @Deprecated
     public ResponseEntity<Page<Vacancy>> search(@PathVariable String location, @PathVariable String keyword, Pageable pageable) {
         Page<Vacancy> vacancies = vacancyRepository.search(location, keyword, pageable);
 
@@ -95,8 +108,19 @@ public class VacancyController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/search/location/{location}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Search for vacancies by location", nickname = "searchByLocation")
+    @Deprecated
     public ResponseEntity<Page<Vacancy>> search(@PathVariable String location, Pageable pageable) {
         Page<Vacancy> vacancies = vacancyRepository.search(location, pageable);
+
+        return ResponseEntity.ok().body(vacancies);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Search for vacancies by location and keyword with support for pagination", nickname = "search")
+    public ResponseEntity<Page<Vacancy>> search(@ApiParam(name = "searchParameters", value = "The values supplied to perform the search with", required = true) @RequestBody VacancySearchParameters searchParameters, Pageable pageable) {
+        log.debug("Starting search with vacancySearchParameters: " + searchParameters.toString());
+
+        Page<Vacancy> vacancies = vacancyRepository.search(searchParameters, pageable);
 
         return ResponseEntity.ok().body(vacancies);
     }
