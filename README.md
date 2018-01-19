@@ -1,4 +1,4 @@
-#CSHR API
+# CSHR API
 
 ## Prerequisites
 
@@ -18,15 +18,15 @@ The api supports Spring Profiles. We have two profiles available 'dev' and 'prod
 
 To start the docker container from the command line, indicating the Spring Profile to use:
 
-###dev Spring profile
+### Setting the spring profile
 
-'SPRING_PROFILES_ACTIVE=dev docker-compose up api'
+`SPRING_PROFILES_ACTIVE=dev docker-compose up api`
 
 *Note: The 'dev' profile will give access to full Swagger capability such as the ability to use Swagger UI to try out the api.  This must not be allowed in any environment other than a development one.*
 
-###prod Spring Profile
+For production, pass in "prod".
 
-'SPRING_PROFILES_ACTIVE=prod docker-compose up api'
+`SPRING_PROFILES_ACTIVE=prod docker-compose up api`
 
 ## Stopping API
 
