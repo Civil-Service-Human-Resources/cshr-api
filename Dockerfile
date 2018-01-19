@@ -13,6 +13,6 @@ RUN mvn -f /usr/src/myapp/pom.xml clean package
 
 FROM frolvlad/alpine-oraclejdk8:slim
 
-COPY --from=build /usr/src/myapp/vcm/target/vcm-0.0.1.war /vcm-0.0.1.war
+COPY --from=build /usr/src/myapp/vcm/target/vcm-0.0.1.jar /vcm-0.0.1.jar
 
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/vcm-0.0.1.war"]
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/vcm-0.0.1.jar"]
