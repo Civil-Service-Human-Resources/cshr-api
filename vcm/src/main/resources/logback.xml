@@ -20,7 +20,7 @@
 		</layout>
 	</appender>
 
-<!--	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<File>logFile.log</File>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<FileNamePattern>
@@ -33,10 +33,10 @@
 				%d{HH:mm:ss,SSS} [%thread] %-5level %logger{32} - %msg%n
 			</Pattern>
 		</layout>
-	</appender>-->
+	</appender>
 
 	<root level="DEBUG">
-		<!--<appender-ref ref="FILE"/>-->-->
+		<appender-ref ref="FILE"/>
 		<appender-ref ref="STDOUT"/>
 	</root>
 
