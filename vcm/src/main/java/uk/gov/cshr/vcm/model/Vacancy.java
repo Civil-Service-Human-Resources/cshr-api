@@ -41,7 +41,7 @@ public class Vacancy implements Serializable {
     private @NonNull
     String workingHours;
 
-	@JsonFormat (shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.m")
+	@JsonFormat (shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ")
     private @NonNull
     Timestamp closingDate;
 
