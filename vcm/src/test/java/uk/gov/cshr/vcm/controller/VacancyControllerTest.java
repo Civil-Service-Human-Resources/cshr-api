@@ -3,7 +3,11 @@ package uk.gov.cshr.vcm.controller;
 import static java.lang.Math.toIntExact;
 import java.nio.charset.Charset;
 import java.sql.Timestamp;
-import java.util.Calendar;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.ZoneId;
+import java.util.Date;
 import javax.inject.Inject;
 import org.assertj.core.api.Assertions;
 import static org.hamcrest.Matchers.*;
@@ -45,6 +49,8 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
     private MockMvc mvc;
 
+	private static final SimpleDateFormat ISO_DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+
 	private static final Timestamp ONE_MONTHS_TIME_DATE = VacancyControllerTest.oneMonthsTime();
 
     final private MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
@@ -81,7 +87,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             "\"role\":\"" + requestBodyVacancy.getRole() + "\"," +
             "\"responsibilities\":\"" + requestBodyVacancy.getResponsibilities() + "\"," +
             "\"workingHours\":\"" + requestBodyVacancy.getWorkingHours() + "\"," +
-            "\"closingDate\":\"" + requestBodyVacancy.getClosingDate().toString() + "\"," +
+            "\"closingDate\":\"" +  ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate())  + "\"," +
             "\"contactName\":\"" + requestBodyVacancy.getContactName() + "\"," +
             "\"contactDepartment\":\"" + requestBodyVacancy.getContactDepartment() + "\"," +
             "\"contactEmail\":\"" + requestBodyVacancy.getContactEmail() + "\"," +
@@ -180,7 +186,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[0].role", is(this.vacancy1.getRole())))
                 .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy1.getResponsibilities())))
                 .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy1.getWorkingHours())))
-                .andExpect(jsonPath("$.content[0].closingDate", is(this.vacancy1.getClosingDate().toString())))
+                .andExpect(jsonPath("$.content[0].closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
                 .andExpect(jsonPath("$.content[0].contactName", is(this.vacancy1.getContactName())))
                 .andExpect(jsonPath("$.content[0].contactDepartment", is(this.vacancy1.getContactDepartment())))
                 .andExpect(jsonPath("$.content[0].contactEmail", is(this.vacancy1.getContactEmail())))
@@ -196,7 +202,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[1].role", is(this.vacancy2.getRole())))
                 .andExpect(jsonPath("$.content[1].responsibilities", is(this.vacancy2.getResponsibilities())))
                 .andExpect(jsonPath("$.content[1].workingHours", is(this.vacancy2.getWorkingHours())))
-                .andExpect(jsonPath("$.content[1].closingDate", is(this.vacancy2.getClosingDate().toString())))
+                .andExpect(jsonPath("$.content[1].closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
                 .andExpect(jsonPath("$.content[1].contactName", is(this.vacancy2.getContactName())))
                 .andExpect(jsonPath("$.content[1].contactDepartment", is(this.vacancy2.getContactDepartment())))
                 .andExpect(jsonPath("$.content[1].contactEmail", is(this.vacancy2.getContactEmail())))
@@ -226,7 +232,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.role", is(this.vacancy1.getRole())))
                 .andExpect(jsonPath("$.responsibilities", is(this.vacancy1.getResponsibilities())))
                 .andExpect(jsonPath("$.workingHours", is(this.vacancy1.getWorkingHours())))
-                .andExpect(jsonPath("$.closingDate", is(this.vacancy1.getClosingDate().toString())))
+                .andExpect(jsonPath("$.closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
                 .andExpect(jsonPath("$.contactName", is(this.vacancy1.getContactName())))
                 .andExpect(jsonPath("$.contactDepartment", is(this.vacancy1.getContactDepartment())))
                 .andExpect(jsonPath("$.contactEmail", is(this.vacancy1.getContactEmail())))
@@ -295,7 +301,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.role", is(this.requestBodyVacancy.getRole())))
                 .andExpect(jsonPath("$.responsibilities", is(this.requestBodyVacancy.getResponsibilities())))
                 .andExpect(jsonPath("$.workingHours", is(this.requestBodyVacancy.getWorkingHours())))
-                .andExpect(jsonPath("$.closingDate", is(this.requestBodyVacancy.getClosingDate().toString())))
+                .andExpect(jsonPath("$.closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
                 .andExpect(jsonPath("$.contactName", is(this.requestBodyVacancy.getContactName())))
                 .andExpect(jsonPath("$.contactDepartment", is(this.requestBodyVacancy.getContactDepartment())))
                 .andExpect(jsonPath("$.contactEmail", is(this.requestBodyVacancy.getContactEmail())))
@@ -372,7 +378,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[0].role", is(this.vacancy1.getRole())))
                 .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy1.getResponsibilities())))
                 .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy1.getWorkingHours())))
-                .andExpect(jsonPath("$.content[0].closingDate", is(this.vacancy1.getClosingDate())))
+                .andExpect(jsonPath("$.closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
                 .andExpect(jsonPath("$.content[0].contactName", is(this.vacancy1.getContactName())))
                 .andExpect(jsonPath("$.content[0].contactDepartment", is(this.vacancy1.getContactDepartment())))
                 .andExpect(jsonPath("$.content[0].contactEmail", is(this.vacancy1.getContactEmail())))
@@ -450,7 +456,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[0].role", is(this.vacancy1.getRole())))
                 .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy1.getResponsibilities())))
                 .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy1.getWorkingHours())))
-                .andExpect(jsonPath("$.content[0].closingDate", is(this.vacancy1.getClosingDate())))
+                .andExpect(jsonPath("$.closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
                 .andExpect(jsonPath("$.content[0].contactName", is(this.vacancy1.getContactName())))
                 .andExpect(jsonPath("$.content[0].contactDepartment", is(this.vacancy1.getContactDepartment())))
                 .andExpect(jsonPath("$.content[0].contactEmail", is(this.vacancy1.getContactEmail())))
@@ -521,7 +527,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[0].role", is(this.vacancy1.getRole())))
                 .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy1.getResponsibilities())))
                 .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy1.getWorkingHours())))
-                .andExpect(jsonPath("$.content[0].closingDate", is(this.vacancy1.getClosingDate())))
+                .andExpect(jsonPath("$.closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
                 .andExpect(jsonPath("$.content[0].contactName", is(this.vacancy1.getContactName())))
                 .andExpect(jsonPath("$.content[0].contactDepartment", is(this.vacancy1.getContactDepartment())))
                 .andExpect(jsonPath("$.content[0].contactEmail", is(this.vacancy1.getContactEmail())))
@@ -556,7 +562,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[0].role", is(this.vacancy1.getRole())))
                 .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy1.getResponsibilities())))
                 .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy1.getWorkingHours())))
-                .andExpect(jsonPath("$.content[0].closingDate", is(this.vacancy1.getClosingDate())))
+                .andExpect(jsonPath("$.closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
                 .andExpect(jsonPath("$.content[0].contactName", is(this.vacancy1.getContactName())))
                 .andExpect(jsonPath("$.content[0].contactDepartment", is(this.vacancy1.getContactDepartment())))
                 .andExpect(jsonPath("$.content[0].contactEmail", is(this.vacancy1.getContactEmail())))
@@ -591,7 +597,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[0].role", is(this.vacancy1.getRole())))
                 .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy1.getResponsibilities())))
                 .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy1.getWorkingHours())))
-                .andExpect(jsonPath("$.content[0].closingDate", is(this.vacancy1.getClosingDate())))
+                .andExpect(jsonPath("$.closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
                 .andExpect(jsonPath("$.content[0].contactName", is(this.vacancy1.getContactName())))
                 .andExpect(jsonPath("$.content[0].contactDepartment", is(this.vacancy1.getContactDepartment())))
                 .andExpect(jsonPath("$.content[0].contactEmail", is(this.vacancy1.getContactEmail())))
@@ -688,12 +694,9 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
     }
 
 	private static Timestamp oneMonthsTime() {
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.MONTH, 1);
-		cal.set(Calendar.HOUR, 0);
-		cal.set(Calendar.MINUTE, 0);
-		cal.set(Calendar.SECOND, 0);
-		cal.set(Calendar.MILLISECOND, 0);
-		return new Timestamp(cal.getTimeInMillis());
+
+		LocalDate localDate = LocalDate.of(2018, Month.JANUARY, 22);
+		Date date = Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+		return new Timestamp(date.getTime());
 	}
 }
