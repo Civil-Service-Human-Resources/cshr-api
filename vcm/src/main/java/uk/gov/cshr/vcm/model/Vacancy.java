@@ -1,9 +1,10 @@
 package uk.gov.cshr.vcm.model;
 
-import lombok.*;
-
-import javax.persistence.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
+import java.sql.Timestamp;
+import javax.persistence.*;
+import lombok.*;
 
 @Entity
 @Builder
@@ -40,8 +41,9 @@ public class Vacancy implements Serializable {
     private @NonNull
     String workingHours;
 
+	@JsonFormat (shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ")
     private @NonNull
-    String closingDate;
+    Timestamp closingDate;
 
     private @NonNull
     String contactName;
