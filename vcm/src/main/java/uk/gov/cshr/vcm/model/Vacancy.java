@@ -66,7 +66,7 @@ public class Vacancy implements Serializable {
 
     private int numberVacancies;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "dept_id")
     private Department department;
 }
