@@ -1,17 +1,6 @@
 package uk.gov.cshr.vcm.controller;
 
-import static java.lang.Math.toIntExact;
-import java.nio.charset.Charset;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-import javax.inject.Inject;
 import org.assertj.core.api.Assertions;
-import static org.hamcrest.Matchers.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,8 +10,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.testng.annotations.AfterMethod;
@@ -33,6 +20,22 @@ import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
+
+import javax.inject.Inject;
+import java.nio.charset.Charset;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
+import static java.lang.Math.toIntExact;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = VcmApplication.class)
 @ContextConfiguration
@@ -87,7 +90,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             "\"role\":\"" + requestBodyVacancy.getRole() + "\"," +
             "\"responsibilities\":\"" + requestBodyVacancy.getResponsibilities() + "\"," +
             "\"workingHours\":\"" + requestBodyVacancy.getWorkingHours() + "\"," +
-            "\"closingDate\":\"" +  ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate())  + "\"," +
+            "\"closingDate\":\"" + ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()) + "\"," +
             "\"contactName\":\"" + requestBodyVacancy.getContactName() + "\"," +
             "\"contactDepartment\":\"" + requestBodyVacancy.getContactDepartment() + "\"," +
             "\"contactEmail\":\"" + requestBodyVacancy.getContactEmail() + "\"," +
@@ -389,7 +392,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
     /**
      * Current search implementation is primitive, this test will evolve with time
-     *
+     * <p>
      * The test has to be disabled for now until the h2 in memory database has been replaced by a postgres docker instance.
      * The query in use is not supported by h2 db.
      *
@@ -501,8 +504,8 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[0].salaryMin", is(this.vacancy1.getSalaryMin())))
                 .andExpect(jsonPath("$.content[0].salaryMax", is(this.vacancy1.getSalaryMax())))
                 .andExpect(jsonPath("$.content[0].numberVacancies", is(this.vacancy1.getNumberVacancies())))
-                .andExpect(jsonPath("$.content[0].department.id", is (this.vacancy1.getDepartment().getId())))
-                .andExpect(jsonPath("$.content[0].department.name", is (this.vacancy1.getDepartment().getName())));
+                .andExpect(jsonPath("$.content[0].department.id", is(this.vacancy1.getDepartment().getId())))
+                .andExpect(jsonPath("$.content[0].department.name", is(this.vacancy1.getDepartment().getName())));
     }
 
     @Test(enabled = false)
@@ -572,8 +575,8 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[0].salaryMin", is(this.vacancy1.getSalaryMin())))
                 .andExpect(jsonPath("$.content[0].salaryMax", is(this.vacancy1.getSalaryMax())))
                 .andExpect(jsonPath("$.content[0].numberVacancies", is(this.vacancy1.getNumberVacancies())))
-                .andExpect(jsonPath("$.content[0].department.id", is (this.vacancy1.getDepartment().getId())))
-                .andExpect(jsonPath("$.content[0].department.name", is (this.vacancy1.getDepartment().getName())));
+                .andExpect(jsonPath("$.content[0].department.id", is(this.vacancy1.getDepartment().getId())))
+                .andExpect(jsonPath("$.content[0].department.name", is(this.vacancy1.getDepartment().getName())));
     }
 
     @Test(enabled = false)
@@ -607,8 +610,8 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[0].salaryMin", is(this.vacancy1.getSalaryMin())))
                 .andExpect(jsonPath("$.content[0].salaryMax", is(this.vacancy1.getSalaryMax())))
                 .andExpect(jsonPath("$.content[0].numberVacancies", is(this.vacancy1.getNumberVacancies())))
-                .andExpect(jsonPath("$.content[0].department.id", is (this.vacancy1.getDepartment().getId())))
-                .andExpect(jsonPath("$.content[0].department.name", is (this.vacancy1.getDepartment().getName())));
+                .andExpect(jsonPath("$.content[0].department.id", is(this.vacancy1.getDepartment().getId())))
+                .andExpect(jsonPath("$.content[0].department.name", is(this.vacancy1.getDepartment().getName())));
     }
 
     @Test(enabled = false)
@@ -642,8 +645,8 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[0].salaryMin", is(this.vacancy1.getSalaryMin())))
                 .andExpect(jsonPath("$.content[0].salaryMax", is(this.vacancy1.getSalaryMax())))
                 .andExpect(jsonPath("$.content[0].numberVacancies", is(this.vacancy1.getNumberVacancies())))
-                .andExpect(jsonPath("$.content[0].department.id", is (this.vacancy1.getDepartment().getId())))
-                .andExpect(jsonPath("$.content[0].department.name", is (this.vacancy1.getDepartment().getName())))
+                .andExpect(jsonPath("$.content[0].department.id", is(this.vacancy1.getDepartment().getId())))
+                .andExpect(jsonPath("$.content[0].department.name", is(this.vacancy1.getDepartment().getName())))
                 .andExpect(jsonPath("$.content[1].id", is(toIntExact(this.vacancy2.getId()))))
                 .andExpect(jsonPath("$.content[1].description", is(this.vacancy2.getDescription())))
                 .andExpect(jsonPath("$.content[1].location", is(this.vacancy2.getLocation())))
@@ -660,8 +663,8 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[1].salaryMin", is(this.vacancy2.getSalaryMin())))
                 .andExpect(jsonPath("$.content[1].salaryMax", is(this.vacancy2.getSalaryMax())))
                 .andExpect(jsonPath("$.content[1].numberVacancies", is(this.vacancy2.getNumberVacancies())))
-                .andExpect(jsonPath("$.content[1].department.id", is (this.vacancy2.getDepartment().getId())))
-                .andExpect(jsonPath("$.content[1].department.name", is (this.vacancy2.getDepartment().getName())));
+                .andExpect(jsonPath("$.content[1].department.id", is(this.vacancy2.getDepartment().getId())))
+                .andExpect(jsonPath("$.content[1].department.name", is(this.vacancy2.getDepartment().getName())));
     }
 
     @Test(enabled = false)
@@ -710,8 +713,8 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[0].salaryMin", is(this.vacancy1.getSalaryMin())))
                 .andExpect(jsonPath("$.content[0].salaryMax", is(this.vacancy1.getSalaryMax())))
                 .andExpect(jsonPath("$.content[0].numberVacancies", is(this.vacancy1.getNumberVacancies())))
-                .andExpect(jsonPath("$.content[0].department.id", is (this.vacancy1.getDepartment().getId())))
-                .andExpect(jsonPath("$.content[0].department.name", is (this.vacancy1.getDepartment().getName())));
+                .andExpect(jsonPath("$.content[0].department.id", is(this.vacancy1.getDepartment().getId())))
+                .andExpect(jsonPath("$.content[0].department.name", is(this.vacancy1.getDepartment().getName())));
     }
 
     @Test(enabled = false)
@@ -729,13 +732,13 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.totalElements", is(0)));
     }
 
-	private static Timestamp getTime(int numberOfDaysFromNow) {
+    private static Timestamp getTime(int numberOfDaysFromNow) {
         Date date = Date.from(LocalDateTime.now().plusDays(numberOfDaysFromNow).atZone(ZoneId.systemDefault()).toInstant());
 
         return new Timestamp(date.getTime());
     }
 
-	@Test(enabled = false)
+    @Test(enabled = false)
     public void search_onlyInternalSearchesAllowed() throws Exception {
         doClosedPublicSearchTests(TEN_DAYS_AGO, 10, 1);
     }
@@ -848,8 +851,8 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[0].salaryMin", is(this.vacancy3.getSalaryMin())))
                 .andExpect(jsonPath("$.content[0].salaryMax", is(this.vacancy3.getSalaryMax())))
                 .andExpect(jsonPath("$.content[0].numberVacancies", is(this.vacancy3.getNumberVacancies())))
-                .andExpect(jsonPath("$.content[0].department.id", is (this.vacancy3.getDepartment().getId())))
-                .andExpect(jsonPath("$.content[0].department.name", is (this.vacancy3.getDepartment().getName())));
+                .andExpect(jsonPath("$.content[0].department.id", is(this.vacancy3.getDepartment().getId())))
+                .andExpect(jsonPath("$.content[0].department.name", is(this.vacancy3.getDepartment().getName())));
     }
 
     @Test(enabled = false)

@@ -1,9 +1,6 @@
 package uk.gov.cshr.vcm.controller;
 
-import static java.lang.Math.toIntExact;
-import java.nio.charset.Charset;
 import org.assertj.core.api.Assertions;
-import static org.hamcrest.Matchers.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -13,8 +10,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.testng.annotations.BeforeMethod;
@@ -22,6 +17,14 @@ import org.testng.annotations.Test;
 import uk.gov.cshr.vcm.VcmApplication;
 import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
+
+import java.nio.charset.Charset;
+
+import static java.lang.Math.toIntExact;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = VcmApplication.class)
 @ContextConfiguration
@@ -44,7 +47,6 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
     private Department requestBodyDepartment = Department.builder()
             .name("department name")
             .build();
-
 
 
     private String requestBody = "{" +
@@ -104,9 +106,9 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
         // When
         ResultActions sendRequest = mvc.perform(get(path));
 
-		MvcResult mvcResult = sendRequest.andReturn();
+        MvcResult mvcResult = sendRequest.andReturn();
 
-		System.out.println(mvcResult.getResponse().getContentAsString());
+        System.out.println(mvcResult.getResponse().getContentAsString());
 
         // Then
         sendRequest
@@ -207,7 +209,7 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
 
     @Test
     public void testFindAllPaginated() throws Exception {
-		
+
         // Given
         String path = "/department/?page=0&size=1";
 

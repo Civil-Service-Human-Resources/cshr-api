@@ -1,10 +1,23 @@
 package uk.gov.cshr.vcm.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.sql.Timestamp;
-import javax.persistence.*;
-import lombok.*;
 
 @Entity
 @Builder
@@ -41,7 +54,7 @@ public class Vacancy implements Serializable {
     @NonNull
     private String workingHours;
 
-	@JsonFormat (shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
     @NonNull
     private Timestamp closingDate;
 
@@ -60,16 +73,16 @@ public class Vacancy implements Serializable {
     @NonNull
     private String eligibility;
 
-    @JsonFormat (shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-    @Column(name="government_opening_date")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+    @Column(name = "government_opening_date")
     private Timestamp governmentOpeningDate;
 
-    @JsonFormat (shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-    @Column(name="internal_opening_date")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+    @Column(name = "internal_opening_date")
     private Timestamp internalOpeningDate;
 
-    @JsonFormat (shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-    @Column(name="public_opening_date")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+    @Column(name = "public_opening_date")
     private Timestamp publicOpeningDate;
 
     private int salaryMin;
