@@ -3,7 +3,11 @@ package uk.gov.cshr.vcm.model;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -12,7 +16,7 @@ import java.util.Arrays;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ApiModel(value="VacancySearchParameters", description="The parameters allowed for when searching for vacancies")
+@ApiModel(value = "VacancySearchParameters", description = "The parameters allowed for when searching for vacancies")
 public class VacancySearchParameters implements Serializable {
     @ApiModelProperty(value = "location of the vacancy", required = true)
     @NonNull

@@ -1,11 +1,10 @@
 package model;
 
+import org.junit.Test;
+import uk.gov.cshr.vcm.model.VacancySearchParameters;
+
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-
-import org.junit.Test;
-
-import uk.gov.cshr.vcm.model.VacancySearchParameters;
 
 /**
  * Tests {@link VacancySearchParameters}

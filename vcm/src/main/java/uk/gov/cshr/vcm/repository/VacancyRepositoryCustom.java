@@ -16,7 +16,7 @@ public interface VacancyRepositoryCustom {
      *
      * @param vacancySearchParameters parameters and values supplied for conducting a search
      * @param pageable                Information supplied that dictate the pagination options available
-     * @return Page<Vacancy> contains the results returned from the search query and data about pagination, such as total number results and number of results returned.
+     * @return Page<Vacancy> a page of vacancies that match the given search parameters and for which the maximum number of elements in the page is specified in Pageable.getPageSize()
      */
     Page<Vacancy> search(VacancySearchParameters vacancySearchParameters, Pageable pageable);
 }

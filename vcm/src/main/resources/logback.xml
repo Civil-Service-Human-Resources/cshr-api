@@ -45,4 +45,7 @@
 		<appender-ref ref="CONTROLLER_LOGGER" />
 	</logger>
 
+	<logger name="ch.qos.logback" level="ERROR" additivity="false">
+		<appender-ref ref="CONTROLLER_LOGGER" />
+	</logger>
 </configuration>

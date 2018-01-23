@@ -10,7 +10,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
@@ -25,7 +30,7 @@ import java.util.Optional;
 @Api(value = "vacancyservice", description = "Operations pertaining to vacancies for jobs in Government")
 public class VacancyController {
 
-	private static final Logger log = LoggerFactory.getLogger(VacancyController.class);
+    private static final Logger log = LoggerFactory.getLogger(VacancyController.class);
 
     private final VacancyRepository vacancyRepository;
 
@@ -48,15 +53,15 @@ public class VacancyController {
         Optional<Vacancy> foundVacancy = vacancyRepository.findById(vacancyId);
         System.out.print("Test");
 
-		if ( ! foundVacancy.isPresent() ) {
-			log.debug("No vancancy found for id " + vacancyId);
-		}
+        if (!foundVacancy.isPresent()) {
+            log.debug("No vancancy found for id " + vacancyId);
+        }
         ResponseEntity<Vacancy> notFound = ResponseEntity.notFound().build();
         return foundVacancy.map(vacancy -> ResponseEntity.ok().body(vacancy)).orElse(notFound);
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    @ApiOperation(value="create", nickname = "create")
+    @ApiOperation(value = "create", nickname = "create")
     public ResponseEntity<Vacancy> create(@RequestBody Vacancy vacancy) {
 
         Vacancy savedVacancy = vacancyRepository.save(vacancy);
@@ -74,9 +79,9 @@ public class VacancyController {
 
         Optional<Vacancy> foundVacancy = vacancyRepository.findById(vacancyId);
 
-		if ( ! foundVacancy.isPresent() ) {
-			log.error("No vacancy found for id " + vacancyId);
-		}
+        if (!foundVacancy.isPresent()) {
+            log.error("No vacancy found for id " + vacancyId);
+        }
 
         ResponseEntity<Vacancy> notFound = ResponseEntity.notFound().build();
 
@@ -89,7 +94,7 @@ public class VacancyController {
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/{vacancyId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value="delete", nickname = "delete")
+    @ApiOperation(value = "delete", nickname = "delete")
     public ResponseEntity<Vacancy> deleteById(@PathVariable Long vacancyId) {
 
         vacancyRepository.delete(vacancyId);

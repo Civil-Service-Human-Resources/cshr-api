@@ -1,8 +1,6 @@
 package uk.gov.cshr.vcm.controller;
 
 import io.swagger.annotations.ApiOperation;
-import java.net.URI;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,16 +8,24 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
+
+import java.net.URI;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/department", produces = MediaType.APPLICATION_JSON_VALUE)
 public class DepartmentController {
 
-	private static final Logger log = LoggerFactory.getLogger(DepartmentController.class);
+    private static final Logger log = LoggerFactory.getLogger(DepartmentController.class);
 
     private final DepartmentRepository departmentRepository;
 
@@ -30,21 +36,21 @@ public class DepartmentController {
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
-	@ApiOperation(value = "Find all departments", nickname = "findAll")
+    @ApiOperation(value = "Find all departments", nickname = "findAll")
     public ResponseEntity<Page<Department>> findAll(Pageable pageable) {
         Page<Department> departments = departmentRepository.findAll(pageable);
         return ResponseEntity.ok().body(departments);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{departmentId}", produces = MediaType.APPLICATION_JSON_VALUE)
-	@ApiOperation(value = "Find a specific department", nickname = "findById")
+    @ApiOperation(value = "Find a specific department", nickname = "findById")
     public ResponseEntity<Department> findById(@PathVariable Long departmentId) {
 
         Optional<Department> foundDepartment = departmentRepository.findById(departmentId);
 
-		if ( ! foundDepartment.isPresent() ) {
-			log.debug("No department found for id " + departmentId);
-		}
+        if (!foundDepartment.isPresent()) {
+            log.debug("No department found for id " + departmentId);
+        }
 
         ResponseEntity<Department> notFound = ResponseEntity.notFound().build();
 
@@ -68,9 +74,9 @@ public class DepartmentController {
 
         Optional<Department> foundDepartment = departmentRepository.findById(departmentId);
 
-		if ( ! foundDepartment.isPresent() ) {
-			log.error("No department found for id " + departmentId);
-		}
+        if (!foundDepartment.isPresent()) {
+            log.error("No department found for id " + departmentId);
+        }
 
         ResponseEntity<Department> notFound = ResponseEntity.notFound().build();
 

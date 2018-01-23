@@ -11,6 +11,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.math.BigInteger;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -25,6 +27,15 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom {
     @PersistenceContext
     private EntityManager em;
 
+    /**
+     * This method is responsible for building and executing a query to search for vacancies based on given search parameters.
+     * <p>
+     * If a vacancy has no value for Vacancy.publicOpeningDate this is treated as the vacancy is not open to the public.
+     *
+     * @param vacancySearchParameters parameters and values supplied for conducting a search
+     * @param pageable                Information supplied that dictate the pagination options available
+     * @return Page<Vacancy> a page of vacancies that match the given search parameters and for which the maximum number of elements in the page is specified in Pageable.getPageSize()
+     */
     @Override
     public Page<Vacancy> search(VacancySearchParameters vacancySearchParameters, Pageable pageable) {
         Query selectQuery = em.createNativeQuery(buildQuery("SELECT *", vacancySearchParameters), Vacancy.class);
@@ -32,6 +43,10 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom {
 
         selectQuery.setParameter(LOCATION, WILDCARD + vacancySearchParameters.getLocation() + WILDCARD);
         countQuery.setParameter(LOCATION, WILDCARD + vacancySearchParameters.getLocation() + WILDCARD);
+
+        Timestamp now = Timestamp.valueOf(LocalDateTime.now());
+        selectQuery.setParameter("now", now);
+        countQuery.setParameter("now", now);
 
         if (!StringUtils.isEmpty(vacancySearchParameters.getKeyword())) {
             selectQuery.setParameter(KEYWORD, WILDCARD + vacancySearchParameters.getKeyword() + WILDCARD);
@@ -42,7 +57,7 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom {
             for (int i = 0; i < vacancySearchParameters.getDepartment().length; i++) {
                 int deptId = Integer.valueOf(vacancySearchParameters.getDepartment()[i]);
                 selectQuery.setParameter(DEPT + i, deptId);
-                countQuery.setParameter(DEPT + i,  deptId);
+                countQuery.setParameter(DEPT + i, deptId);
             }
         }
 
@@ -59,6 +74,7 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom {
         StringBuilder query = new StringBuilder(selectClause);
 
         query.append(" FROM vacancies WHERE location ILIKE :location");
+        query.append(" AND public_opening_date is not null and public_opening_date <= :now");
 
         if (!StringUtils.isEmpty(vacancySearchParameters.getKeyword())) {
             query.append(" AND CONCAT(title, ' ', description) ILIKE :keyword");
