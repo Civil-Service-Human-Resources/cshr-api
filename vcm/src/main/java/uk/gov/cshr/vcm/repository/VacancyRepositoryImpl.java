@@ -15,6 +15,7 @@ import javax.persistence.Query;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -81,9 +82,9 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom {
 
         selectQuery.setFirstResult(pageable.getOffset()).setMaxResults(pageable.getPageSize());
 
-        List<Vacancy> vacancies = selectQuery.getResultList();
-
         BigInteger total = (BigInteger) countQuery.getSingleResult();
+
+        List<Vacancy> vacancies = total.compareTo(BigInteger.ZERO) > 0 ? selectQuery.getResultList() : new ArrayList<>();
 
         return new PageImpl<>(vacancies, pageable, total.longValueExact());
     }
