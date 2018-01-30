@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,11 +18,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import uk.gov.cshr.vcm.model.Coordinates;
+import uk.gov.cshr.vcm.model.SearchParameters;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
+import uk.gov.cshr.vcm.service.LocationService;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Optional;
 
 @RestController
@@ -122,11 +127,27 @@ public class VacancyController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Search for vacancies by location and keyword with support for pagination", nickname = "search")
-    public ResponseEntity<Page<Vacancy>> search(@ApiParam(name = "searchParameters", value = "The values supplied to perform the search with", required = true) @RequestBody VacancySearchParameters searchParameters, Pageable pageable) {
-        log.debug("Starting search with vacancySearchParameters: " + searchParameters.toString());
+    public ResponseEntity<Page<Vacancy>> search(@ApiParam(name = "searchParameters", value = "The values supplied to perform the search with", required = true) @RequestBody VacancySearchParameters vacancySearchParameters, Pageable pageable) {
+        log.debug("Starting search with vacancySearchParameters: " + vacancySearchParameters.toString());
 
-        Page<Vacancy> vacancies = vacancyRepository.search(searchParameters, pageable);
+        Coordinates coordinates = new LocationService().find(vacancySearchParameters.getLocation().getPlace());
+
+        Page<Vacancy> vacancies;
+
+        if (coordinatesExist(coordinates)) {
+            SearchParameters searchParameters = SearchParameters.builder()
+                    .vacancySearchParameters(vacancySearchParameters)
+                    .coordinates(coordinates)
+                    .build();
+            vacancies = vacancyRepository.search(searchParameters, pageable);
+        } else {
+            vacancies = new PageImpl<>(new ArrayList<Vacancy>());
+        }
 
         return ResponseEntity.ok().body(vacancies);
+    }
+
+    private boolean coordinatesExist(Coordinates coordinates) {
+        return coordinates != null && coordinates.getLatitude() != null && coordinates.getLongitude() != null;
     }
 }

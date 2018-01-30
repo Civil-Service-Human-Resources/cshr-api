@@ -46,9 +46,6 @@ public class Vacancy implements Serializable {
     private String grade;
 
     @NonNull
-    private String role;
-
-    @NonNull
     private String responsibilities;
 
     @NonNull
@@ -91,6 +88,15 @@ public class Vacancy implements Serializable {
 
     private int numberVacancies;
 
+    /**
+     * If a vacancy has no longitude ensure it is null not 0 (zero) since 0 is a valid point in latitude
+     */
+    private Double longitude;
+
+    /**
+     * If a vacancy has no latitude ensure it is null not 0 (zero) since 0 is a valid point in latitude
+     */
+    private Double latitude;
     @ManyToOne
     @JoinColumn(name = "dept_id")
     private Department department;

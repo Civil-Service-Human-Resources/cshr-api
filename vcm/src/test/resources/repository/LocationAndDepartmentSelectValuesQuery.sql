@@ -1,0 +1,1 @@
+SELECT * FROM vacancies WHERE public_opening_date IS NOT NULL AND public_opening_date <= :now AND (point(:searchFromLongitudeValue, :searchFromLatitudeValue) <@> point(longitude, latitude)) < :distance AND dept_id in (:dept0,:dept1)
