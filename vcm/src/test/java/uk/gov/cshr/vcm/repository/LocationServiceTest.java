@@ -13,7 +13,7 @@ import static org.hamcrest.Matchers.nullValue;
 public class LocationServiceTest {
     private LocationService service;
 
-    @Before
+    /*@Before
     public void setup() {
         service = new LocationService();
     }
@@ -36,5 +36,5 @@ public class LocationServiceTest {
     @Test
     public void find_resultsExpected() {
         assertThat(service.find("bristol"), is(notNullValue()));
-    }
+    }*/
 }

@@ -43,6 +43,7 @@
     <!-- Specific logging for package  uk.gov.cshr.vcm.controller -->
 	<logger name="uk.gov.cshr.vcm.controller" level="DEBUG" additivity="FALSE">
 		<appender-ref ref="CONTROLLER_LOGGER" />
+		<appender-ref ref="FILE" />
 	</logger>
 
 	<logger name="ch.qos.logback" level="ERROR" additivity="false">

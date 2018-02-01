@@ -19,12 +19,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.cshr.vcm.model.Coordinates;
+import uk.gov.cshr.vcm.model.Location;
 import uk.gov.cshr.vcm.model.SearchParameters;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
 import uk.gov.cshr.vcm.service.LocationService;
 
+import javax.inject.Inject;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -34,8 +36,10 @@ import java.util.Optional;
 @ResponseBody
 @Api(value = "vacancyservice", description = "Operations pertaining to vacancies for jobs in Government")
 public class VacancyController {
-
     private static final Logger log = LoggerFactory.getLogger(VacancyController.class);
+
+    @Inject
+    private LocationService locationService;
 
     private final VacancyRepository vacancyRepository;
 
@@ -130,17 +134,19 @@ public class VacancyController {
     public ResponseEntity<Page<Vacancy>> search(@ApiParam(name = "searchParameters", value = "The values supplied to perform the search with", required = true) @RequestBody VacancySearchParameters vacancySearchParameters, Pageable pageable) {
         log.debug("Starting search with vacancySearchParameters: " + vacancySearchParameters.toString());
 
-        Coordinates coordinates = new LocationService().find(vacancySearchParameters.getLocation().getPlace());
+        Coordinates coordinates = locationService.find(vacancySearchParameters.getLocation().getPlace());
 
         Page<Vacancy> vacancies;
 
         if (coordinatesExist(coordinates)) {
+            log.debug("Coordinates for " + vacancySearchParameters.getLocation().getPlace() + " with radius of " + vacancySearchParameters.getLocation().getRadius() + " exist");
             SearchParameters searchParameters = SearchParameters.builder()
                     .vacancySearchParameters(vacancySearchParameters)
                     .coordinates(coordinates)
                     .build();
             vacancies = vacancyRepository.search(searchParameters, pageable);
         } else {
+            log.debug("No coordinates for " + vacancySearchParameters.getLocation().getPlace() + " with radius of " + vacancySearchParameters.getLocation().getRadius() + " exist");
             vacancies = new PageImpl<>(new ArrayList<Vacancy>());
         }
 

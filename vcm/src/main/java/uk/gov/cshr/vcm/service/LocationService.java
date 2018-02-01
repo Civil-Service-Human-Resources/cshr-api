@@ -1,27 +1,48 @@
 package uk.gov.cshr.vcm.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import uk.gov.cshr.vcm.model.Coordinates;
 
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * This service is responsible for calling an external location lookup service to transform a place into a coordinates representing latitude and longitude.
+ */
+@Service
 public class LocationService {
-    private static final Map<String, Coordinates> COORDINATES_MAP = new HashMap<>();
+    private static final Logger log = LoggerFactory.getLogger(LocationService.class);
 
-    static {
-        COORDINATES_MAP.put("BA14", Coordinates.builder().latitude(51.3202692).longitude(-2.2150652).build());
-        COORDINATES_MAP.put("BRISTOL", Coordinates.builder().latitude(51.468468).longitude(-2.6609202).build());
-        COORDINATES_MAP.put("BS1", Coordinates.builder().latitude(51.4548812).longitude(-2.6079938).build());
-        COORDINATES_MAP.put("BS13", Coordinates.builder().latitude(51.415705).longitude(-2.6304586).build());
-        COORDINATES_MAP.put("BS20", Coordinates.builder().latitude(51.4744213).longitude(-2.7715351).build());
-        COORDINATES_MAP.put("HA9", Coordinates.builder().latitude(51.5609154).longitude(-0.3053616).build());
-        COORDINATES_MAP.put("LONDON", Coordinates.builder().latitude(51.5285578).longitude(-0.2420229).build());
-        COORDINATES_MAP.put("SE4", Coordinates.builder().latitude(51.4604104).longitude(-0.0448475).build());
-        COORDINATES_MAP.put("SN14", Coordinates.builder().latitude(51.5023133).longitude(-2.3295928).build());
-        COORDINATES_MAP.put("UB8", Coordinates.builder().latitude(51.5375109).longitude(-0.4844852).build());
-    }
+    @Value("${spring.location.service.url}")
+    private String locationServiceURL;
 
+    /**
+     * This method calls an external service to map the given location to coordinates representing a single latitude and longitude.
+     *
+     * It is possible that no results are found.
+     *
+     * @param location the place whose latitude and longitude coordinates are required
+     * @return Coordinates the corresponding latitude and longitude of the given location
+     */
     public Coordinates find(final String location) {
-        return COORDINATES_MAP.get(location.toUpperCase());
+        log.debug("Starting find() and LOCATION SERVICE URL = " + locationServiceURL);
+        Coordinates coordinates = null;
+
+        Map<String, String> params = new HashMap<>();
+        params.put("searchTerm", location);
+
+        try {
+            coordinates = new RestTemplate().getForObject(locationServiceURL, Coordinates.class, params);
+            log.debug("COORDINATES FOR " + location + " ARE " + coordinates.toString());
+        } catch (Exception ex) {
+            log.error("An unexpected error occurred trying to find coordinates for " + location, ex);
+            //THROW A SERVICE EXCEPTION
+        }
+
+        return coordinates;
     }
 }
