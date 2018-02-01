@@ -4,7 +4,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import uk.gov.cshr.vcm.model.SearchParameters;
 import uk.gov.cshr.vcm.model.Vacancy;
-import uk.gov.cshr.vcm.model.VacancySearchParameters;
 
 /**
  * Defines the methods that will provide custom JPA queries for accessing the Vacancy datastore.

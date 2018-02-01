@@ -24,8 +24,6 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom {
     private static final String KEYWORD = "keyword";
     private static final String SALARY_MIN = "salary_min";
     private static final String SALARY_MAX = "salary_max";
-    private static final String LOCATION = "location";
-    private static final String NOW = "now";
     private static final String SEARCH_FROM_LATITUDE_VALUE = "searchFromLatitudeValue";
     private static final String SEARCH_FROM_LONGITUDE_VALUE = "searchFromLongitudeValue";
     private static final String WILDCARD = "%";
@@ -48,14 +46,12 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom {
     @Override
     @SuppressWarnings("unchecked")
     public Page<Vacancy> search(SearchParameters searchParameters, Pageable pageable) {
-
         Query selectQuery = em.createNativeQuery(queryBuilder.buildSelectValuesQuery(searchParameters), Vacancy.class);
         Query countQuery = em.createNativeQuery(queryBuilder.buildCountQuery(searchParameters));
 
         selectQuery.setParameter(SEARCH_FROM_LONGITUDE_VALUE, searchParameters.getLongitude());
         selectQuery.setParameter(SEARCH_FROM_LATITUDE_VALUE, searchParameters.getLatitude());
         selectQuery.setParameter(DISTANCE, searchParameters.getRadius());
-
         countQuery.setParameter(SEARCH_FROM_LONGITUDE_VALUE, searchParameters.getLongitude());
         countQuery.setParameter(SEARCH_FROM_LATITUDE_VALUE, searchParameters.getLatitude());
         countQuery.setParameter(DISTANCE, searchParameters.getRadius());
@@ -79,7 +75,7 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom {
             int paramNumber = 0;
             for (int i = 0; i < searchParameters.getDepartment().length; i++) {
                 if (StringUtils.isNotBlank(searchParameters.getDepartment()[i])) {
-                    int deptId = Integer.valueOf(searchParameters.getDepartment()[i]);
+                    int deptId = Integer.parseInt(searchParameters.getDepartment()[i]);
                     selectQuery.setParameter(DEPT + paramNumber, deptId);
                     countQuery.setParameter(DEPT + paramNumber, deptId);
                     paramNumber++;

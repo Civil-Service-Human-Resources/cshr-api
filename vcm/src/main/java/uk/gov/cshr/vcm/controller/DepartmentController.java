@@ -48,8 +48,8 @@ public class DepartmentController {
 
         Optional<Department> foundDepartment = departmentRepository.findById(departmentId);
 
-        if (!foundDepartment.isPresent()) {
-            log.debug("No department found for id " + departmentId);
+        if (log.isDebugEnabled() && !foundDepartment.isPresent()) {
+            log.debug(String.format("No department found for id %d", departmentId));
         }
 
         ResponseEntity<Department> notFound = ResponseEntity.notFound().build();
@@ -74,8 +74,8 @@ public class DepartmentController {
 
         Optional<Department> foundDepartment = departmentRepository.findById(departmentId);
 
-        if (!foundDepartment.isPresent()) {
-            log.error("No department found for id " + departmentId);
+        if (log.isErrorEnabled() && !foundDepartment.isPresent()) {
+            log.error(String.format("No department found for id %d", departmentId));
         }
 
         ResponseEntity<Department> notFound = ResponseEntity.notFound().build();
