@@ -7,9 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.cshr.vcm.model.Coordinates;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * This service is responsible for calling an external location lookup service to transform a place into a coordinates representing latitude and longitude.
  */
@@ -32,11 +29,11 @@ public class LocationService {
         log.debug("Starting find() and LOCATION SERVICE URL = " + locationServiceURL);
         Coordinates coordinates = null;
 
-        Map<String, String> params = new HashMap<>();
-        params.put("searchTerm", location);
+//        Map<String, String> params = new HashMap<>();
+//        params.put("searchTerm", location);
 
         try {
-            coordinates = new RestTemplate().getForObject(locationServiceURL, Coordinates.class, params);
+            coordinates = new RestTemplate().getForObject(locationServiceURL + location, Coordinates.class);
             log.debug("COORDINATES FOR " + location + " ARE " + coordinates.toString());
         } catch (Exception ex) {
             log.error("An unexpected error occurred trying to find coordinates for " + location, ex);

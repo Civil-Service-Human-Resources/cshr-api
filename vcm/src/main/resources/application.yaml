@@ -1,14 +1,14 @@
 spring:
   datasource:
-    url: jdbc:postgresql://db:5432/cshr
+    url: jdbc:postgresql://localhost:5432/cshr
     username: postgres
-    password: qwerty
+    password: postgres
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
     hibernate.ddl-auto: update # update schema on run. Use "create-drop" to reset schema on every run
   location:
     service:
-      url: http://localhost:8081/findlocation/{searchTerm} # will be overridden by an env variable
+      url: http://location-service.dev.cshr-gov.uk/findlocation/ # will be overridden by an env variable
 server:
   port: 8080
