@@ -5,9 +5,6 @@ services:
     image: cshr/cshr-api:${DOCKER_SERVICE_TAG}
     networks:
       - cshr-net
-    environment:
-      SPRING_PROFILES_ACTIVE: "${SPRING_PROFILES_ACTIVE}"
-      LOCATION_SERVICE_URL: "${LOCATION_SERVICE_URL}"
 
   db:
     image: postgres:10
