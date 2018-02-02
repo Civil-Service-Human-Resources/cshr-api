@@ -1,5 +1,7 @@
 package uk.gov.cshr.vcm.service;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,11 +31,11 @@ public class LocationService {
         log.debug("Starting find() and LOCATION SERVICE URL = " + locationServiceURL);
         Coordinates coordinates = null;
 
-//        Map<String, String> params = new HashMap<>();
-//        params.put("searchTerm", location);
+        Map<String, String> params = new HashMap<>();
+        params.put("searchTerm", location);
 
         try {
-            coordinates = new RestTemplate().getForObject(locationServiceURL + location, Coordinates.class);
+            coordinates = new RestTemplate().getForObject(locationServiceURL, Coordinates.class);
             log.debug("COORDINATES FOR " + location + " ARE " + coordinates.toString());
         } catch (Exception ex) {
             log.error("An unexpected error occurred trying to find coordinates for " + location, ex);
