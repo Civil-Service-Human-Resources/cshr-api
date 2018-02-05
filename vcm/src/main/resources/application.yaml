@@ -6,9 +6,11 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
-    hibernate.ddl-auto: update # update schema on run. Use "create-drop" to reset schema on every run
+    #hibernate.ddl-auto: update # update schema on run. Use "create-drop" to reset schema on every run
   location:
     service:
       url: http://location-service.dev.cshr-gov.uk/findlocation/{searchTerm} # will be overridden by an env variable
 server:
   port: 8080
+liquibase:
+    change-log: classpath:/changelog.xml

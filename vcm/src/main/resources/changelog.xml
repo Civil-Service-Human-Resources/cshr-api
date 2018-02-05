@@ -1,0 +1,66 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.liquibase.org/xml/ns/dbchangelog-ext
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="gordon" id="2">
+        <createSequence sequenceName="vacancies_sequence"/>
+    </changeSet>
+    <changeSet author="gordon" id="4">
+        <createTable tableName="vacancies">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="closing_date" type="TEXT"/>
+            <column name="contact_department" type="TEXT"/>
+            <column name="contact_email" type="TEXT"/>
+            <column name="contact_name" type="TEXT"/>
+            <column name="contact_telephone" type="TEXT"/>
+            <column name="description" type="TEXT"/>
+            <column name="eligibility" type="TEXT"/>
+            <column name="grade" type="TEXT"/>
+            <column name="location" type="TEXT"/>
+            <column name="number_vacancies" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="responsibilities" type="TEXT"/>
+            <column name="role" type="TEXT"/>
+            <column name="salary_max" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="salary_min" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="TEXT"/>
+            <column name="working_hours" type="TEXT"/>
+            <column name="departmentid" type="BIGINT"/>
+            <column name="government_opening_date" type="TIMESTAMP(6) WITHOUT TIME ZONE"/>
+            <column name="internal_opening_date" type="TIMESTAMP(6) WITHOUT TIME ZONE"/>
+            <column name="public_opening_date" type="TIMESTAMP(6) WITHOUT TIME ZONE"/>
+            <column name="dept_id" type="BIGINT"/>
+            <column name="latitude" type="FLOAT8"/>
+            <column name="longitude" type="FLOAT8"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="gordon" id="6">
+        <addPrimaryKey columnNames="id" constraintName="vacancies_pkey" tableName="vacancies"/>
+    </changeSet>
+    <changeSet author="gordon" id="7">
+        <addForeignKeyConstraint
+            baseColumnNames="dept_id"
+            baseTableName="vacancies"
+            constraintName="fk_vacancies_departments"
+            deferrable="false"
+            initiallyDeferred="false"
+            onDelete="NO ACTION"
+            onUpdate="NO ACTION"
+            referencedColumnNames="id"
+            referencedTableName="departments"/>
+    </changeSet>
+</databaseChangeLog>
