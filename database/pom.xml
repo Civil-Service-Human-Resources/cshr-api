@@ -1,0 +1,219 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>uk.gov.cshr</groupId>
+    <artifactId>database-setup</artifactId>
+    <packaging>jar</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <name>Database Setup</name>
+
+	<parent>
+		<groupId>uk.gov.cshr</groupId>
+		<artifactId>cshr</artifactId>
+		<version>0.0.1</version>
+	</parent>
+
+    <properties>
+
+        <database-driver>org.postgresql.Driver</database-driver>
+
+        <admin-url>jdbc:postgresql://localhost:5432/</admin-url>
+        <admin-user>postgres</admin-user>
+        <admin-password>qwerty</admin-password>
+
+        <database>cshr</database>
+        <database-url>jdbc:postgresql://localhost:5432/cshr</database-url>
+        <database-user>postgres</database-user>
+        <database-password>qwerty</database-password>
+    </properties>
+
+    <build>
+        <plugins>
+
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>sql-maven-plugin</artifactId>
+                <version>1.5</version>
+
+                <dependencies>
+
+                    <dependency>
+                        <groupId>postgresql</groupId>
+                        <artifactId>postgresql</artifactId>
+                        <version>9.1-901-1.jdbc4</version>
+                    </dependency>
+
+                </dependencies>
+
+                <!-- common configuration shared by all executions -->
+                <configuration>
+                    <driver>${database-driver}</driver>
+                    <url>${database-url}</url>
+                    <username>${admin-user}</username>
+                    <password>${admin-password}</password>
+                    <!-- You can comment out username/password configurations and
+                         have maven to look them up in your settings.xml using ${settingsKey}
+                    -->
+                    <!--<settingsKey>sensibleKey</settingsKey>-->
+                    <!--&lt;!&ndash;all executions are ignored if -Dmaven.test.skip=true&ndash;&gt;-->
+                    <!--<skip>${maven.test.skip}</skip>-->
+
+
+                </configuration>
+
+                <executions>
+                    <execution>
+                        <id>drop-db-before-test-if-any</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <!-- need another database to drop the targeted one -->
+                            <url>${admin-url}</url>
+                            <username>${admin-user}</username>
+                            <password>${admin-password}</password>
+                            <autocommit>true</autocommit>
+                            <sqlCommand>drop database ${database}</sqlCommand>
+                            <!-- ignore error when database is not avaiable -->
+                            <onError>continue</onError>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>drop-user-before-test-if-any</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <!-- need another database to drop the targeted one -->
+                            <url>${admin-url}</url>
+                            <username>${admin-user}</username>
+                            <password>${admin-password}</password>
+                            <autocommit>true</autocommit>
+                            <sqlCommand>drop user ${database-user}</sqlCommand>
+                            <!-- ignore error when database is not avaiable -->
+                            <onError>continue</onError>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>create-user-before-test-if-any</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <!-- need another database to drop the targeted one -->
+                            <url>${admin-url}</url>
+                            <username>${admin-user}</username>
+                            <password>${admin-password}</password>
+                            <autocommit>true</autocommit>
+                            <sqlCommand>create user ${database-user} superuser password '${database-password}'</sqlCommand>
+                            <!-- ignore error when database is not avaiable -->
+                            <onError>continue</onError>
+                        </configuration>
+                    </execution>
+
+
+                    <execution>
+                        <id>create-db</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <url>${admin-url}</url>
+                            <!-- no transaction -->
+                            <autocommit>true</autocommit>
+                            <sqlCommand>create database ${database} owner ${database-user}</sqlCommand>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>create-schema</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <autocommit>true</autocommit>
+                            <sqlCommand>grant all on database ${database} to ${database-user}</sqlCommand>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>create-data</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <orderFile>ascending</orderFile>
+                            <fileset>
+                                <basedir>${basedir}</basedir>
+                                <includes>
+                                    <include>src/test/sql/test-create.sql</include>
+                                    <include>src/test/sql/test-populate.sql</include>
+                                </includes>
+                            </fileset>
+                        </configuration>
+                    </execution>
+
+                    <!-- drop db after test -->
+                    <!--<execution>-->
+                    <!--<id>drop-db-after-test</id>-->
+                    <!--<phase>test</phase>-->
+                    <!--<goals>-->
+                    <!--<goal>execute</goal>-->
+                    <!--</goals>-->
+                    <!--<configuration>-->
+                    <!--<autocommit>true</autocommit>-->
+                    <!--<sqlCommand>drop database ${database}</sqlCommand>-->
+                    <!--</configuration>-->
+                    <!--</execution>-->
+
+
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-maven-plugin</artifactId>
+                <version>3.5.3</version>
+                <executions>
+                    <execution>
+                        <!-- phase>process-resources</phase -->
+                        <phase>liquibase</phase>
+
+                        <goals>
+                            <goal>update</goal>
+                        </goals>
+                    </execution>
+
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>postgresql</groupId>
+                        <artifactId>postgresql</artifactId>
+                        <version>9.1-901-1.jdbc4</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <changeLogFile>src/main/liquibase/changelog.xml</changeLogFile>
+                    <driver>org.postgresql.Driver</driver>
+                    <url>${database-url}</url>
+                    <username>${database-user}</username>
+                    <password>${database-password}</password>
+                </configuration>
+            </plugin>
+
+
+        </plugins>
+    </build>
+
+
+</project>
