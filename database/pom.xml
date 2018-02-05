@@ -8,12 +8,6 @@
     <version>1.0-SNAPSHOT</version>
     <name>Database Setup</name>
 
-	<parent>
-		<groupId>uk.gov.cshr</groupId>
-		<artifactId>cshr</artifactId>
-		<version>0.0.1</version>
-	</parent>
-
     <properties>
 
         <database-driver>org.postgresql.Driver</database-driver>
@@ -65,8 +59,8 @@
 
                 <executions>
                     <execution>
-                        <id>drop-db-before-test-if-any</id>
-                        <phase>process-test-resources</phase>
+                        <id>drop-db</id>
+                        <phase>clean</phase>
                         <goals>
                             <goal>execute</goal>
                         </goals>
@@ -83,8 +77,8 @@
                     </execution>
 
                     <execution>
-                        <id>drop-user-before-test-if-any</id>
-                        <phase>process-test-resources</phase>
+                        <id>drop-user</id>
+                        <phase>process-resources</phase>
                         <goals>
                             <goal>execute</goal>
                         </goals>
@@ -101,8 +95,8 @@
                     </execution>
 
                     <execution>
-                        <id>create-user-before-test-if-any</id>
-                        <phase>process-test-resources</phase>
+                        <id>create-user</id>
+                        <phase>process-resources</phase>
                         <goals>
                             <goal>execute</goal>
                         </goals>
@@ -118,10 +112,9 @@
                         </configuration>
                     </execution>
 
-
                     <execution>
                         <id>create-db</id>
-                        <phase>process-test-resources</phase>
+                        <phase>process-resources</phase>
                         <goals>
                             <goal>execute</goal>
                         </goals>
@@ -130,12 +123,13 @@
                             <!-- no transaction -->
                             <autocommit>true</autocommit>
                             <sqlCommand>create database ${database} owner ${database-user}</sqlCommand>
+                            <!--<onError>continue</onError>-->
                         </configuration>
                     </execution>
 
                     <execution>
                         <id>create-schema</id>
-                        <phase>process-test-resources</phase>
+                        <phase>process-resources</phase>
                         <goals>
                             <goal>execute</goal>
                         </goals>
@@ -145,9 +139,9 @@
                         </configuration>
                     </execution>
 
-                    <execution>
+<!--                    <execution>
                         <id>create-data</id>
-                        <phase>process-test-resources</phase>
+                        <phase>process-resources</phase>
                         <goals>
                             <goal>execute</goal>
                         </goals>
@@ -161,21 +155,7 @@
                                 </includes>
                             </fileset>
                         </configuration>
-                    </execution>
-
-                    <!-- drop db after test -->
-                    <!--<execution>-->
-                    <!--<id>drop-db-after-test</id>-->
-                    <!--<phase>test</phase>-->
-                    <!--<goals>-->
-                    <!--<goal>execute</goal>-->
-                    <!--</goals>-->
-                    <!--<configuration>-->
-                    <!--<autocommit>true</autocommit>-->
-                    <!--<sqlCommand>drop database ${database}</sqlCommand>-->
-                    <!--</configuration>-->
-                    <!--</execution>-->
-
+                    </execution>-->
 
                 </executions>
             </plugin>
@@ -186,15 +166,13 @@
                 <version>3.5.3</version>
                 <executions>
                     <execution>
-                        <!-- phase>process-resources</phase -->
-                        <phase>liquibase</phase>
-
+                         <phase>process-resources</phase>
                         <goals>
                             <goal>update</goal>
                         </goals>
                     </execution>
-
                 </executions>
+
                 <dependencies>
                     <dependency>
                         <groupId>postgresql</groupId>
@@ -210,10 +188,6 @@
                     <password>${database-password}</password>
                 </configuration>
             </plugin>
-
-
         </plugins>
     </build>
-
-
 </project>
