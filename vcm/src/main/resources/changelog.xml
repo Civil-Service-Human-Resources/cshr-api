@@ -9,19 +9,8 @@
         http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-    <changeSet author="gordon" id="1">
-        <createSequence sequenceName="departments_sequence"/>
-    </changeSet>
     <changeSet author="gordon" id="2">
         <createSequence sequenceName="vacancies_sequence"/>
-    </changeSet>
-    <changeSet author="gordon" id="3">
-        <createTable tableName="departments">
-            <column name="id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="name" type="TEXT"/>
-        </createTable>
     </changeSet>
     <changeSet author="gordon" id="4">
         <createTable tableName="vacancies">
@@ -58,9 +47,6 @@
             <column name="latitude" type="FLOAT8"/>
             <column name="longitude" type="FLOAT8"/>
         </createTable>
-    </changeSet>
-    <changeSet author="gordon" id="5">
-        <addPrimaryKey columnNames="id" constraintName="departments_pkey" tableName="departments"/>
     </changeSet>
     <changeSet author="gordon" id="6">
         <addPrimaryKey columnNames="id" constraintName="vacancies_pkey" tableName="vacancies"/>
