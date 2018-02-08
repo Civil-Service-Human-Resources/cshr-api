@@ -1,22 +1,20 @@
 package uk.gov.cshr.vcm.repository;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.apache.commons.lang3.StringUtils;
-import uk.gov.cshr.vcm.model.SearchParameters;
-import uk.gov.cshr.vcm.model.Vacancy;
-import uk.gov.cshr.vcm.model.VacancySearchParameters;
-
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import uk.gov.cshr.vcm.model.SearchParameters;
+import uk.gov.cshr.vcm.model.Vacancy;
 
 /**
  * This class is responsible for providing custom dynamic JPA queries for working with Vacancies
@@ -25,6 +23,8 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom {
     private static final String DEPT = "dept";
     private static final String DISTANCE = "distance";
     private static final String KEYWORD = "keyword";
+    private static final String SALARY_MIN = "salary_min";
+    private static final String SALARY_MAX = "salary_max";
     private static final String LOCATION = "location";
     private static final String NOW = "now";
     private static final String SEARCH_FROM_LATITUDE_VALUE = "searchFromLatitudeValue";
@@ -49,6 +49,7 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom {
     @Override
     @SuppressWarnings("unchecked")
     public Page<Vacancy> search(SearchParameters searchParameters, Pageable pageable) {
+
         Query selectQuery = em.createNativeQuery(queryBuilder.buildSelectValuesQuery(searchParameters), Vacancy.class);
         Query countQuery = em.createNativeQuery(queryBuilder.buildCountQuery(searchParameters));
 
@@ -59,6 +60,7 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom {
         selectQuery.setParameter(SEARCH_FROM_LONGITUDE_VALUE, searchParameters.getLongitude());
         selectQuery.setParameter(SEARCH_FROM_LATITUDE_VALUE, searchParameters.getLatitude());
         selectQuery.setParameter(DISTANCE, searchParameters.getRadius());
+
         countQuery.setParameter(SEARCH_FROM_LONGITUDE_VALUE, searchParameters.getLongitude());
         countQuery.setParameter(SEARCH_FROM_LATITUDE_VALUE, searchParameters.getLatitude());
         countQuery.setParameter(DISTANCE, searchParameters.getRadius());
@@ -66,6 +68,16 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom {
         if (StringUtils.isNotBlank(searchParameters.getKeyword())) {
             selectQuery.setParameter(KEYWORD, WILDCARD + searchParameters.getKeyword() + WILDCARD);
             countQuery.setParameter(KEYWORD, WILDCARD + searchParameters.getKeyword() + WILDCARD);
+        }
+
+        if (searchParameters.getSalaryMin() != null) {
+            selectQuery.setParameter(SALARY_MIN, searchParameters.getSalaryMin());
+            countQuery.setParameter(SALARY_MIN, searchParameters.getSalaryMin());
+        }
+
+        if (searchParameters.getSalaryMax() != null) {
+            selectQuery.setParameter(SALARY_MAX, searchParameters.getSalaryMax());
+            countQuery.setParameter(SALARY_MAX, searchParameters.getSalaryMax());
         }
 
         if (searchParameters.getDepartment() != null && searchParameters.getDepartment().length > 0) {

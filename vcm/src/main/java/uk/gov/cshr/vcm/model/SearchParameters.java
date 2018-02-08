@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SearchParameters {
+
     private VacancySearchParameters vacancySearchParameters;
     private Coordinates coordinates;
 
@@ -40,5 +41,13 @@ public class SearchParameters {
 
     public Double getLatitude() {
         return coordinates != null ? coordinates.getLatitude() : null;
+    }
+
+    public Integer getSalaryMin() {
+        return vacancySearchParameters != null ? vacancySearchParameters.getMinSalary() : null;
+    }
+
+    public Integer getSalaryMax() {
+        return vacancySearchParameters != null ? vacancySearchParameters.getMaxSalary() : null;
     }
 }

@@ -1,5 +1,7 @@
 package uk.gov.cshr.vcm.repository;
 
+import java.util.Optional;
+import javax.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -8,9 +10,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import uk.gov.cshr.vcm.model.Vacancy;
 
-import java.util.Optional;
-
 @Repository
+@Transactional
 public interface VacancyRepository extends PagingAndSortingRepository<Vacancy, Long>, VacancyRepositoryCustom {
 
     default Optional<Vacancy> findById(Long id) {
