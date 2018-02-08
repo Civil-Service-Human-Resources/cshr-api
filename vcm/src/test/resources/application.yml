@@ -1,12 +1,11 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/cshr
-    username: postgres
-    password: qwerty
+    url: jdbc:h2:mem:USERS;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false
+    username: sa
+    password:
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    database-platform: org.hibernate.dialect.H2Dialect
     show-sql: true
-    hibernate.ddl-auto: validate
-    auto-commit: false
+    hibernate.ddl-auto: create
 server:
   port: 9095
