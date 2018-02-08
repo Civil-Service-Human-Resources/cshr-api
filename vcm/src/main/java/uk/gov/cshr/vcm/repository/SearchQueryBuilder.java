@@ -3,7 +3,6 @@ package uk.gov.cshr.vcm.repository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.cshr.vcm.model.SearchParameters;
-import uk.gov.cshr.vcm.model.VacancySearchParameters;
 
 /**
  * This class is responsible for building the native query that will be executed.
@@ -20,18 +19,26 @@ public class SearchQueryBuilder {
         return buildQuery("SELECT count(*)", parameters);
     }
 
-    private String buildQuery(String selectClause, SearchParameters parameters) {
+    private String buildQuery(String selectClause, SearchParameters searchParameters) {
         StringBuilder query = new StringBuilder(selectClause);
 
         query.append(" FROM vacancies WHERE public_opening_date IS NOT NULL AND public_opening_date <= :now");
         query.append(" AND (point(:searchFromLongitudeValue, :searchFromLatitudeValue) <@> point(longitude, latitude)) < :distance");
 
-        if (StringUtils.isNotBlank(parameters.getKeyword())) {
+        if (StringUtils.isNotBlank(searchParameters.getKeyword())) {
             query.append(" AND CONCAT(title, ' ', description) ILIKE :keyword");
         }
 
-        if (parameters.getDepartment() != null && parameters.getDepartment().length > 0) {
-            query.append(buildDepartmentClause(parameters.getDepartment()));
+        if (searchParameters.getDepartment() != null && searchParameters.getDepartment().length > 0) {
+            query.append(buildDepartmentClause(searchParameters.getDepartment()));
+        }
+
+        if (searchParameters.getSalaryMin() != null) {
+            query.append(" AND salary_max >= :salary_min");
+        }
+
+        if (searchParameters.getSalaryMax() != null) {
+            query.append(" AND salary_max <= :salary_max");
         }
 
         return query.toString();
