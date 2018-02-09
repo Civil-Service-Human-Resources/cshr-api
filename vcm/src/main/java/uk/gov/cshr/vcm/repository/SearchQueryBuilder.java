@@ -38,7 +38,7 @@ public class SearchQueryBuilder {
         }
 
         if (searchParameters.getSalaryMax() != null) {
-            query.append(" AND salary_max <= :salary_max");
+            query.append(" AND salary_min <= :salary_max or salary_max is null");
         }
 
         return query.toString();
