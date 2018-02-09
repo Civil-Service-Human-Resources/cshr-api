@@ -1,12 +1,8 @@
 package uk.gov.cshr.vcm.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-
+import java.io.Serializable;
+import java.sql.Timestamp;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,8 +12,11 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import java.io.Serializable;
-import java.sql.Timestamp;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 @Entity
 @Builder
@@ -31,7 +30,7 @@ public class Vacancy implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "vacancies_sequence")
-    private long id;
+    private Long id;
 
     @NonNull
     private String title;
@@ -82,11 +81,12 @@ public class Vacancy implements Serializable {
     @Column(name = "public_opening_date")
     private Timestamp publicOpeningDate;
 
-    private int salaryMin;
+    @NonNull
+    private Integer salaryMin;
 
-    private int salaryMax;
+    private Integer salaryMax;
 
-    private int numberVacancies;
+    private Integer numberVacancies;
 
     /**
      * If a vacancy has no longitude ensure it is null not 0 (zero) since 0 is a valid point in latitude

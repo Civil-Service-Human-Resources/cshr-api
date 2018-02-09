@@ -1,6 +1,18 @@
 package uk.gov.cshr.vcm.controller;
 
+import static java.lang.Math.toIntExact;
+import java.nio.charset.Charset;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import javax.inject.Inject;
 import org.assertj.core.api.Assertions;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -10,6 +22,8 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.testng.annotations.AfterMethod;
@@ -20,22 +34,6 @@ import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
-
-import javax.inject.Inject;
-import java.nio.charset.Charset;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-
-import static java.lang.Math.toIntExact;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = VcmApplication.class)
 @ContextConfiguration
@@ -100,7 +98,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             "}";
 
     private Vacancy vacancy1 = Vacancy.builder()
-            .id(1)
+            .id(1L)
             .title("testTile1 SearchQueryTitle")
             .description("testDescription1 SearchQueryDescription")
             .location("testLocation1 SearchQueryLocation")
@@ -121,7 +119,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             .build();
 
     private Vacancy vacancy2 = Vacancy.builder()
-            .id(2)
+            .id(2L)
             .title("testTitle2")
             .description("testDescription2")
             .location("testLocation2")
@@ -142,7 +140,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             .build();
 
     private Vacancy vacancy3 = Vacancy.builder()
-            .id(3)
+            .id(3L)
             .title("testTitle3")
             .description("testDescription3")
             .location("testLocation3")

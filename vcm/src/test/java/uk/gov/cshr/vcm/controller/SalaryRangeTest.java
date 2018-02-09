@@ -6,14 +6,14 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.assertj.core.api.Fail;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -81,19 +81,15 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
     private final List<Vacancy> createdVacancies = new ArrayList<>();
     private final List<Department> createdDepartments = new ArrayList<>();
 
+    private Department department;
+
     @Before
     public void before() {
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
-        Department department = departmentRepository.save(Department.builder().name("Department One").build());
+        department = departmentRepository.save(Department.builder().name("Department One").build());
         createdDepartments.add(department);
-
-        createVacancyWithSalaries(10000, 20000, department);
-        createVacancyWithSalaries(20000, 30000, department);
-        createVacancyWithSalaries(30000, 40000, department);
-        createVacancyWithSalaries(40000, 50000, department);
-        createVacancyWithSalaries(60000, 70000, department);
 
         given(locationService.find(any()))
                 .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE));
@@ -112,67 +108,103 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void testMaxSalary() throws Exception {
+    public void testFindMinSalaryNoMax() throws Exception {
 
-        Page<Vacancy> result = testExample(null, 69000);
+        createVacancyWithSalaryRange(14000, null, department);
+
+        Page<Vacancy> result = findVancancies(10000, 20000);
         List<Vacancy> resultsList = result.getContent();
 
-        List<Long> actualVacancyIDs
-                = resultsList.stream()
-                        .map(Vacancy::getId)
-                        .collect(Collectors.toList());
+        boolean vacancyFound = false;
 
-        List<Long> expectedVacancyIDs
-                = createdVacancies.stream()
-                        .filter(v -> v.getSalaryMax() <= 69000)
-                        .map(Vacancy::getId)
-                        .collect(Collectors.toList());
+        for (Vacancy vacancy : resultsList) {
 
-        assertThat(actualVacancyIDs, is(equalTo(expectedVacancyIDs)));
+            if (vacancy.getSalaryMin().equals(14000)) {
+                vacancyFound = true;
+            }
+        }
+
+        Assert.assertTrue(vacancyFound);
+    }
+
+    @Test
+    public void testFindMinSalaryWithMinAndMax() throws Exception {
+
+        createVacancyWithSalaryRange(14000, 48000, department);
+        createVacancyWithSalaryRange(20000, 29000, department);
+        createVacancyWithSalaryRange(41000, 50000, department);
+
+        Page<Vacancy> result = findVancancies(30000, 40000);
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertTrue("Expected results", !resultsList.isEmpty());
+
+        boolean vacancyFound = false;
+
+        for (Vacancy vacancy : resultsList) {
+
+            if (vacancy.getSalaryMin().equals(14000)) {
+                vacancyFound = true;
+            }
+            else {
+                Fail.fail("Vacancy with salary range " + vacancy.getSalaryMin() + "-" + vacancy.getSalaryMax() + "  when filtering for 30000-40000");
+            }
+        }
+
+        Assert.assertTrue(vacancyFound);
+    }
+
+    @Test
+    public void testMaxSalary() throws Exception {
+
+        createVacancyWithSalaryRange(40000, 50000, department);
+        createVacancyWithSalaryRange(69001, 70000, department);
+        createVacancyWithSalaryRange(69000, 70000, department);
+        createVacancyWithSalaryRange(40000, 69000, department);
+
+        Page<Vacancy> result = findVancancies(null, 69000);
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertTrue("Expected results", !resultsList.isEmpty());
+
+        for (Vacancy vacancy : resultsList) {
+
+            if (vacancy.getSalaryMin().compareTo(69001) == 0) {
+                Fail.fail("Vacancy with min salary of " + vacancy.getSalaryMin() + " when filtering for max of 69000");
+            }
+        }
     }
 
     @Test
     public void testMinSalary() throws Exception {
 
-        Page<Vacancy> result = testExample(70000, null);
+        createVacancyWithSalaryRange(10000, null, department);
+        createVacancyWithSalaryRange(10000, 20000, department);
+        createVacancyWithSalaryRange(20000, 30000, department);
+        createVacancyWithSalaryRange(30000, 40000, department);
+        createVacancyWithSalaryRange(40000, 50000, department);
+
+        Vacancy v1 = createVacancyWithSalaryRange(60000, 70000, department);
+        Vacancy v2 = createVacancyWithSalaryRange(70000, 70001, department);
+        Vacancy v3 = createVacancyWithSalaryRange(70001, 80000, department);
+
+        List<String> expectedVacancyIDs = Arrays.asList(
+                v1.getId().toString(),
+                v2.getId().toString(),
+                v3.getId().toString());
+
+        Page<Vacancy> result = findVancancies(70000, null);
         List<Vacancy> resultsList = result.getContent();
 
-        List<Long> actualVacancyIDs
-                = resultsList.stream()
-                        .map(Vacancy::getId)
-                        .collect(Collectors.toList());
+        Assert.assertEquals("Expected results", resultsList.size(), expectedVacancyIDs.size());
 
-        List<Long> expectedVacancyIDs
-                = createdVacancies.stream()
-                        .filter(v -> v.getSalaryMax() >= 70000)
-                        .map(Vacancy::getId)
-                        .collect(Collectors.toList());
-
-        assertThat(actualVacancyIDs, is(equalTo(expectedVacancyIDs)));
+        List<String> resultVacancyIDs = resultsList.stream().map(v -> v.getId().toString()).collect(Collectors.toList());
+        Assert.assertTrue(resultVacancyIDs.contains(v1.getId().toString()));
+        Assert.assertTrue(resultVacancyIDs.contains(v2.getId().toString()));
+        Assert.assertTrue(resultVacancyIDs.contains(v3.getId().toString()));
     }
 
-    @Test
-    public void testSalaryRange() throws Exception {
-
-        Page<Vacancy> result = testExample(20001, 50000);
-        List<Vacancy> resultsList = result.getContent();
-
-        List<Long> actualVacancyIDs
-                = resultsList.stream()
-                        .map(Vacancy::getId)
-                        .collect(Collectors.toList());
-
-        List<Long> expectedVacancyIDs
-                = createdVacancies.stream()
-                        .filter(v -> v.getSalaryMax() >= 21000)
-                        .filter(v -> v.getSalaryMax() <= 50000)
-                        .map(Vacancy::getId)
-                        .collect(Collectors.toList());
-
-        assertThat(actualVacancyIDs, is(equalTo(expectedVacancyIDs)));
-    }
-
-    public Page<Vacancy> testExample(Integer minSalary, Integer maxSalary) throws Exception {
+    public Page<Vacancy> findVancancies(Integer minSalary, Integer maxSalary) throws Exception {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -229,7 +261,7 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         return vacancyPrototype;
     }
 
-    private void createVacancyWithSalaries(int salaryMin, int salaryMax, Department department) {
+    private Vacancy createVacancyWithSalaryRange(Integer salaryMin, Integer salaryMax, Department department) {
 
         Vacancy vacancy = getVacancyPrototype();
         vacancy.setDepartment(department);
@@ -237,5 +269,6 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         vacancy.setSalaryMax(salaryMax);
         vacancyRepository.save(vacancy);
         createdVacancies.add(vacancy);
+        return vacancy;
     }
 }
