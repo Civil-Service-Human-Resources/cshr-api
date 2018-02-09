@@ -30,7 +30,7 @@ public class Vacancy implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "vacancies_sequence")
-    private long id;
+    private Long id;
 
     @NonNull
     private String title;

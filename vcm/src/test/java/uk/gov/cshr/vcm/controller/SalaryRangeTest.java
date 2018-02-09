@@ -6,8 +6,10 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.assertj.core.api.Fail;
 import org.junit.After;
@@ -153,11 +155,10 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
     @Test
     public void testMaxSalary() throws Exception {
 
-        createVacancyWithSalaryRange(10000, 20000, department);
-        createVacancyWithSalaryRange(20000, 30000, department);
-        createVacancyWithSalaryRange(30000, 40000, department);
         createVacancyWithSalaryRange(40000, 50000, department);
-        createVacancyWithSalaryRange(60000, 70000, department);
+        createVacancyWithSalaryRange(69001, 70000, department);
+        createVacancyWithSalaryRange(69000, 70000, department);
+        createVacancyWithSalaryRange(40000, 69000, department);
 
         Page<Vacancy> result = findVancancies(null, 69000);
         List<Vacancy> resultsList = result.getContent();
@@ -166,7 +167,7 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
 
         for (Vacancy vacancy : resultsList) {
 
-            if (vacancy.getSalaryMin() >= 69000) {
+            if (vacancy.getSalaryMin().compareTo(69001) == 0) {
                 Fail.fail("Vacancy with min salary of " + vacancy.getSalaryMin() + " when filtering for max of 69000");
             }
         }
@@ -175,23 +176,30 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
     @Test
     public void testMinSalary() throws Exception {
 
+        createVacancyWithSalaryRange(10000, null, department);
         createVacancyWithSalaryRange(10000, 20000, department);
         createVacancyWithSalaryRange(20000, 30000, department);
         createVacancyWithSalaryRange(30000, 40000, department);
         createVacancyWithSalaryRange(40000, 50000, department);
-        createVacancyWithSalaryRange(60000, 70000, department);
+
+        Vacancy v1 = createVacancyWithSalaryRange(60000, 70000, department);
+        Vacancy v2 = createVacancyWithSalaryRange(70000, 70001, department);
+        Vacancy v3 = createVacancyWithSalaryRange(70001, 80000, department);
+
+        List<String> expectedVacancyIDs = Arrays.asList(
+                v1.getId().toString(),
+                v2.getId().toString(),
+                v3.getId().toString());
 
         Page<Vacancy> result = findVancancies(70000, null);
         List<Vacancy> resultsList = result.getContent();
 
-        Assert.assertTrue("Expected results", !resultsList.isEmpty());
+        Assert.assertEquals("Expected results", resultsList.size(), expectedVacancyIDs.size());
 
-        for (Vacancy vacancy : resultsList) {
-
-            if (vacancy.getSalaryMax() < 70000) {
-                Fail.fail("Vacancy with max salary of " + vacancy.getSalaryMax() + " when filtering for min of 70000");
-            }
-        }
+        List<String> resultVacancyIDs = resultsList.stream().map(v -> v.getId().toString()).collect(Collectors.toList());
+        Assert.assertTrue(resultVacancyIDs.contains(v1.getId().toString()));
+        Assert.assertTrue(resultVacancyIDs.contains(v2.getId().toString()));
+        Assert.assertTrue(resultVacancyIDs.contains(v3.getId().toString()));
     }
 
     public Page<Vacancy> findVancancies(Integer minSalary, Integer maxSalary) throws Exception {
@@ -251,7 +259,7 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         return vacancyPrototype;
     }
 
-    private void createVacancyWithSalaryRange(Integer salaryMin, Integer salaryMax, Department department) {
+    private Vacancy createVacancyWithSalaryRange(Integer salaryMin, Integer salaryMax, Department department) {
 
         Vacancy vacancy = getVacancyPrototype();
         vacancy.setDepartment(department);
@@ -259,5 +267,6 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         vacancy.setSalaryMax(salaryMax);
         vacancyRepository.save(vacancy);
         createdVacancies.add(vacancy);
+        return vacancy;
     }
 }
