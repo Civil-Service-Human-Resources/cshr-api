@@ -3,12 +3,18 @@ package uk.gov.cshr.vcm.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Optional;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,17 +25,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.cshr.vcm.model.Coordinates;
-import uk.gov.cshr.vcm.model.Location;
 import uk.gov.cshr.vcm.model.SearchParameters;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
 import uk.gov.cshr.vcm.service.LocationService;
-
-import javax.inject.Inject;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/vacancy", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -60,13 +60,19 @@ public class VacancyController {
     public ResponseEntity<Vacancy> findById(@PathVariable Long vacancyId) {
 
         Optional<Vacancy> foundVacancy = vacancyRepository.findById(vacancyId);
-        System.out.print("Test");
+        ResponseEntity<Vacancy> notFound = ResponseEntity.notFound().build();
 
         if (!foundVacancy.isPresent()) {
-            log.debug("No vancancy found for id " + vacancyId);
+            log.debug("No vacancy found for id " + vacancyId);
+            return notFound;
         }
-        ResponseEntity<Vacancy> notFound = ResponseEntity.notFound().build();
-        return foundVacancy.map(vacancy -> ResponseEntity.ok().body(vacancy)).orElse(notFound);
+        else if (foundVacancy.isPresent() && foundVacancy.get().getClosingDate().before(new Date())) {
+            log.debug("No vacancy closed: " + vacancyId);
+            return ResponseEntity.status(HttpStatus.GONE).build();
+        }
+        else {
+            return ResponseEntity.ok().body(foundVacancy.get());
+        }
     }
 
     @RequestMapping(method = RequestMethod.POST)
