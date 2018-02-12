@@ -1,6 +1,10 @@
 package uk.gov.cshr.vcm.repository;
 
 import com.google.common.io.ByteStreams;
+import java.io.IOException;
+import java.io.InputStream;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,12 +12,6 @@ import uk.gov.cshr.vcm.model.Coordinates;
 import uk.gov.cshr.vcm.model.Location;
 import uk.gov.cshr.vcm.model.SearchParameters;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
-
-import java.io.IOException;
-import java.io.InputStream;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Tests {@link SearchQueryBuilder}
@@ -30,6 +28,7 @@ public class SearchQueryBuilderTest {
     private static final String LOCATION_KEYWORD_SELECT_VALUES_QUERY = "/repository/LocationAndKeywordSelectValuesQuery.sql";
     private static final String LOCATION_COUNT_QUERY = "/repository/LocationOnlyCountQuery.sql";
     private static final String LOCATION_SELECT_VALUES_QUERY = "/repository/LocationOnlySelectValuesQuery.sql";
+    private static final String SALARY_RANGE_QUERY = "/repository/SalaryRangeSelectValuesQuery.sql";
 
     private SearchQueryBuilder builder;
 
@@ -74,6 +73,23 @@ public class SearchQueryBuilderTest {
     @Test
     public void buildSelectValuesQuery_onlyLocationSupplied() throws IOException {
         doSelectValuesQueryTest(buildParameters(BRISTOL, null, null), LOCATION_SELECT_VALUES_QUERY);
+    }
+
+    @Test
+    public void buildSelectValuesQuery_SalaryRange() throws IOException {
+
+        VacancySearchParameters vacancySearchParameters = VacancySearchParameters
+                .builder()
+                .location(Location.builder().place(BRISTOL).radius(30).build())
+                .minSalary(10000)
+                .build();
+
+        SearchParameters searchParameters = SearchParameters
+                .builder()
+                .vacancySearchParameters(vacancySearchParameters)
+                .build();
+
+        doSelectValuesQueryTest(searchParameters, SALARY_RANGE_QUERY);
     }
 
     private void doSelectValuesQueryTest(SearchParameters parameters, String expectedResourceFileName) throws IOException {
