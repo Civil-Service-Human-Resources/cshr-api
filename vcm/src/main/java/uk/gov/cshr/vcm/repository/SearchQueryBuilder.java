@@ -41,6 +41,8 @@ public class SearchQueryBuilder {
             query.append(" AND salary_min <= :salary_max or salary_max is null");
         }
 
+        query.append(" AND closing_date > current_timestamp");
+
         return query.toString();
     }
 

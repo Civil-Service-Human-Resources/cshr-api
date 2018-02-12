@@ -26,8 +26,8 @@ public interface VacancyRepository extends PagingAndSortingRepository<Vacancy, L
      * @param keyword  user's input for the search on keyword
      * @return List of found vacancies
      */
-    @Query(value = "SELECT * FROM vacancies WHERE location ILIKE %:location% AND CONCAT(title, ' ', description) ILIKE %:keyword% ORDER BY ?#{#pageable}",
-            countQuery = "SELECT COUNT(*) FROM vacancies WHERE location ILIKE %:location% AND CONCAT(title, ' ', description) ILIKE %:keyword%",
+    @Query(value = "SELECT * FROM vacancies WHERE location ILIKE %:location% AND CONCAT(title, ' ', description) ILIKE %:keyword% and closing_date > current_timestamp ORDER BY ?#{#pageable}",
+            countQuery = "SELECT COUNT(*) FROM vacancies WHERE location ILIKE %:location% AND CONCAT(title, ' ', description) ILIKE %:keyword% AND closing_date > current_timestamp",
             nativeQuery = true)
     Page<Vacancy> search(@Param("location") String location, @Param("keyword") String keyword, Pageable pageable);
 
@@ -38,8 +38,8 @@ public interface VacancyRepository extends PagingAndSortingRepository<Vacancy, L
      * @param location user's input for the search on location
      * @return List of found vacancies
      */
-    @Query(value = "SELECT * FROM vacancies WHERE location ILIKE %:location%  ORDER BY ?#{#pageable}",
-            countQuery = "SELECT COUNT(*) FROM vacancies WHERE location ILIKE %:location%",
+    @Query(value = "SELECT * FROM vacancies WHERE location ILIKE %:location% and closing_date > current_timestamp  ORDER BY ?#{#pageable}",
+            countQuery = "SELECT COUNT(*) FROM vacancies WHERE location ILIKE %:location% AND closing_date > current_timestamp",
             nativeQuery = true)
     Page<Vacancy> search(@Param("location") String location, Pageable pageable);
 }
