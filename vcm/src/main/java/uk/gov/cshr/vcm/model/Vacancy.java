@@ -38,6 +38,9 @@ public class Vacancy implements Serializable {
     @NonNull
     private String description;
 
+    @Column(name = "shortdescription")
+    private String shortDescription;
+
     @NonNull
     private String location;
 
