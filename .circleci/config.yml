@@ -3,6 +3,8 @@ jobs:
   build:
     environment:
       - COMPOSE_FILE: "docker-compose.yml"
+      - BINTRAY_URL: "cshr-docker-rpg.bintray.io"
+
     machine: true
     steps:
       - checkout
@@ -23,6 +25,28 @@ jobs:
           command: |
             export DOCKER_SERVICE_TAG="$CIRCLE_WORKFLOW_ID"
             docker-compose push api
+
+      # Tag and push the image to Bintray
+      - run:
+          name: Login to Bintray
+          command: docker login -u cshr -p ${BINTRAY_API_KEY} ${BINTRAY_URL}
+
+      - run:
+          name: Tag the dockerhub images as bintray images
+          command: docker tag cshr/cshr-api:${CIRCLE_WORKFLOW_ID} ${BINTRAY_URL}/rpg/cshr-api:${CIRCLE_WORKFLOW_ID}
+
+      - run:
+          name: Push the images to Bintray
+          command: docker push ${BINTRAY_URL}/rpg/cshr-api:${CIRCLE_WORKFLOW_ID}
+
+  notify:
+    machine: true
+    steps:
+      - run:
+          name: Notify Jenkins
+          command: curl -X POST --user "circleci:${JENKINS_API_KEY}"  "https://${JENKINS_HOST}/job/deploy-cshr-api/buildWithParameters?dockerTag=${CIRCLE_WORKFLOW_ID}&environment=dev"
+
+
 
   ship:
     environment:
