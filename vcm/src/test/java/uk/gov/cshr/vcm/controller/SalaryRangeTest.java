@@ -233,6 +233,28 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         }
     }
 
+    @Test
+    public void testNewcastleMin() throws Exception {
+
+        Vacancy newcastle = createVacancyWithSalaryRange(11000, null, department, NEWCASTLE);
+
+        Page<Vacancy> result = findVancancies(10000, null, "newcastle");
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertTrue("Expected results", resultsList.get(0).equals(newcastle));
+    }
+
+    @Test
+    public void testMinNoMaxVacancy_noMinMaxSearch() throws Exception {
+
+        Vacancy newcastle = createVacancyWithSalaryRange(11000, null, department, NEWCASTLE);
+
+        Page<Vacancy> result = findVancancies(null, 5000, "newcastle");
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertTrue("Expected results", resultsList.isEmpty());
+    }
+
     public Page<Vacancy> findVancancies(Integer minSalary, Integer maxSalary, String place) throws Exception {
 
         ObjectMapper objectMapper = new ObjectMapper();
