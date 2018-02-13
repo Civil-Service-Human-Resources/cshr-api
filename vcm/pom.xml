@@ -15,4 +15,25 @@
 		<version>0.0.1</version>
 	</parent>
 
+	<properties>
+		<postgres.version>9.4-1206-jdbc42</postgres.version>
+        <testng.version>6.10</testng.version>
+	</properties>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>${postgres.version}</version>
+		</dependency>
+
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
+            <scope>test</scope>
+        </dependency>
+	</dependencies>
 </project>

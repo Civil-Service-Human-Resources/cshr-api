@@ -15,4 +15,4 @@ FROM frolvlad/alpine-oraclejdk8:slim
 
 COPY --from=build /usr/src/myapp/vcm/target/vcm-0.0.1.jar /vcm-0.0.1.jar
 
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/vcm-0.0.1.jar"]
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/vcm-0.0.1.jar", "--spring.location.service.url=${LOCATION_SERVICE_URL}"]
