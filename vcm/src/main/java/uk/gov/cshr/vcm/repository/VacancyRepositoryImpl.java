@@ -100,4 +100,6 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom {
 
         return new PageImpl<>(vacancies, pageable, total.longValueExact());
     }
+
+
 }

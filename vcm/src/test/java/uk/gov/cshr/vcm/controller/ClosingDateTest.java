@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.After;
 import org.junit.Assert;
 import static org.junit.Assert.fail;
@@ -22,6 +25,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
@@ -35,6 +39,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.cshr.vcm.VcmApplication;
+import uk.gov.cshr.vcm.controller.exception.VacancyClosedException;
+import uk.gov.cshr.vcm.controller.exception.VacancyError;
 import uk.gov.cshr.vcm.model.Coordinates;
 import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.model.Location;
@@ -122,12 +128,10 @@ public class ClosingDateTest extends AbstractTestNGSpringContextTests {
 
         Assert.assertEquals("Expected results", 2, resultsList.size());
 
-        for (Vacancy vacancy : resultsList) {
-
-            if (vacancy.getClosingDate().compareTo(new Date()) == -1) {
-                fail("vacancy.getClosingDate() in past: " + vacancy.getClosingDate());
-            }
-        }
+        resultsList.stream().filter((vacancy) -> (vacancy.getClosingDate().compareTo(new Date()) == -1))
+                .forEachOrdered((vacancy) -> {
+                    fail("vacancy.getClosingDate() in past: " + vacancy.getClosingDate());
+                });
     }
 
     @Test
@@ -140,6 +144,15 @@ public class ClosingDateTest extends AbstractTestNGSpringContextTests {
                 .accept(APPLICATION_JSON_UTF8))
                 .andExpect(status().isGone())
                 .andReturn();
+
+        String response = mvcResult.getResponse().getContentAsString();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        VacancyError vacancyError = objectMapper.readValue(response, VacancyError.class);
+
+        assertThat(vacancyError.getStatus(), is(HttpStatus.GONE));
+        assertThat(vacancyError.getMessage(),
+                containsString(VacancyClosedException.CLOSED_MESSAGE));
     }
 
     public Page<Vacancy> findVancancies() throws Exception {
