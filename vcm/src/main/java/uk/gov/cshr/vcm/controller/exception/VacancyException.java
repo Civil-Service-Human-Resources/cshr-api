@@ -12,10 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class VacancyException extends RuntimeException {
-
-//    private Long vacancyID;
-//    private HttpStatus status;
-//    private String message;
-//    private List<String> errors;
+    
     private VacancyError vacancyError;
 }
