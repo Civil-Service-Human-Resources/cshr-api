@@ -103,4 +103,7 @@ public class Vacancy implements Serializable {
     @ManyToOne
     @JoinColumn(name = "dept_id")
     private Department department;
+
+    @Column(name = "displaycsccontent")
+    private Boolean displayCscContent;
 }
