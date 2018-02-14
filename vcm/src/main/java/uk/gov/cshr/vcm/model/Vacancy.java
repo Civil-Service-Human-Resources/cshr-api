@@ -24,13 +24,17 @@ import lombok.NonNull;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "vacancies")
-@SequenceGenerator(name = "vacancies_sequence", sequenceName = "vacancies_sequence", allocationSize = 1)
+@SequenceGenerator(name = "vacancies_id_seq", sequenceName = "vacancies_id_seq", allocationSize = 1)
 public class Vacancy implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "vacancies_sequence")
+    @Column(name = "id", columnDefinition = "serial")
+    @GeneratedValue(strategy = GenerationType.AUTO, generator="vacancies_id_seq")
     private Long id;
+
+    @NonNull
+    private Long identifier;
 
     @NonNull
     private String title;
@@ -46,6 +50,9 @@ public class Vacancy implements Serializable {
 
     @NonNull
     private String grade;
+
+    @NonNull
+    private String role;
 
     @NonNull
     private String responsibilities;
@@ -100,6 +107,7 @@ public class Vacancy implements Serializable {
      * If a vacancy has no latitude ensure it is null not 0 (zero) since 0 is a valid point in latitude
      */
     private Double latitude;
+
     @ManyToOne
     @JoinColumn(name = "dept_id")
     private Department department;

@@ -20,13 +20,13 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "departments")
-@SequenceGenerator(name = "departments_sequence", sequenceName = "departments_sequence", allocationSize = 1)
+@SequenceGenerator(name = "departments_id_seq", sequenceName = "departments_id_seq", allocationSize = 1)
 public class Department implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "departments_sequence")
+    @GeneratedValue(strategy = GenerationType.AUTO,  generator="departments_id_seq")
     private Long id;
 
     private @NonNull
