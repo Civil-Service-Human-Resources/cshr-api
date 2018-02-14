@@ -57,9 +57,10 @@ public class SearchQueryBuilderTest {
     }
 
     private void doCountQueryTest(SearchParameters parameters, String expectedResourceFileName) throws IOException {
-        try (InputStream inputStream = SearchQueryBuilderTest.class.getResourceAsStream(expectedResourceFileName)) {
-            byte[] expectedQuery = ByteStreams.toByteArray(inputStream);
 
+        try (InputStream inputStream = SearchQueryBuilderTest.class.getResourceAsStream(expectedResourceFileName)) {
+
+            byte[] expectedQuery = ByteStreams.toByteArray(inputStream);
             String actualQuery = builder.buildCountQuery(parameters);
 
             assertThat(actualQuery, equalTo(new String(expectedQuery)));
@@ -77,11 +78,11 @@ public class SearchQueryBuilderTest {
     }
 
     private void doSelectValuesQueryTest(SearchParameters parameters, String expectedResourceFileName) throws IOException {
+
         try (InputStream inputStream = SearchQueryBuilderTest.class.getResourceAsStream(expectedResourceFileName)) {
+
             byte[] expectedQuery = ByteStreams.toByteArray(inputStream);
-
             String actualQuery = builder.buildSelectValuesQuery(parameters);
-
             assertThat(actualQuery, equalTo(new String(expectedQuery)));
         }
     }

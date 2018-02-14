@@ -1,1 +1,1 @@
-SELECT count(*) FROM vacancies WHERE public_opening_date IS NOT NULL AND public_opening_date <= :now AND (point(:searchFromLongitudeValue, :searchFromLatitudeValue) <@> point(longitude, latitude)) < :distance AND dept_id in (:dept0,:dept1)
+SELECT count(*) FROM vacancies WHERE public_opening_date IS NOT NULL AND public_opening_date <= current_timestamp AND (point(:searchFromLongitudeValue, :searchFromLatitudeValue) <@> point(longitude, latitude)) < :distance AND closing_date > current_timestamp AND dept_id in (:dept0,:dept1)
