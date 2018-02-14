@@ -4,6 +4,8 @@ import com.google.common.io.ByteStreams;
 import java.io.IOException;
 import java.io.InputStream;
 import org.hamcrest.CoreMatchers;
+
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.After;
 import org.junit.Before;
@@ -60,8 +62,8 @@ public class SearchQueryBuilderTest {
 
             byte[] expectedQuery = ByteStreams.toByteArray(inputStream);
             String actualQuery = builder.buildCountQuery(parameters);
-            assertThat(actualQuery, CoreMatchers.containsString(new String(expectedQuery)));
-            assertThat(actualQuery, CoreMatchers.containsString("closing_date > current_timestamp"));
+
+            assertThat(actualQuery, equalTo(new String(expectedQuery)));
         }
     }
 
@@ -81,8 +83,7 @@ public class SearchQueryBuilderTest {
 
             byte[] expectedQuery = ByteStreams.toByteArray(inputStream);
             String actualQuery = builder.buildSelectValuesQuery(parameters);
-            assertThat(actualQuery, CoreMatchers.startsWith(new String(expectedQuery)));
-            assertThat(actualQuery, CoreMatchers.containsString("closing_date > current_timestamp"));
+            assertThat(actualQuery, equalTo(new String(expectedQuery)));
         }
     }
 

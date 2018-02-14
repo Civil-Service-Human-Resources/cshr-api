@@ -22,8 +22,9 @@ public class SearchQueryBuilder {
     private String buildQuery(String selectClause, SearchParameters searchParameters) {
         StringBuilder query = new StringBuilder(selectClause);
 
-        query.append(" FROM vacancies WHERE public_opening_date IS NOT NULL AND public_opening_date <= :now");
+        query.append(" FROM vacancies WHERE public_opening_date IS NOT NULL AND public_opening_date <= current_timestamp");
         query.append(" AND (point(:searchFromLongitudeValue, :searchFromLatitudeValue) <@> point(longitude, latitude)) < :distance");
+        query.append(" AND closing_date > current_timestamp");
 
         if (StringUtils.isNotBlank(searchParameters.getKeyword())) {
             query.append(" AND CONCAT(title, ' ', description) ILIKE :keyword");
@@ -40,8 +41,6 @@ public class SearchQueryBuilder {
         if (searchParameters.getSalaryMax() != null) {
             query.append(" AND (salary_min <= :salary_max )");
         }
-
-        query.append(" AND closing_date > current_timestamp");
 
         return query.toString();
     }
