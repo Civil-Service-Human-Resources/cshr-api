@@ -60,7 +60,8 @@ public class SearchQueryBuilderTest {
 
             byte[] expectedQuery = ByteStreams.toByteArray(inputStream);
             String actualQuery = builder.buildCountQuery(parameters);
-            assertThat(actualQuery, CoreMatchers.containsString(new String(expectedQuery)));;
+            assertThat(actualQuery, CoreMatchers.containsString(new String(expectedQuery)));
+            assertThat(actualQuery, CoreMatchers.containsString("closing_date > current_timestamp"));
         }
     }
 
@@ -79,10 +80,9 @@ public class SearchQueryBuilderTest {
         try (InputStream inputStream = SearchQueryBuilderTest.class.getResourceAsStream(expectedResourceFileName)) {
 
             byte[] expectedQuery = ByteStreams.toByteArray(inputStream);
-//            String expectedQueryString = String.valueOf(expectedQuery);
-
             String actualQuery = builder.buildSelectValuesQuery(parameters);
             assertThat(actualQuery, CoreMatchers.startsWith(new String(expectedQuery)));
+            assertThat(actualQuery, CoreMatchers.containsString("closing_date > current_timestamp"));
         }
     }
 
