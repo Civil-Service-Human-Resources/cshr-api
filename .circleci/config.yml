@@ -33,11 +33,11 @@ jobs:
 
       - run:
           name: Tag the dockerhub images as bintray images
-          command: docker tag cshr/cshr-api:${CIRCLE_WORKFLOW_ID} ${BINTRAY_URL}/rpg/cshr-api:${CIRCLE_WORKFLOW_ID}
+          command: docker tag cshr/cshr-api:${CIRCLE_WORKFLOW_ID} ${BINTRAY_URL}/cshr-api:${CIRCLE_WORKFLOW_ID}
 
       - run:
           name: Push the images to Bintray
-          command: docker push ${BINTRAY_URL}/rpg/cshr-api:${CIRCLE_WORKFLOW_ID}
+          command: docker push ${BINTRAY_URL}/cshr-api:${CIRCLE_WORKFLOW_ID}
 
   notify:
     machine: true
