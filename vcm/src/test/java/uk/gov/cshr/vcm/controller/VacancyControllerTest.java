@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -38,7 +39,7 @@ import uk.gov.cshr.vcm.repository.VacancyRepository;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = VcmApplication.class)
 @ContextConfiguration
 @WebAppConfiguration
-public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
+public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
 
     private static final SimpleDateFormat ISO_DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
     private static final int TEN_DAYS_AGO = -10;
