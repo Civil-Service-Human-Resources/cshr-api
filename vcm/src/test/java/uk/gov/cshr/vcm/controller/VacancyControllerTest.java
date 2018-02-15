@@ -124,6 +124,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             .latitude(51.4549291)
             .longitude(-2.6278111)
             .displayCscContent(Boolean.TRUE)
+            .selectionProcessDetails("selectionProcessDetails")
             .build();
 
     private Vacancy vacancy2 = Vacancy.builder()
@@ -285,6 +286,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.description", is(this.vacancy1.getDescription())))
                 .andExpect(jsonPath("$.shortDescription", is(this.vacancy1.getShortDescription())))
                 .andExpect(jsonPath("$.displayCscContent", is(this.vacancy1.getDisplayCscContent())))
+                .andExpect(jsonPath("$.selectionProcessDetails", is(this.vacancy1.getSelectionProcessDetails())))
                 .andExpect(jsonPath("$.location", is(this.vacancy1.getLocation())))
                 .andExpect(jsonPath("$.grade", is(this.vacancy1.getGrade())))
                 .andExpect(jsonPath("$.role", is(this.vacancy1.getRole())))
