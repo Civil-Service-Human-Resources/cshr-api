@@ -94,7 +94,12 @@ public class ClosingDateTest extends AbstractTestNGSpringContextTests {
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
-        department = departmentRepository.save(Department.builder().name("Department One").build());
+        department = departmentRepository.save(
+                Department.builder()
+                        .name("Department One")
+                        .disabilityLogo("disabilityLogo")
+                        .build());
+
         createdDepartments.add(department);
 
         given(locationService.find(any()))
@@ -180,7 +185,9 @@ public class ClosingDateTest extends AbstractTestNGSpringContextTests {
         Vacancy vacancy = objectMapper.readValue(updatedVacancyJson, Vacancy.class);
 
         Assert.assertEquals("Date updated", THIRTY_DAYS_FROM_NOW, vacancy.getClosingDate());
-
+        Assert.assertEquals("dept disability logo",
+                vacancy.getDepartment().getDisabilityLogo(),
+                department.getDisabilityLogo());
     }
 
     public Page<Vacancy> findVancancies() throws Exception {
