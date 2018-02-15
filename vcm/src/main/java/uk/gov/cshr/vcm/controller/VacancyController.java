@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Optional;
 import javax.inject.Inject;
 import org.slf4j.Logger;
@@ -71,8 +72,12 @@ public class VacancyController {
         if (!foundVacancy.isPresent()) {
             log.debug("No vacancy found for id " + vacancyId);
         }
+        else if (foundVacancy.get().getClosingDate().before(new Date())) {
+            throw new VacancyClosedException(vacancyId);
+        }
 
         ResponseEntity<Vacancy> notFound = ResponseEntity.notFound().build();
+
         return foundVacancy.map((Vacancy vacancy) -> {
             return ResponseEntity.ok().body(vacancy);
         }).orElse(notFound);

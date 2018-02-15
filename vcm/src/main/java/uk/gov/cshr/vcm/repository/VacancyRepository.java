@@ -1,6 +1,5 @@
 package uk.gov.cshr.vcm.repository;
 
-import java.util.Date;
 import java.util.Optional;
 import javax.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -9,23 +8,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import uk.gov.cshr.vcm.controller.exception.VacancyClosedException;
 import uk.gov.cshr.vcm.model.Vacancy;
 
 @Repository
 @Transactional
-public interface VacancyRepository extends PagingAndSortingRepository<Vacancy, Long>, VacancyRepositoryCustom {
+public interface VacancyRepository extends PagingAndSortingRepository<Vacancy, Long>,
+        VacancyRepositoryCustom {
 
     default Optional<Vacancy> findById(Long id) {
 
-        Optional<Vacancy> vacancy = Optional.ofNullable(this.findOne(id));
-
-        if (vacancy.isPresent() && vacancy.get().getClosingDate().before(new Date())) {
-            throw new VacancyClosedException(id);
-        }
-        else {
-            return vacancy;
-        }
+        return Optional.ofNullable(this.findOne(id));
     }
 
     /**
