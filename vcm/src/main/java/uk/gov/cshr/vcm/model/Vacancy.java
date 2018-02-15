@@ -114,4 +114,7 @@ public class Vacancy implements Serializable {
 
     @Column(name = "displaycsccontent")
     private Boolean displayCscContent;
+
+    @Column(name = "selectionprocessdetails")
+    private String selectionProcessDetails;
 }
