@@ -5,17 +5,12 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Optional;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,23 +22,27 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.cshr.vcm.controller.exception.VacancyClosedException;
 import uk.gov.cshr.vcm.controller.exception.VacancyError;
-import uk.gov.cshr.vcm.model.Coordinates;
-import uk.gov.cshr.vcm.model.SearchParameters;
+import uk.gov.cshr.vcm.exception.LocationServiceException;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
-import uk.gov.cshr.vcm.service.LocationService;
+import uk.gov.cshr.vcm.service.SearchService;
+
+import javax.inject.Inject;
+import java.net.URI;
+import java.util.Date;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/vacancy", produces = MediaType.APPLICATION_JSON_VALUE)
 @ResponseBody
-@Api(value = "vacancyservice", description = "Operations pertaining to vacancies for jobs in Government")
+@Api(value = "vacancyservice")
 public class VacancyController {
 
     private static final Logger log = LoggerFactory.getLogger(VacancyController.class);
 
     @Inject
-    private LocationService locationService;
+    private SearchService searchService;
 
     private final VacancyRepository vacancyRepository;
 
@@ -56,6 +55,7 @@ public class VacancyController {
     @ApiOperation(value = "Find all vacancies with support for pagination", nickname = "findAll")
     public ResponseEntity<Page<Vacancy>> findAll(Pageable pageable) {
         Page<Vacancy> vacancies = vacancyRepository.findAll(pageable);
+
         return ResponseEntity.ok().body(vacancies);
     }
 
@@ -63,24 +63,19 @@ public class VacancyController {
     @ApiOperation(value = "Find a specific vacancy for an id", nickname = "findById")
     @ApiResponse(code = 410, response = VacancyClosedException.class, message = VacancyClosedException.CLOSED_MESSAGE)
     @ApiResponses(value = {
-        @ApiResponse(code = 410, message = VacancyClosedException.CLOSED_MESSAGE, response = VacancyError.class)
+            @ApiResponse(code = 410, message = VacancyClosedException.CLOSED_MESSAGE, response = VacancyError.class)
     })
     public ResponseEntity<Vacancy> findById(@PathVariable Long vacancyId) {
 
         Optional<Vacancy> foundVacancy = vacancyRepository.findById(vacancyId);
 
-        if (!foundVacancy.isPresent()) {
+        if (!foundVacancy.isPresent() && log.isDebugEnabled()) {
             log.debug("No vacancy found for id " + vacancyId);
-        }
-        else if (foundVacancy.get().getClosingDate().before(new Date())) {
+        } else if (foundVacancy.isPresent() && foundVacancy.get().getClosingDate().before(new Date())) {
             throw new VacancyClosedException(vacancyId);
         }
 
-        ResponseEntity<Vacancy> notFound = ResponseEntity.notFound().build();
-
-        return foundVacancy.map((Vacancy vacancy) -> {
-            return ResponseEntity.ok().body(vacancy);
-        }).orElse(notFound);
+        return foundVacancy.map(ResponseEntity.ok()::body).orElse(ResponseEntity.notFound().build());
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -102,18 +97,13 @@ public class VacancyController {
 
         Optional<Vacancy> foundVacancy = vacancyRepository.findById(vacancyId);
 
-        if (!foundVacancy.isPresent()) {
-            log.error("No vacancy found for id " + vacancyId);
-        }
-
-        ResponseEntity<Vacancy> notFound = ResponseEntity.notFound().build();
-
         return foundVacancy.map((Vacancy vacancy) -> {
             // Attention, mutable state on the argument
             vacancyUpdate.setId(vacancy.getId());
             vacancyRepository.save(vacancyUpdate);
+
             return ResponseEntity.ok().body(vacancy);
-        }).orElse(notFound);
+        }).orElse(ResponseEntity.notFound().build());
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/{vacancyId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -121,53 +111,22 @@ public class VacancyController {
     public ResponseEntity<Vacancy> deleteById(@PathVariable Long vacancyId) {
 
         vacancyRepository.delete(vacancyId);
+
         return ResponseEntity.noContent().build();
-
-    }
-
-    @RequestMapping(method = RequestMethod.GET, value = "/search/location/{location}/keyword/{keyword}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Search for vacancies by location and keyword with support for pagination", nickname = "searchByLocationAndKeyword")
-    @Deprecated
-    public ResponseEntity<Page<Vacancy>> search(@PathVariable String location, @PathVariable String keyword, Pageable pageable) {
-        Page<Vacancy> vacancies = vacancyRepository.search(location, keyword, pageable);
-
-        return ResponseEntity.ok().body(vacancies);
-    }
-
-    @RequestMapping(method = RequestMethod.GET, value = "/search/location/{location}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Search for vacancies by location", nickname = "searchByLocation")
-    @Deprecated
-    public ResponseEntity<Page<Vacancy>> search(@PathVariable String location, Pageable pageable) {
-        Page<Vacancy> vacancies = vacancyRepository.search(location, pageable);
-
-        return ResponseEntity.ok().body(vacancies);
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Search for vacancies by location and keyword with support for pagination", nickname = "search")
     public ResponseEntity<Page<Vacancy>> search(@ApiParam(name = "searchParameters", value = "The values supplied to perform the search with", required = true) @RequestBody VacancySearchParameters vacancySearchParameters, Pageable pageable) {
-        log.debug("Starting search with vacancySearchParameters: " + vacancySearchParameters.toString());
+        ResponseEntity<Page<Vacancy>> response;
 
-        Coordinates coordinates = locationService.find(vacancySearchParameters.getLocation().getPlace());
-
-        Page<Vacancy> vacancies;
-
-        if (coordinatesExist(coordinates)) {
-            log.debug("Coordinates for " + vacancySearchParameters.getLocation().getPlace() + " with radius of " + vacancySearchParameters.getLocation().getRadius() + " exist");
-            SearchParameters searchParameters = SearchParameters.builder()
-                    .vacancySearchParameters(vacancySearchParameters)
-                    .coordinates(coordinates)
-                    .build();
-            vacancies = vacancyRepository.search(searchParameters, pageable);
-        } else {
-            log.debug("No coordinates for " + vacancySearchParameters.getLocation().getPlace() + " with radius of " + vacancySearchParameters.getLocation().getRadius() + " exist");
-            vacancies = new PageImpl<>(new ArrayList<Vacancy>());
+        try {
+            Page<Vacancy> vacancies = searchService.search(vacancySearchParameters, pageable);
+            response = ResponseEntity.ok().body(vacancies);
+        } catch (LocationServiceException ex) {
+            response = ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
 
-        return ResponseEntity.ok().body(vacancies);
-    }
-
-    private boolean coordinatesExist(Coordinates coordinates) {
-        return coordinates != null && coordinates.getLatitude() != null && coordinates.getLongitude() != null;
+        return response;
     }
 }
