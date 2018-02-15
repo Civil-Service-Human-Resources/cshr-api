@@ -155,6 +155,34 @@ public class ClosingDateTest extends AbstractTestNGSpringContextTests {
                 containsString(VacancyClosedException.CLOSED_MESSAGE));
     }
 
+    @Test
+    public void testUpdateClosedVacancy() throws Exception {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        Vacancy closedVacancy = createVacancyWithClosingDate(YESTERDAY, department);
+        closedVacancy.setClosingDate(THIRTY_DAYS_FROM_NOW);
+
+        MvcResult mvcUpdateResult = this.mockMvc.perform(put("/vacancy/" + closedVacancy.getId())
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(objectMapper.writeValueAsString(closedVacancy))
+                .accept(APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        MvcResult mvcFindResult = this.mockMvc.perform(get("/vacancy/" + closedVacancy.getId())
+                .contentType(APPLICATION_JSON_UTF8)
+                .accept(APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String updatedVacancyJson = mvcFindResult.getResponse().getContentAsString();
+        Vacancy vacancy = objectMapper.readValue(updatedVacancyJson, Vacancy.class);
+
+        Assert.assertEquals("Date updated", THIRTY_DAYS_FROM_NOW, vacancy.getClosingDate());
+
+    }
+
     public Page<Vacancy> findVancancies() throws Exception {
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -205,6 +233,8 @@ public class ClosingDateTest extends AbstractTestNGSpringContextTests {
                 .numberVacancies(1)
                 .latitude(BRISTOL_LATITUDE)
                 .longitude(BRISTOL_LONGITUDE)
+                .identifier(1L)
+                .role("role")
                 .build();
 
         vacancy.setDepartment(department);
