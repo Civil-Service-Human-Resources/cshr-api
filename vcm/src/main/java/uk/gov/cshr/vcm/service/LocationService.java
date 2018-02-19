@@ -38,7 +38,7 @@ public class LocationService {
         try {
             coordinates = new RestTemplate().getForObject(locationServiceURL, Coordinates.class, params);
 
-            if (log.isDebugEnabled()) {
+            if (log.isDebugEnabled() && coordinates != null) {
                 log.debug(String.format("Coordinates returned from the external lookup service for %s are %s", location, coordinates.toString()));
             }
         } catch (Exception ex) {
