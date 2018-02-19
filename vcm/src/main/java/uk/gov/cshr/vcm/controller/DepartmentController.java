@@ -1,5 +1,8 @@
 package uk.gov.cshr.vcm.controller;
 
+import java.net.URI;
+import java.util.Optional;
+
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,9 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
-
-import java.net.URI;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/department", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -1,5 +1,11 @@
 package uk.gov.cshr.vcm.controller;
 
+import java.net.URI;
+import java.util.Date;
+import java.util.Optional;
+
+import javax.inject.Inject;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -27,11 +33,6 @@ import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
 import uk.gov.cshr.vcm.service.SearchService;
-
-import javax.inject.Inject;
-import java.net.URI;
-import java.util.Date;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/vacancy", produces = MediaType.APPLICATION_JSON_VALUE)

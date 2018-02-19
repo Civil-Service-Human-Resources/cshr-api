@@ -1,13 +1,12 @@
 package uk.gov.cshr.vcm.controller;
 
+import static org.mockito.BDDMockito.given;
+
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 import uk.gov.cshr.vcm.exception.LocationServiceException;
 import uk.gov.cshr.vcm.model.Coordinates;
 import uk.gov.cshr.vcm.service.LocationService;
-
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
 
 public abstract class SearchTestConfiguration extends AbstractJUnit4SpringContextTests {
     static final double BRISTOL_LATITUDE = 51.4549291;

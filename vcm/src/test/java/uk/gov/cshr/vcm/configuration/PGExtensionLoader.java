@@ -1,11 +1,11 @@
 package uk.gov.cshr.vcm.configuration;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PGExtensionLoader {
     private static final Logger log = LoggerFactory.getLogger(PGExtensionLoader.class);
