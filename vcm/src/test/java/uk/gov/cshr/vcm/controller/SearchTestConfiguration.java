@@ -9,16 +9,18 @@ import uk.gov.cshr.vcm.model.Coordinates;
 import uk.gov.cshr.vcm.service.LocationService;
 
 public abstract class SearchTestConfiguration extends AbstractJUnit4SpringContextTests {
-    static final double BRISTOL_LATITUDE = 51.4549291;
-    static final double BRISTOL_LONGITUDE = -2.6278111;
+    public static final double BRISTOL_LATITUDE = 51.4549291;
+    public static final double BRISTOL_LONGITUDE = -2.6278111;
 
-    static final double NEWCASTLE_LATITUDE = 54.9806308;
-    static final double NEWCASTLE_LONGITUDE = -1.6167437;
+    public static final double NEWCASTLE_LATITUDE = 54.9806308;
+    public static final double NEWCASTLE_LONGITUDE = -1.6167437;
+
+    public static final Coordinates BRISTOL_COORDINATES = Coordinates.builder().latitude(BRISTOL_LATITUDE).longitude(BRISTOL_LONGITUDE).build();
 
     @MockBean
-    LocationService locationService;
+    public LocationService locationService;
 
-    void initLocationService() throws LocationServiceException {
+    public void initLocationService() throws LocationServiceException {
         given(locationService.find("bristol"))
                 .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE));
 
