@@ -1,6 +1,10 @@
 package uk.gov.cshr.vcm.repository;
 
 import com.google.common.io.ByteStreams;
+import java.io.IOException;
+import java.io.InputStream;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,16 +13,11 @@ import uk.gov.cshr.vcm.model.Location;
 import uk.gov.cshr.vcm.model.SearchParameters;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-
 /**
  * Tests {@link SearchQueryBuilder}
  */
 public class SearchQueryBuilderTest {
+
     private static final String ALL_PARAMETERS_SELECT_VALUES_QUERY = "/repository/AllParametersSuppliedSelectValuesQuery.sql";
     private static final String BLANK = "";
     private static final String BRISTOL = "Bristol";
