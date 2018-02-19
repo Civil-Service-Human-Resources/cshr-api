@@ -1,28 +1,13 @@
 package uk.gov.cshr.vcm.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.nio.charset.Charset;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import javax.inject.Inject;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.After;
 import org.junit.Assert;
-import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -30,26 +15,37 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.cshr.vcm.VcmApplication;
 import uk.gov.cshr.vcm.controller.exception.VacancyClosedException;
 import uk.gov.cshr.vcm.controller.exception.VacancyError;
 import uk.gov.cshr.vcm.exception.LocationServiceException;
-import uk.gov.cshr.vcm.model.Coordinates;
 import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.model.Location;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
-import uk.gov.cshr.vcm.service.LocationService;
+
+import javax.inject.Inject;
+import java.nio.charset.Charset;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.fail;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Ignore
 @RunWith(SpringRunner.class)
@@ -57,10 +53,7 @@ import uk.gov.cshr.vcm.service.LocationService;
 @ContextConfiguration
 @WebAppConfiguration
 @TestExecutionListeners(MockitoTestExecutionListener.class)
-public class ClosingDateTest extends AbstractTestNGSpringContextTests {
-
-    public static final double BRISTOL_LATITUDE = 51.4549291;
-    public static final double BRISTOL_LONGITUDE = -2.6278111;
+public class ClosingDateTest extends SearchTestConfiguration {
 
     final private MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(),
@@ -76,9 +69,6 @@ public class ClosingDateTest extends AbstractTestNGSpringContextTests {
     private DepartmentRepository departmentRepository;
 
     private MockMvc mockMvc;
-
-    @MockBean
-    private LocationService locationService;
 
     private static final Timestamp YESTERDAY = getTime(-1);
     private static final Timestamp TODAY = getTime(0);
@@ -103,20 +93,14 @@ public class ClosingDateTest extends AbstractTestNGSpringContextTests {
 
         createdDepartments.add(department);
 
-        given(locationService.find(any()))
-                .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE));
+        initLocationService();
     }
 
     @After
     public void after() {
+            vacancyRepository.delete(createdVacancies);
 
-        for (Vacancy createdVacancy : createdVacancies) {
-            vacancyRepository.delete(createdVacancy);
-        }
-
-        for (Department createdDepartment : createdDepartments) {
-            departmentRepository.delete(createdDepartment);
-        }
+            departmentRepository.delete(createdDepartments);
     }
 
     @Test

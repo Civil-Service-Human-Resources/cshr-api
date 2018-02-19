@@ -1,6 +1,31 @@
 package uk.gov.cshr.vcm.controller;
 
-import static java.lang.Math.toIntExact;
+import org.assertj.core.api.Assertions;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+import uk.gov.cshr.vcm.VcmApplication;
+import uk.gov.cshr.vcm.exception.LocationServiceException;
+import uk.gov.cshr.vcm.model.Department;
+import uk.gov.cshr.vcm.model.Vacancy;
+import uk.gov.cshr.vcm.repository.DepartmentRepository;
+import uk.gov.cshr.vcm.repository.VacancyRepository;
+
+import javax.inject.Inject;
 import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -9,41 +34,23 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import javax.inject.Inject;
-import org.assertj.core.api.Assertions;
+
+import static java.lang.Math.toIntExact;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-import uk.gov.cshr.vcm.VcmApplication;
-import uk.gov.cshr.vcm.model.Department;
-import uk.gov.cshr.vcm.model.Vacancy;
-import uk.gov.cshr.vcm.repository.DepartmentRepository;
-import uk.gov.cshr.vcm.repository.VacancyRepository;
 
+@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = VcmApplication.class)
 @ContextConfiguration
 @WebAppConfiguration
-public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
+@TestExecutionListeners(MockitoTestExecutionListener.class)
+public class VacancyControllerTest extends SearchTestConfiguration {
 
     private static final SimpleDateFormat ISO_DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
     private static final int TEN_DAYS_AGO = -10;
-    private static final Timestamp THIRTY_DAYS_FROM_NOW = getTime(30);
+    private static final Timestamp THIRTY_DAYS_FROM_NOW = getTime(30, 0);
     private static final int TWENTY_DAYS_AGO = -20;
     private static final int TWENTY_DAYS_FROM_NOW = 20;
 
@@ -58,11 +65,12 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
 
     private MockMvc mvc;
 
-    final private MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
+    private final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(),
             Charset.forName("utf8"));
 
     private Vacancy requestBodyVacancy = Vacancy.builder()
+            .id(4L)
             .identifier(398457344L)
             .title("testTitle")
             .description("testDescription")
@@ -126,6 +134,7 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
             .longitude(-2.6278111)
             .displayCscContent(Boolean.TRUE)
             .selectionProcessDetails("selectionProcessDetails")
+            .publicOpeningDate(getTime(TWENTY_DAYS_AGO, 0))
             .build();
 
     private Vacancy vacancy2 = Vacancy.builder()
@@ -133,7 +142,7 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
             .identifier(398457346L)
             .title("testTitle2")
             .description("testDescription2")
-            .location("testLocation2")
+            .location("Bristol")
             .grade("testGrade2")
             .role("testRole2")
             .responsibilities("testResponsibilities2")
@@ -149,6 +158,7 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
             .numberVacancies(2)
             .latitude(51.4549291)
             .longitude(-2.6278111)
+            .publicOpeningDate(getTime(TWENTY_DAYS_AGO, 0))
             .build();
 
     private Vacancy vacancy3 = Vacancy.builder()
@@ -156,7 +166,7 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
             .identifier(398457347L)
             .title("testTitle3")
             .description("testDescription3")
-            .location("testLocation3")
+            .location("Bristol")
             .grade("testGrade3")
             .role("testRole3")
             .responsibilities("testResponsibilities3")
@@ -172,16 +182,24 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
             .numberVacancies(2)
             .latitude(51.4549291)
             .longitude(-2.6278111)
+            .publicOpeningDate(getTime(TWENTY_DAYS_AGO, 0))
             .build();
 
-    @BeforeMethod
-    void setup() {
+
+    private Department department1;
+    private Department department2;
+    private Department department3;
+
+    @Before
+    public void setup() throws LocationServiceException {
 
         this.mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
-        Department department1 = departmentRepository.save(Department.builder().id(1L).name("Department One").build());
-        Department department2 = departmentRepository.save(Department.builder().id(2L).name("Department Two").build());
-        Department department3 = departmentRepository.save(Department.builder().id(3L).name("Department Three").build());
+        initLocationService();
+
+        department1 = departmentRepository.save(Department.builder().name("Department One").build());
+        department2 = departmentRepository.save(Department.builder().name("Department Two").build());
+        department3 = departmentRepository.save(Department.builder().name("Department Three").build());
 
         vacancy1.setDepartment(department1);
         Vacancy savedVacancy1 = this.vacancyRepository.save(vacancy1);
@@ -196,8 +214,8 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
         vacancy3.setId(savedVacancy3.getId());
     }
 
-    @AfterMethod
-    void tearDown() {
+    @After
+    public void tearDown() {
         this.vacancyRepository.deleteAll();
 
         this.departmentRepository.deleteAll();
@@ -226,7 +244,7 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
                 .andExpect(jsonPath("$.content[0].role", is(this.vacancy1.getRole())))
                 .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy1.getResponsibilities())))
                 .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy1.getWorkingHours())))
-                .andExpect(jsonPath("$.content[0].closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
+                .andExpect(jsonPath("$.content[0].closingDate", is(ISO_DATEFORMAT.format(vacancy1.getClosingDate()))))
                 .andExpect(jsonPath("$.content[0].contactName", is(this.vacancy1.getContactName())))
                 .andExpect(jsonPath("$.content[0].contactDepartment", is(this.vacancy1.getContactDepartment())))
                 .andExpect(jsonPath("$.content[0].contactEmail", is(this.vacancy1.getContactEmail())))
@@ -243,7 +261,7 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
                 .andExpect(jsonPath("$.content[1].role", is(this.vacancy2.getRole())))
                 .andExpect(jsonPath("$.content[1].responsibilities", is(this.vacancy2.getResponsibilities())))
                 .andExpect(jsonPath("$.content[1].workingHours", is(this.vacancy2.getWorkingHours())))
-                .andExpect(jsonPath("$.content[1].closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
+                .andExpect(jsonPath("$.content[1].closingDate", is(ISO_DATEFORMAT.format(vacancy2.getClosingDate()))))
                 .andExpect(jsonPath("$.content[1].contactName", is(this.vacancy2.getContactName())))
                 .andExpect(jsonPath("$.content[1].contactDepartment", is(this.vacancy2.getContactDepartment())))
                 .andExpect(jsonPath("$.content[1].contactEmail", is(this.vacancy2.getContactEmail())))
@@ -260,7 +278,7 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
                 .andExpect(jsonPath("$.content[2].role", is(this.vacancy3.getRole())))
                 .andExpect(jsonPath("$.content[2].responsibilities", is(this.vacancy3.getResponsibilities())))
                 .andExpect(jsonPath("$.content[2].workingHours", is(this.vacancy3.getWorkingHours())))
-                .andExpect(jsonPath("$.content[2].closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
+                .andExpect(jsonPath("$.content[2].closingDate", is(ISO_DATEFORMAT.format(vacancy3.getClosingDate()))))
                 .andExpect(jsonPath("$.content[2].contactName", is(this.vacancy3.getContactName())))
                 .andExpect(jsonPath("$.content[2].contactDepartment", is(this.vacancy3.getContactDepartment())))
                 .andExpect(jsonPath("$.content[2].contactEmail", is(this.vacancy3.getContactEmail())))
@@ -410,48 +428,6 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
         Assertions.assertThat(validIds.contains(vacancy.getId()));
     }
 
-
-    /**
-     * Current search implementation is primitive, this test will evolve with time
-     * <p>
-     * The test has to be disabled for now until the h2 in memory database has been replaced by a postgres docker instance.
-     * The query in use is not supported by h2 db.
-     *
-     * @throws Exception if any unexpected error occurs
-     */
-    @Test(enabled = false)
-    public void testSearch() throws Exception {
-        // Given
-        String path = "/vacancy/search/location/searchQueryLocation/keyword/search?page=0&size=1";
-
-        // When
-        ResultActions sendRequest = mvc.perform(get(path));
-
-        // Then
-        sendRequest
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$.content", hasSize(1)))
-                .andExpect(jsonPath("$.totalElements", is(1)))
-                .andExpect(jsonPath("$.content[0].id", is(toIntExact(this.vacancy1.getId()))))
-                .andExpect(jsonPath("$.content[0].identifier", is(toIntExact(this.vacancy1.getIdentifier()))))
-                .andExpect(jsonPath("$.content[0].description", is(this.vacancy1.getDescription())))
-                .andExpect(jsonPath("$.content[0].location", is(this.vacancy1.getLocation())))
-                .andExpect(jsonPath("$.content[0].grade", is(this.vacancy1.getGrade())))
-                .andExpect(jsonPath("$.content[0].role", is(this.vacancy1.getRole())))
-                .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy1.getResponsibilities())))
-                .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy1.getWorkingHours())))
-                .andExpect(jsonPath("$.content[0].closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
-                .andExpect(jsonPath("$.content[0].contactName", is(this.vacancy1.getContactName())))
-                .andExpect(jsonPath("$.content[0].contactDepartment", is(this.vacancy1.getContactDepartment())))
-                .andExpect(jsonPath("$.content[0].contactEmail", is(this.vacancy1.getContactEmail())))
-                .andExpect(jsonPath("$.content[0].contactTelephone", is(this.vacancy1.getContactTelephone())))
-                .andExpect(jsonPath("$.content[0].eligibility", is(this.vacancy1.getEligibility())))
-                .andExpect(jsonPath("$.content[0].salaryMin", is(this.vacancy1.getSalaryMin())))
-                .andExpect(jsonPath("$.content[0].salaryMax", is(this.vacancy1.getSalaryMax())))
-                .andExpect(jsonPath("$.content[0].numberVacancies", is(this.vacancy1.getNumberVacancies())));
-    }
-
     @Test
     public void testFindAllPaginated() throws Exception {
         // Given
@@ -473,7 +449,7 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
 
     @Test
     public void search_invalidHttpVerb() throws Exception {
-        String path = "/vacancy/search?page=0&size=1";
+        String path = "/vacancy/search?page=0&size=10";
 
         mvc.perform(get(path).contentType(APPLICATION_JSON_UTF8).content(requestBody)).andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
     }
@@ -485,7 +461,7 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
 
     private void performSearchError400Test(String requestBody) throws Exception {
         // Given
-        String path = "/vacancy/search?page=0&size=1";
+        String path = "/vacancy/search?page=0&size=10";
 
         mvc.perform(post(path).contentType(APPLICATION_JSON_UTF8).content(requestBody)).andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
     }
@@ -495,16 +471,16 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
         performSearchError400Test("{\"keyword\": \"foo\"}");
     }
 
-    @Test(enabled = false)
+    @Test
     public void search_locationAndKeywordSupplied() throws Exception {
         // Given
-        String path = "/vacancy/search?page=0&size=1";
+        String path = "/vacancy/search?page=0&size=10";
 
         String requestBody = "{\n" +
                 "  \"department\": [],\n" +
-                "  \"keyword\": \"search\",\n" +
+                "  \"keyword\": \"test\",\n" +
                 "  \"location\": {\n" +
-                "    \"place\": \"searchQueryLocation\",\n" +
+                "    \"place\": \"bristol\",\n" +
                 "    \"radius\": \"30\"\n" +
                 "  }\n" +
                 "}";
@@ -515,8 +491,8 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
         sendRequest
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$.content", hasSize(1)))
-                .andExpect(jsonPath("$.totalElements", is(1)))
+                .andExpect(jsonPath("$.content", hasSize(3)))
+                .andExpect(jsonPath("$.totalElements", is(3)))
                 .andExpect(jsonPath("$.content[0].id", is(toIntExact(this.vacancy1.getId()))))
                 .andExpect(jsonPath("$.content[0].identifier", is(toIntExact(this.vacancy1.getIdentifier()))))
                 .andExpect(jsonPath("$.content[0].description", is(this.vacancy1.getDescription())))
@@ -534,14 +510,52 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
                 .andExpect(jsonPath("$.content[0].salaryMin", is(this.vacancy1.getSalaryMin())))
                 .andExpect(jsonPath("$.content[0].salaryMax", is(this.vacancy1.getSalaryMax())))
                 .andExpect(jsonPath("$.content[0].numberVacancies", is(this.vacancy1.getNumberVacancies())))
-                .andExpect(jsonPath("$.content[0].department.id", is(this.vacancy1.getDepartment().getId())))
-                .andExpect(jsonPath("$.content[0].department.name", is(this.vacancy1.getDepartment().getName())));
+                .andExpect(jsonPath("$.content[0].department.id", is(this.vacancy1.getDepartment().getId().intValue())))
+                .andExpect(jsonPath("$.content[0].department.name", is(this.vacancy1.getDepartment().getName())))
+                .andExpect(jsonPath("$.content[1].id", is(toIntExact(this.vacancy2.getId()))))
+                .andExpect(jsonPath("$.content[1].identifier", is(toIntExact(this.vacancy2.getIdentifier()))))
+                .andExpect(jsonPath("$.content[1].description", is(this.vacancy2.getDescription())))
+                .andExpect(jsonPath("$.content[1].location", is(this.vacancy2.getLocation())))
+                .andExpect(jsonPath("$.content[1].grade", is(this.vacancy2.getGrade())))
+                .andExpect(jsonPath("$.content[1].role", is(this.vacancy2.getRole())))
+                .andExpect(jsonPath("$.content[1].responsibilities", is(this.vacancy2.getResponsibilities())))
+                .andExpect(jsonPath("$.content[1].workingHours", is(this.vacancy2.getWorkingHours())))
+                .andExpect(jsonPath("$.content[1].closingDate", is(ISO_DATEFORMAT.format(vacancy2.getClosingDate()))))
+                .andExpect(jsonPath("$.content[1].contactName", is(this.vacancy2.getContactName())))
+                .andExpect(jsonPath("$.content[1].contactDepartment", is(this.vacancy2.getContactDepartment())))
+                .andExpect(jsonPath("$.content[1].contactEmail", is(this.vacancy2.getContactEmail())))
+                .andExpect(jsonPath("$.content[1].contactTelephone", is(this.vacancy2.getContactTelephone())))
+                .andExpect(jsonPath("$.content[1].eligibility", is(this.vacancy2.getEligibility())))
+                .andExpect(jsonPath("$.content[1].salaryMin", is(this.vacancy2.getSalaryMin())))
+                .andExpect(jsonPath("$.content[1].salaryMax", is(this.vacancy2.getSalaryMax())))
+                .andExpect(jsonPath("$.content[1].numberVacancies", is(this.vacancy2.getNumberVacancies())))
+                .andExpect(jsonPath("$.content[1].department.id", is(this.vacancy2.getDepartment().getId().intValue())))
+                .andExpect(jsonPath("$.content[1].department.name", is(this.vacancy2.getDepartment().getName())))
+                .andExpect(jsonPath("$.content[2].id", is(toIntExact(this.vacancy3.getId()))))
+                .andExpect(jsonPath("$.content[2].identifier", is(toIntExact(this.vacancy3.getIdentifier()))))
+                .andExpect(jsonPath("$.content[2].description", is(this.vacancy3.getDescription())))
+                .andExpect(jsonPath("$.content[2].location", is(this.vacancy3.getLocation())))
+                .andExpect(jsonPath("$.content[2].grade", is(this.vacancy3.getGrade())))
+                .andExpect(jsonPath("$.content[2].role", is(this.vacancy3.getRole())))
+                .andExpect(jsonPath("$.content[2].responsibilities", is(this.vacancy3.getResponsibilities())))
+                .andExpect(jsonPath("$.content[2].workingHours", is(this.vacancy3.getWorkingHours())))
+                .andExpect(jsonPath("$.content[2].closingDate", is(ISO_DATEFORMAT.format(vacancy3.getClosingDate()))))
+                .andExpect(jsonPath("$.content[2].contactName", is(this.vacancy3.getContactName())))
+                .andExpect(jsonPath("$.content[2].contactDepartment", is(this.vacancy3.getContactDepartment())))
+                .andExpect(jsonPath("$.content[2].contactEmail", is(this.vacancy3.getContactEmail())))
+                .andExpect(jsonPath("$.content[2].contactTelephone", is(this.vacancy3.getContactTelephone())))
+                .andExpect(jsonPath("$.content[2].eligibility", is(this.vacancy3.getEligibility())))
+                .andExpect(jsonPath("$.content[2].salaryMin", is(this.vacancy3.getSalaryMin())))
+                .andExpect(jsonPath("$.content[2].salaryMax", is(this.vacancy3.getSalaryMax())))
+                .andExpect(jsonPath("$.content[2].numberVacancies", is(this.vacancy3.getNumberVacancies())))
+                .andExpect(jsonPath("$.content[2].numberVacancies", is(this.vacancy3.getNumberVacancies())))
+                .andExpect(jsonPath("$.content[2].department.id", is(this.vacancy3.getDepartment().getId().intValue())));
     }
 
-    @Test(enabled = false)
+    @Test
     public void search_noResultsForlocationAndKeywordAndDepartment() throws Exception {
         // Given
-        String path = "/vacancy/search?page=0&size=1";
+        String path = "/vacancy/search?page=0&size=10";
 
         String requestBody = "{\n" +
                 "  \"department\": [\"2\"],\n" +
@@ -563,10 +577,10 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
 
     }
 
-    @Test(enabled = false)
+    @Test
     public void search_noResultsForlocationAndKeywordAndEmptyDepartment() throws Exception {
         // Given
-        String path = "/vacancy/search?page=0&size=1";
+        String path = "/vacancy/search?page=0&size=10";
 
         String requestBody = "{\n" +
                 "  \"department\": [],\n" +
@@ -588,16 +602,19 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
 
     }
 
-    @Test(enabled = false)
+    @Test
     public void search_locationAndKeywordAndDepartment() throws Exception {
         // Given
-        String path = "/vacancy/search?page=0&size=1";
+        String path = "/vacancy/search?page=0&size=10";
+        String d1 = department1.getId().toString();
 
         String requestBody = "{\n" +
-                "  \"department\": [\"1\"],\n" +
+                "  \"department\": [\"" +
+                d1 +
+                "\"],\n" +
                 "  \"keyword\": \"search\",\n" +
                 "  \"location\": {\n" +
-                "    \"place\": \"searchQueryLocation\",\n" +
+                "    \"place\": \"bristol\",\n" +
                 "    \"radius\": \"30\"\n" +
                 "  }\n" +
                 "}";
@@ -627,20 +644,20 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
                 .andExpect(jsonPath("$.content[0].salaryMin", is(this.vacancy1.getSalaryMin())))
                 .andExpect(jsonPath("$.content[0].salaryMax", is(this.vacancy1.getSalaryMax())))
                 .andExpect(jsonPath("$.content[0].numberVacancies", is(this.vacancy1.getNumberVacancies())))
-                .andExpect(jsonPath("$.content[0].department.id", is(this.vacancy1.getDepartment().getId())))
+                .andExpect(jsonPath("$.content[0].department.id", is(this.vacancy1.getDepartment().getId().intValue())))
                 .andExpect(jsonPath("$.content[0].department.name", is(this.vacancy1.getDepartment().getName())));
     }
 
-    @Test(enabled = false)
+    @Test
     public void search_locationAndKeywordAndEmptyDepartment() throws Exception {
         // Given
-        String path = "/vacancy/search?page=0&size=1";
+        String path = "/vacancy/search?page=0&size=10";
 
         String requestBody = "{\n" +
                 "  \"department\": [],\n" +
                 "  \"keyword\": \"search\",\n" +
                 "  \"location\": {\n" +
-                "    \"place\": \"searchQueryLocation\",\n" +
+                "    \"place\": \"bristol\",\n" +
                 "    \"radius\": \"30\"\n" +
                 "  }\n" +
                 "}";
@@ -670,22 +687,26 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
                 .andExpect(jsonPath("$.content[0].salaryMin", is(this.vacancy1.getSalaryMin())))
                 .andExpect(jsonPath("$.content[0].salaryMax", is(this.vacancy1.getSalaryMax())))
                 .andExpect(jsonPath("$.content[0].numberVacancies", is(this.vacancy1.getNumberVacancies())))
-                .andExpect(jsonPath("$.content[0].department.id", is(this.vacancy1.getDepartment().getId())))
+                .andExpect(jsonPath("$.content[0].department.id", is(this.vacancy1.getDepartment().getId().intValue())))
                 .andExpect(jsonPath("$.content[0].department.name", is(this.vacancy1.getDepartment().getName())));
     }
 
-    @Test(enabled = false)
+    @Test
     public void search_locationAndKeywordAndDepartments() throws Exception {
         // Given
-        String path = "/vacancy/search?page=0&size=1";
+        String path = "/vacancy/search?page=0&size=10";
+        String d1 = department1.getId().toString();
+        String d2 = department2.getId().toString();
 
         String requestBody = "{\n" +
-                "  \"department\": [\n" +
-                "    \"1\",\"2\"\n" +
-                "  ],\n" +
-                "  \"keyword\": \"search\",\n" +
+                "  \"department\": [ \"" +
+                d1 +
+                "\",\"" +
+                d2 +
+                "\"],\n" +
+                "  \"keyword\": \"test\",\n" +
                 "  \"location\": {\n" +
-                "    \"place\": \"testLocation\",\n" +
+                "    \"place\": \"bristol\",\n" +
                 "    \"radius\": \"30\"\n" +
                 "  }\n" +
                 "}";
@@ -706,7 +727,7 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
                 .andExpect(jsonPath("$.content[0].role", is(this.vacancy1.getRole())))
                 .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy1.getResponsibilities())))
                 .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy1.getWorkingHours())))
-                .andExpect(jsonPath("$.content[0].closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
+                .andExpect(jsonPath("$.content[0].closingDate", is(ISO_DATEFORMAT.format(vacancy1.getClosingDate()))))
                 .andExpect(jsonPath("$.content[0].contactName", is(this.vacancy1.getContactName())))
                 .andExpect(jsonPath("$.content[0].contactDepartment", is(this.vacancy1.getContactDepartment())))
                 .andExpect(jsonPath("$.content[0].contactEmail", is(this.vacancy1.getContactEmail())))
@@ -715,7 +736,7 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
                 .andExpect(jsonPath("$.content[0].salaryMin", is(this.vacancy1.getSalaryMin())))
                 .andExpect(jsonPath("$.content[0].salaryMax", is(this.vacancy1.getSalaryMax())))
                 .andExpect(jsonPath("$.content[0].numberVacancies", is(this.vacancy1.getNumberVacancies())))
-                .andExpect(jsonPath("$.content[0].department.id", is(this.vacancy1.getDepartment().getId())))
+                .andExpect(jsonPath("$.content[0].department.id", is(this.vacancy1.getDepartment().getId().intValue())))
                 .andExpect(jsonPath("$.content[0].department.name", is(this.vacancy1.getDepartment().getName())))
                 .andExpect(jsonPath("$.content[1].id", is(toIntExact(this.vacancy2.getId()))))
                 .andExpect(jsonPath("$.content[1].identifier", is(toIntExact(this.vacancy2.getIdentifier()))))
@@ -725,7 +746,7 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
                 .andExpect(jsonPath("$.content[1].role", is(this.vacancy2.getRole())))
                 .andExpect(jsonPath("$.content[1].responsibilities", is(this.vacancy2.getResponsibilities())))
                 .andExpect(jsonPath("$.content[1].workingHours", is(this.vacancy2.getWorkingHours())))
-                .andExpect(jsonPath("$.content[1].closingDate", is(this.vacancy2.getClosingDate())))
+                .andExpect(jsonPath("$.content[1].closingDate", is(ISO_DATEFORMAT.format(this.vacancy2.getClosingDate()))))
                 .andExpect(jsonPath("$.content[1].contactName", is(this.vacancy2.getContactName())))
                 .andExpect(jsonPath("$.content[1].contactDepartment", is(this.vacancy2.getContactDepartment())))
                 .andExpect(jsonPath("$.content[1].contactEmail", is(this.vacancy2.getContactEmail())))
@@ -734,14 +755,14 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
                 .andExpect(jsonPath("$.content[1].salaryMin", is(this.vacancy2.getSalaryMin())))
                 .andExpect(jsonPath("$.content[1].salaryMax", is(this.vacancy2.getSalaryMax())))
                 .andExpect(jsonPath("$.content[1].numberVacancies", is(this.vacancy2.getNumberVacancies())))
-                .andExpect(jsonPath("$.content[1].department.id", is(this.vacancy2.getDepartment().getId())))
+                .andExpect(jsonPath("$.content[1].department.id", is(this.vacancy2.getDepartment().getId().intValue())))
                 .andExpect(jsonPath("$.content[1].department.name", is(this.vacancy2.getDepartment().getName())));
     }
 
-    @Test(enabled = false)
+    @Test
     public void search_locationAndKeywordAndUnknownDepartment() throws Exception {
         // Given
-        String path = "/vacancy/search?page=0&size=1";
+        String path = "/vacancy/search?page=0&size=10";
 
         String requestBody = "{\n" +
                 "  \"department\": [\n" +
@@ -762,18 +783,19 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
                 .andExpect(jsonPath("$.totalElements", is(0)));
     }
 
-    @Test(enabled = false)
+    @Test
     public void search_locationAndDepartment() throws Exception {
         // Given
-        String path = "/vacancy/search?page=0&size=1";
+        String path = "/vacancy/search?page=0&size=10";
+        String d1 = vacancy1.getDepartment().getId().toString();
 
         String requestBody = "{\n" +
-                "  \"department\": [\n" +
-                "    \"1\"\n" +
-                "  ],\n" +
-                "  \"keyword\": \"search\",\n" +
+                "  \"department\": [ \"" +
+                d1 +
+                "\"],\n" +
+                "  \"keyword\": \"test\",\n" +
                 "  \"location\": {\n" +
-                "    \"place\": \"testLocation\",\n" +
+                "    \"place\": \"bristol\",\n" +
                 "    \"radius\": \"30\"\n" +
                 "  }\n" +
                 "}";
@@ -794,7 +816,7 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
                 .andExpect(jsonPath("$.content[0].role", is(this.vacancy1.getRole())))
                 .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy1.getResponsibilities())))
                 .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy1.getWorkingHours())))
-                .andExpect(jsonPath("$.content[0].closingDate", is(this.vacancy1.getClosingDate())))
+                .andExpect(jsonPath("$.content[0].closingDate", is(ISO_DATEFORMAT.format(this.vacancy1.getClosingDate()))))
                 .andExpect(jsonPath("$.content[0].contactName", is(this.vacancy1.getContactName())))
                 .andExpect(jsonPath("$.content[0].contactDepartment", is(this.vacancy1.getContactDepartment())))
                 .andExpect(jsonPath("$.content[0].contactEmail", is(this.vacancy1.getContactEmail())))
@@ -803,22 +825,23 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
                 .andExpect(jsonPath("$.content[0].salaryMin", is(this.vacancy1.getSalaryMin())))
                 .andExpect(jsonPath("$.content[0].salaryMax", is(this.vacancy1.getSalaryMax())))
                 .andExpect(jsonPath("$.content[0].numberVacancies", is(this.vacancy1.getNumberVacancies())))
-                .andExpect(jsonPath("$.content[0].department.id", is(this.vacancy1.getDepartment().getId())))
+                .andExpect(jsonPath("$.content[0].department.id", is(this.vacancy1.getDepartment().getId().intValue())))
                 .andExpect(jsonPath("$.content[0].department.name", is(this.vacancy1.getDepartment().getName())));
     }
 
-    @Test(enabled = false)
+    @Test
     public void search_locationAndDepartmentAndUnknownKeyword() throws Exception {
         // Given
-        String path = "/vacancy/search?page=0&size=1";
+        String path = "/vacancy/search?page=0&size=10";
+        String d1 = vacancy1.getDepartment().getId().toString();
 
         String requestBody = "{\n" +
-                "  \"department\": [\n" +
-                "    \"1\"\n" +
-                "  ],\n" +
+                "  \"department\": [ \"" +
+                d1 +
+                "\"],\n" +
                 "  \"keyword\": \"BlitheringEejit\",\n" +
                 "  \"location\": {\n" +
-                "    \"place\": \"testLocation\",\n" +
+                "    \"place\": \"Bristol\",\n" +
                 "    \"radius\": \"30\"\n" +
                 "  }\n" +
                 "}";
@@ -831,39 +854,37 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
                 .andExpect(jsonPath("$.totalElements", is(0)));
     }
 
-    private static Timestamp getTime(int numberOfDaysFromNow) {
-        Date date = Date.from(LocalDateTime.now().plusDays(numberOfDaysFromNow).atZone(ZoneId.systemDefault()).toInstant());
+    private static Timestamp getTime(int numberOfDaysFromNow, int hoursFromNow) {
+        Date date = Date.from(LocalDateTime.now().plusDays(numberOfDaysFromNow).plusHours(hoursFromNow).atZone(ZoneId.systemDefault()).toInstant());
 
         return new Timestamp(date.getTime());
     }
 
-    @Test(enabled = false)
+    @Test
     public void search_onlyInternalSearchesAllowed() throws Exception {
         doClosedPublicSearchTests(TEN_DAYS_AGO, 10, 1);
     }
 
     private void doClosedPublicSearchTests(Integer internalDateNumDaysFromNow, Integer governmentDateNumDaysFromNow, Integer publicDateNumDaysFromNow) throws Exception {
         if (governmentDateNumDaysFromNow != null) {
-            vacancy3.setGovernmentOpeningDate(getTime(governmentDateNumDaysFromNow));
+            vacancy3.setGovernmentOpeningDate(getTime(governmentDateNumDaysFromNow, 0));
         }
 
         if (internalDateNumDaysFromNow != null) {
-            vacancy3.setInternalOpeningDate(getTime(internalDateNumDaysFromNow));
+            vacancy3.setInternalOpeningDate(getTime(internalDateNumDaysFromNow, 0));
         }
 
         if (publicDateNumDaysFromNow != null) {
-            vacancy3.setPublicOpeningDate(getTime(1));
+            vacancy3.setPublicOpeningDate(getTime(1, -1));
         }
 
         this.vacancyRepository.save(vacancy3);
 
         // Given
-        String path = "/vacancy/search?page=0&size=1";
+        String path = "/vacancy/search?page=0&size=10";
 
         String requestBody = "{\n" +
-                "  \"department\": [\n" +
-                "    \"1\",\"2\"\n" +
-                "  ],\n" +
+                "  \"department\": [ \"1\"],\n" +
                 "  \"keyword\": \"search\",\n" +
                 "  \"location\": {\n" +
                 "    \"place\": \"testLocation\",\n" +
@@ -879,21 +900,19 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
                 .andExpect(jsonPath("$.totalElements", is(0)));
     }
 
-    @Test(enabled = false)
+    @Test
     public void search_internalAndGovtSearchesAllowed() throws Exception {
         doClosedPublicSearchTests(TWENTY_DAYS_AGO, TEN_DAYS_AGO, 1);
-        vacancy3.setGovernmentOpeningDate(getTime(TEN_DAYS_AGO));
-        vacancy3.setInternalOpeningDate(getTime(TWENTY_DAYS_AGO));
-        vacancy3.setPublicOpeningDate(getTime(TWENTY_DAYS_FROM_NOW));
+        vacancy3.setGovernmentOpeningDate(getTime(TEN_DAYS_AGO, 0));
+        vacancy3.setInternalOpeningDate(getTime(TWENTY_DAYS_AGO, 0));
+        vacancy3.setPublicOpeningDate(getTime(TWENTY_DAYS_FROM_NOW, 0));
         this.vacancyRepository.save(vacancy3);
 
         // Given
-        String path = "/vacancy/search?page=0&size=1";
+        String path = "/vacancy/search?page=0&size=10";
 
         String requestBody = "{\n" +
-                "  \"department\": [\n" +
-                "    \"1\",\"2\"\n" +
-                "  ],\n" +
+                "  \"department\": [ \"1\",\"2\"],\n" +
                 "  \"keyword\": \"search\",\n" +
                 "  \"location\": {\n" +
                 "    \"place\": \"testLocation\",\n" +
@@ -909,21 +928,20 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
                 .andExpect(jsonPath("$.totalElements", is(0)));
     }
 
-    @Test(enabled = false)
+    @Test
     public void search_noOpeningDatesSet() throws Exception {
-        doClosedPublicSearchTests(null, null, null);
-        vacancy3.setGovernmentOpeningDate(getTime(TEN_DAYS_AGO));
-        vacancy3.setInternalOpeningDate(getTime(TWENTY_DAYS_AGO));
-        vacancy3.setPublicOpeningDate(getTime(TWENTY_DAYS_FROM_NOW));
+        vacancy3.setPublicOpeningDate(null);
+
         this.vacancyRepository.save(vacancy3);
 
         // Given
-        String path = "/vacancy/search?page=0&size=1";
+        String path = "/vacancy/search?page=0&size=10";
+        String d1 = department1.getId().toString();
 
         String requestBody = "{\n" +
-                "  \"department\": [\n" +
-                "    \"1\",\"2\"\n" +
-                "  ],\n" +
+                "  \"department\": [ \"" +
+                d1 +
+                "\"],\n" +
                 "  \"keyword\": \"search\",\n" +
                 "  \"location\": {\n" +
                 "    \"place\": \"testLocation\",\n" +
@@ -937,29 +955,31 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
         sendRequest
                 .andExpect(jsonPath("$.content", hasSize(0)))
                 .andExpect(jsonPath("$.totalElements", is(0)));
+
     }
 
-    @Test(enabled = false)
+    @Test
     public void search_publicSearchesAllowedYesterday() throws Exception {
-        doOpenPublicSearchTests(-1);
+        doOpenPublicSearchTests(-1, 0);
     }
 
-    private void doOpenPublicSearchTests(int publicDateNumDaysFromNow) throws Exception {
-        vacancy3.setGovernmentOpeningDate(getTime(TEN_DAYS_AGO));
-        vacancy3.setInternalOpeningDate(getTime(TWENTY_DAYS_AGO));
-        vacancy3.setPublicOpeningDate(getTime(publicDateNumDaysFromNow));
-        this.vacancyRepository.save(vacancy3);
+    private void doOpenPublicSearchTests(int publicDateNumDaysFromNow, int numHoursFromNow) throws Exception {
+        vacancy3.setGovernmentOpeningDate(getTime(TEN_DAYS_AGO, 0));
+        vacancy3.setInternalOpeningDate(getTime(TWENTY_DAYS_AGO, 0));
+        vacancy3.setPublicOpeningDate(getTime(publicDateNumDaysFromNow, numHoursFromNow));
+        vacancy3 = this.vacancyRepository.save(vacancy3);
+        String d3 = vacancy3.getDepartment().getId().toString();
 
         // Given
-        String path = "/vacancy/search?page=0&size=1";
+        String path = "/vacancy/search?page=0&size=10";
 
         String requestBody = "{\n" +
-                "  \"department\": [\n" +
-                "    \"3\"\n" +
-                "  ],\n" +
-                "  \"keyword\": \"search\",\n" +
+                "  \"department\": [\n\"" +
+                d3 +
+                "\"],\n" +
+                "  \"keyword\": \"test\",\n" +
                 "  \"location\": {\n" +
-                "    \"place\": \"testLocation\",\n" +
+                "    \"place\": \"bristol\",\n" +
                 "    \"radius\": \"30\"\n" +
                 "  }\n" +
                 "}";
@@ -986,12 +1006,12 @@ public class VacancyControllerTest extends AbstractJUnit4SpringContextTests {
                 .andExpect(jsonPath("$.content[0].salaryMin", is(this.vacancy3.getSalaryMin())))
                 .andExpect(jsonPath("$.content[0].salaryMax", is(this.vacancy3.getSalaryMax())))
                 .andExpect(jsonPath("$.content[0].numberVacancies", is(this.vacancy3.getNumberVacancies())))
-                .andExpect(jsonPath("$.content[0].department.id", is(this.vacancy3.getDepartment().getId())))
+                .andExpect(jsonPath("$.content[0].department.id", is(this.vacancy3.getDepartment().getId().intValue())))
                 .andExpect(jsonPath("$.content[0].department.name", is(this.vacancy3.getDepartment().getName())));
     }
 
-    @Test(enabled = false)
+    @Test
     public void search_publicSearchesAllowedToday() throws Exception {
-        doOpenPublicSearchTests(0);
+        doOpenPublicSearchTests(0, -1);
     }
 }

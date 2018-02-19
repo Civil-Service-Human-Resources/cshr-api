@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:tc:postgresql://hostname/databasename
+    url: jdbc:tc:postgresql://hostname/databasename?TC_INITFUNCTION=uk.gov.cshr.vcm.configuration.PGExtensionLoader::loadExtensions
     username: sa
     password:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
