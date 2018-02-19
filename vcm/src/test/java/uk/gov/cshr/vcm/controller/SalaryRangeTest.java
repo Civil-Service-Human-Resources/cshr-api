@@ -153,6 +153,234 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
+    public void testSalaries1() throws Exception {
+
+        Vacancy v1 = createVacancyWithSalaryRange(30000, 31000, department);
+        Vacancy v2 = createVacancyWithSalaryRange(45000, 50000, department);
+        Vacancy v3 = createVacancyWithSalaryRange(50000, 60000, department);
+        Vacancy v4 = createVacancyWithSalaryRange(60000, 65000, department);
+        Vacancy v5 = createVacancyWithSalaryRange(60000, null, department);
+
+        Page<Vacancy> result = findVancancies(10000, null);
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertTrue(resultsList.contains(v1));
+        Assert.assertTrue(resultsList.contains(v2));
+        Assert.assertTrue(resultsList.contains(v3));
+        Assert.assertTrue(resultsList.contains(v4));
+        Assert.assertTrue(resultsList.contains(v5));
+    }
+
+    @Test
+    public void testSalaries2() throws Exception {
+
+        Vacancy v1 = createVacancyWithSalaryRange(30000, 31000, department);
+        Vacancy v2 = createVacancyWithSalaryRange(45000, 50000, department);
+        Vacancy v3 = createVacancyWithSalaryRange(50000, 60000, department);
+        Vacancy v4 = createVacancyWithSalaryRange(60000, 65000, department);
+        Vacancy v5 = createVacancyWithSalaryRange(60000, null, department);
+
+        Page<Vacancy> result = findVancancies(40000, null);
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertFalse(resultsList.contains(v1));
+        Assert.assertTrue(resultsList.contains(v2));
+        Assert.assertTrue(resultsList.contains(v3));
+        Assert.assertTrue(resultsList.contains(v4));
+        Assert.assertTrue(resultsList.contains(v5));
+    }
+
+    @Test
+    public void testSalaries3() throws Exception {
+
+        Vacancy v1 = createVacancyWithSalaryRange(30000, 31000, department);
+        Vacancy v2 = createVacancyWithSalaryRange(45000, 50000, department);
+        Vacancy v3 = createVacancyWithSalaryRange(50000, 60000, department);
+        Vacancy v4 = createVacancyWithSalaryRange(60000, 65000, department);
+        Vacancy v5 = createVacancyWithSalaryRange(60000, null, department);
+
+        Page<Vacancy> result = findVancancies(50000, null);
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertFalse(resultsList.contains(v1));
+        Assert.assertTrue(resultsList.contains(v2));
+        Assert.assertTrue(resultsList.contains(v3));
+        Assert.assertTrue(resultsList.contains(v4));
+        Assert.assertTrue(resultsList.contains(v5));
+    }
+
+    @Test
+    public void testSalaries4() throws Exception {
+
+        Vacancy v1 = createVacancyWithSalaryRange(30000, 31000, department);
+        Vacancy v2 = createVacancyWithSalaryRange(45000, 50000, department);
+        Vacancy v3 = createVacancyWithSalaryRange(50000, 60000, department);
+        Vacancy v4 = createVacancyWithSalaryRange(60000, 65000, department);
+        Vacancy v5 = createVacancyWithSalaryRange(60000, null, department);
+
+        Page<Vacancy> result = findVancancies(60000, null);
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertFalse(resultsList.contains(v1));
+        Assert.assertFalse(resultsList.contains(v2));
+        Assert.assertTrue(resultsList.contains(v3));
+        Assert.assertTrue(resultsList.contains(v4));
+        Assert.assertTrue(resultsList.contains(v5));
+    }
+
+    @Test
+    public void testSalaries5() throws Exception {
+
+        Vacancy v1 = createVacancyWithSalaryRange(30000, 31000, department);
+        Vacancy v2 = createVacancyWithSalaryRange(45000, 50000, department);
+        Vacancy v3 = createVacancyWithSalaryRange(50000, 60000, department);
+        Vacancy v4 = createVacancyWithSalaryRange(60000, 65000, department);
+        Vacancy v5 = createVacancyWithSalaryRange(60000, null, department);
+
+        Page<Vacancy> result = findVancancies(70000, null);
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertFalse(resultsList.contains(v1));
+        Assert.assertFalse(resultsList.contains(v2));
+        Assert.assertFalse(resultsList.contains(v3));
+        Assert.assertFalse(resultsList.contains(v4));
+        Assert.assertFalse(resultsList.contains(v5));
+    }
+
+    @Test
+    public void testSalaries6() throws Exception {
+
+        Vacancy v1 = createVacancyWithSalaryRange(30000, 31000, department);
+        Vacancy v2 = createVacancyWithSalaryRange(45000, 50000, department);
+        Vacancy v3 = createVacancyWithSalaryRange(50000, 60000, department);
+        Vacancy v4 = createVacancyWithSalaryRange(60000, 65000, department);
+        Vacancy v5 = createVacancyWithSalaryRange(60000, null, department);
+
+        Page<Vacancy> result = findVancancies(10000, 30000);
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertTrue(resultsList.contains(v1));
+        Assert.assertFalse(resultsList.contains(v2));
+        Assert.assertFalse(resultsList.contains(v3));
+        Assert.assertFalse(resultsList.contains(v4));
+        Assert.assertFalse(resultsList.contains(v5));
+    }
+
+    @Test
+    public void testSalaries7() throws Exception {
+
+        Vacancy v1 = createVacancyWithSalaryRange(30000, 31000, department);
+        Vacancy v2 = createVacancyWithSalaryRange(45000, 50000, department);
+        Vacancy v3 = createVacancyWithSalaryRange(50000, 60000, department);
+        Vacancy v4 = createVacancyWithSalaryRange(60000, 65000, department);
+        Vacancy v5 = createVacancyWithSalaryRange(60000, null, department);
+
+        Page<Vacancy> result = findVancancies(30000, 40000);
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertTrue(resultsList.contains(v1));
+        Assert.assertFalse(resultsList.contains(v2));
+        Assert.assertFalse(resultsList.contains(v3));
+        Assert.assertFalse(resultsList.contains(v4));
+        Assert.assertFalse(resultsList.contains(v5));
+    }
+
+    @Test
+    public void testSalaries8() throws Exception {
+
+        Vacancy v1 = createVacancyWithSalaryRange(30000, 31000, department);
+        Vacancy v2 = createVacancyWithSalaryRange(45000, 50000, department);
+        Vacancy v3 = createVacancyWithSalaryRange(50000, 60000, department);
+        Vacancy v4 = createVacancyWithSalaryRange(60000, 65000, department);
+        Vacancy v5 = createVacancyWithSalaryRange(60000, null, department);
+
+        Page<Vacancy> result = findVancancies(30000, 50000);
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertTrue(resultsList.contains(v1));
+        Assert.assertTrue(resultsList.contains(v2));
+        Assert.assertTrue(resultsList.contains(v3));
+        Assert.assertFalse(resultsList.contains(v4));
+        Assert.assertFalse(resultsList.contains(v5));
+    }
+
+    @Test
+    public void testSalaries9() throws Exception {
+
+        Vacancy v1 = createVacancyWithSalaryRange(30000, 31000, department);
+        Vacancy v2 = createVacancyWithSalaryRange(45000, 50000, department);
+        Vacancy v3 = createVacancyWithSalaryRange(50000, 60000, department);
+        Vacancy v4 = createVacancyWithSalaryRange(60000, 65000, department);
+        Vacancy v5 = createVacancyWithSalaryRange(60000, null, department);
+
+        Page<Vacancy> result = findVancancies(40000, 50000);
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertFalse(resultsList.contains(v1));
+        Assert.assertTrue(resultsList.contains(v2));
+        Assert.assertTrue(resultsList.contains(v3));
+        Assert.assertFalse(resultsList.contains(v4));
+        Assert.assertFalse(resultsList.contains(v5));
+    }
+
+    @Test
+    public void testSalaries10() throws Exception {
+
+        Vacancy v1 = createVacancyWithSalaryRange(30000, 31000, department);
+        Vacancy v2 = createVacancyWithSalaryRange(45000, 50000, department);
+        Vacancy v3 = createVacancyWithSalaryRange(50000, 60000, department);
+        Vacancy v4 = createVacancyWithSalaryRange(60000, 65000, department);
+        Vacancy v5 = createVacancyWithSalaryRange(60000, null, department);
+
+        Page<Vacancy> result = findVancancies(50000, 60000);
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertFalse(resultsList.contains(v1));
+        Assert.assertTrue(resultsList.contains(v2));
+        Assert.assertTrue(resultsList.contains(v3));
+        Assert.assertTrue(resultsList.contains(v4));
+        Assert.assertTrue(resultsList.contains(v5));
+    }
+
+    @Test
+    public void testSalaries11() throws Exception {
+
+        Vacancy v1 = createVacancyWithSalaryRange(30000, 31000, department);
+        Vacancy v2 = createVacancyWithSalaryRange(45000, 50000, department);
+        Vacancy v3 = createVacancyWithSalaryRange(50000, 60000, department);
+        Vacancy v4 = createVacancyWithSalaryRange(60000, 65000, department);
+        Vacancy v5 = createVacancyWithSalaryRange(60000, null, department);
+
+        Page<Vacancy> result = findVancancies(60000, 60000);
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertFalse(resultsList.contains(v1));
+        Assert.assertFalse(resultsList.contains(v2));
+        Assert.assertTrue(resultsList.contains(v3));
+        Assert.assertTrue(resultsList.contains(v4));
+        Assert.assertTrue(resultsList.contains(v5));
+    }
+
+    @Test
+    public void testSalaries12() throws Exception {
+
+        Vacancy v1 = createVacancyWithSalaryRange(30000, 31000, department);
+        Vacancy v2 = createVacancyWithSalaryRange(45000, 50000, department);
+        Vacancy v3 = createVacancyWithSalaryRange(50000, 60000, department);
+        Vacancy v4 = createVacancyWithSalaryRange(60000, 65000, department);
+        Vacancy v5 = createVacancyWithSalaryRange(60000, null, department);
+
+        Page<Vacancy> result = findVancancies(70000, 70000);
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertFalse(resultsList.contains(v1));
+        Assert.assertFalse(resultsList.contains(v2));
+        Assert.assertFalse(resultsList.contains(v3));
+        Assert.assertFalse(resultsList.contains(v4));
+        Assert.assertFalse(resultsList.contains(v5));
+    }
+
+    @Test
     public void testMaxSalary() throws Exception {
 
         createVacancyWithSalaryRange(40000, 50000, department);
@@ -194,9 +422,12 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         Page<Vacancy> result = findVancancies(70000, null);
         List<Vacancy> resultsList = result.getContent();
 
-        Assert.assertEquals("Expected results", resultsList.size(), expectedVacancyIDs.size());
+        Assert.assertEquals("Expected results", expectedVacancyIDs.size(), resultsList.size());
 
-        List<String> resultVacancyIDs = resultsList.stream().map(v -> v.getId().toString()).collect(Collectors.toList());
+        List<String> resultVacancyIDs = resultsList.stream()
+                .map(v -> v.getId().toString())
+                .collect(Collectors.toList());
+
         Assert.assertTrue(resultVacancyIDs.contains(v1.getId().toString()));
         Assert.assertTrue(resultVacancyIDs.contains(v2.getId().toString()));
         Assert.assertTrue(resultVacancyIDs.contains(v3.getId().toString()));

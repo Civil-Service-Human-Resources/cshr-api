@@ -19,6 +19,10 @@ public class SearchQueryBuilder {
         return buildQuery("SELECT count(*)", parameters);
     }
 
+    public String buildSelectValuesQuery(SearchParameters parameters) {
+        return buildQuery("SELECT *", parameters);
+    }
+
     private String buildQuery(String selectClause, SearchParameters searchParameters) {
         StringBuilder query = new StringBuilder(selectClause);
 
@@ -34,11 +38,11 @@ public class SearchQueryBuilder {
         }
 
         if (searchParameters.getSalaryMin() != null) {
-            query.append(" AND salary_max >= :salary_min");
+            query.append(" AND coalesce(salary_max, salary_min) >= :salary_min");
         }
 
         if (searchParameters.getSalaryMax() != null) {
-            query.append(" AND salary_min <= :salary_max or salary_max is null");
+            query.append(" AND salary_min <= :salary_max");
         }
 
         return query.toString();
@@ -65,9 +69,5 @@ public class SearchQueryBuilder {
         }
 
         return clause.toString();
-    }
-
-    public String buildSelectValuesQuery(SearchParameters parameters) {
-        return buildQuery("SELECT *", parameters);
     }
 }
