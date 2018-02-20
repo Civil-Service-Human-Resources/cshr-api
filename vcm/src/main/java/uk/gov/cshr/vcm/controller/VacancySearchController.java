@@ -77,7 +77,8 @@ public class VacancySearchController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Search for vacancies by location and keyword with support for pagination", nickname = "search")
-    public ResponseEntity<Page<Vacancy>> search(@ApiParam(name = "searchParameters", value = "The values supplied to perform the search with", required = true) @RequestBody VacancySearchParameters vacancySearchParameters, Pageable pageable) {
+    public ResponseEntity<Page<Vacancy>> search(@ApiParam(name = "searchParameters",
+            value = "The values supplied to perform the search with", required = true) @RequestBody VacancySearchParameters vacancySearchParameters, Pageable pageable) {
         ResponseEntity<Page<Vacancy>> response;
 
         try {
