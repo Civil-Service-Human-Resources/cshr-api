@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -71,5 +73,13 @@ public class VacancyController {
         vacancyRepository.delete(vacancyId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @RequestMapping(method = RequestMethod.GET)
+    @ApiOperation(value = "Find all vacancies with support for pagination", nickname = "findAll")
+    public ResponseEntity<Page<Vacancy>> findAll(Pageable pageable) {
+        Page<Vacancy> vacancies = vacancyRepository.findAll(pageable);
+
+        return ResponseEntity.ok().body(vacancies);
     }
 }

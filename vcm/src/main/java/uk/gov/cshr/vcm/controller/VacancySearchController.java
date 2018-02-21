@@ -48,14 +48,6 @@ public class VacancySearchController {
         this.vacancyRepository = vacancyRepository;
     }
 
-    @RequestMapping(method = RequestMethod.GET)
-    @ApiOperation(value = "Find all vacancies with support for pagination", nickname = "findAll")
-    public ResponseEntity<Page<Vacancy>> findAll(Pageable pageable) {
-        Page<Vacancy> vacancies = vacancyRepository.findAll(pageable);
-
-        return ResponseEntity.ok().body(vacancies);
-    }
-
     @RequestMapping(method = RequestMethod.GET, value = "/{vacancyId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Find a specific vacancy for an id", nickname = "findById")
     @ApiResponse(code = 410, response = VacancyClosedException.class, message = VacancyClosedException.CLOSED_MESSAGE)
@@ -78,7 +70,9 @@ public class VacancySearchController {
     @RequestMapping(method = RequestMethod.POST, value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Search for vacancies by location and keyword with support for pagination", nickname = "search")
     public ResponseEntity<Page<Vacancy>> search(@ApiParam(name = "searchParameters",
-            value = "The values supplied to perform the search with", required = true) @RequestBody VacancySearchParameters vacancySearchParameters, Pageable pageable) {
+            value = "The values supplied to perform the search with", required = true)
+            @RequestBody VacancySearchParameters vacancySearchParameters, Pageable pageable) {
+
         ResponseEntity<Page<Vacancy>> response;
 
         try {
