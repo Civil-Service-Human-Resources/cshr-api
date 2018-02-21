@@ -16,6 +16,7 @@ import static org.hamcrest.Matchers.is;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -38,6 +39,7 @@ import uk.gov.cshr.vcm.repository.VacancyRepository;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = VcmApplication.class)
 @ContextConfiguration
 @WebAppConfiguration
+@ActiveProfiles("dev")
 public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
     private static final SimpleDateFormat ISO_DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
