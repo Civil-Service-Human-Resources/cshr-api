@@ -1,6 +1,7 @@
 package uk.gov.cshr.vcm.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import javax.persistence.Column;
@@ -117,4 +118,8 @@ public class Vacancy implements Serializable {
 
     @Column(name = "selectionprocessdetails")
     private String selectionProcessDetails;
+
+    @Column(name = "applyurl")
+    @ApiModelProperty(notes = "URL linking to external system")
+    private String applyURL;
 }
