@@ -43,7 +43,7 @@ public class SearchService {
             vacancies = vacancyRepository.search(searchParameters, pageable);
         } else {
             debug("No Coordinates for %s with radius of %d exist", vacancySearchParameters.getLocation().getPlace(), vacancySearchParameters.getLocation().getRadius());
-            vacancies = new PageImpl<>(new ArrayList<Vacancy>());
+            vacancies = new PageImpl<>(new ArrayList<Vacancy>(), pageable, 0);
         }
 
         return vacancies;

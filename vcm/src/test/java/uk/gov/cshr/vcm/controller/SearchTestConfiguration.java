@@ -2,29 +2,53 @@ package uk.gov.cshr.vcm.controller;
 
 import static org.mockito.BDDMockito.given;
 
+import java.nio.charset.Charset;
+
+import javax.inject.Inject;
+
+import org.junit.After;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.context.WebApplicationContext;
 import uk.gov.cshr.vcm.exception.LocationServiceException;
 import uk.gov.cshr.vcm.model.Coordinates;
+import uk.gov.cshr.vcm.model.fixture.CoordinatesFixture;
+import uk.gov.cshr.vcm.repository.DepartmentRepository;
+import uk.gov.cshr.vcm.repository.VacancyRepository;
 import uk.gov.cshr.vcm.service.LocationService;
 
 public abstract class SearchTestConfiguration extends AbstractJUnit4SpringContextTests {
-    public static final double BRISTOL_LATITUDE = 51.4549291;
-    public static final double BRISTOL_LONGITUDE = -2.6278111;
+    static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
+            MediaType.APPLICATION_JSON.getSubtype(),
+            Charset.forName("utf8"));
 
-    public static final double NEWCASTLE_LATITUDE = 54.9806308;
-    public static final double NEWCASTLE_LONGITUDE = -1.6167437;
+    static final Coordinates BRISTOL = CoordinatesFixture.getInstance().getCoordinatesForBristol();
+    static final Coordinates NEWCASTLE = CoordinatesFixture.getInstance().getCoordinatesForNewcastle();
 
-    public static final Coordinates BRISTOL_COORDINATES = Coordinates.builder().latitude(BRISTOL_LATITUDE).longitude(BRISTOL_LONGITUDE).build();
+    @Inject
+    DepartmentRepository departmentRepository;
+    @Inject
+    VacancyRepository vacancyRepository;
+    @Inject
+    WebApplicationContext webApplicationContext;
 
     @MockBean
-    public LocationService locationService;
+    LocationService locationService;
 
-    public void initLocationService() throws LocationServiceException {
-        given(locationService.find("bristol"))
-                .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE));
+    MockMvc mockMvc;
 
-        given(locationService.find("newcastle"))
-                .willReturn(new Coordinates(NEWCASTLE_LONGITUDE, NEWCASTLE_LATITUDE));
+    @After
+    public void tearDown() {
+        this.vacancyRepository.deleteAll();
+
+        this.departmentRepository.deleteAll();
+    }
+
+    void initLocationService() throws LocationServiceException {
+        given(locationService.find("bristol")).willReturn(BRISTOL);
+
+        given(locationService.find("newcastle")).willReturn(NEWCASTLE);
     }
 }

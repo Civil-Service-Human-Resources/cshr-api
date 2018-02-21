@@ -7,23 +7,21 @@ import java.time.ZoneId;
 
 import uk.gov.cshr.vcm.model.Vacancy;
 
-public class VacancyFixture {
-    private static Vacancy PROTOTYPE;
-
+public final class VacancyFixture {
     private static final Timestamp THIRTY_DAYS_FROM_NOW = getTime(30, 0);
 
-    static {
-        buildPrototype();
+    private static final VacancyFixture INSTANCE = new VacancyFixture();
+
+    private VacancyFixture() {}
+
+    public static VacancyFixture getInstance() {
+        return INSTANCE;
     }
 
-    public static Vacancy getPrototype() {
-        return PROTOTYPE;
-    }
-
-    private static void buildPrototype() {
-        PROTOTYPE = Vacancy.builder()
+    public Vacancy getPrototype() {
+        return Vacancy.builder()
                 .identifier(12345L)
-                .title("testTit1e SearchQueryTitle")
+                .title("testTitle SearchQueryTitle")
                 .description("testDescription1 SearchQueryDescription")
                 .location("testLocation1 SearchQueryLocation")
                 .grade("testGrade1 SearchQueryGrade")

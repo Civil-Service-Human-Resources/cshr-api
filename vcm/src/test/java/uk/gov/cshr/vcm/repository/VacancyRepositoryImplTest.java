@@ -7,7 +7,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.junit.MatcherAssert.assertThat;
 
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -23,9 +22,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.cshr.vcm.VcmApplication;
-import uk.gov.cshr.vcm.controller.SearchTestConfiguration;
+import uk.gov.cshr.vcm.model.Coordinates;
 import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.model.Location;
 import uk.gov.cshr.vcm.model.SearchParameters;
@@ -33,27 +33,27 @@ import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
 import uk.gov.cshr.vcm.model.fixture.VacancyFixture;
 
+/**
+ * Tests {@link VacancyRepositoryImpl}
+ */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = VcmApplication.class)
 @ContextConfiguration
-public class VacancyRepositoryImplTest extends SearchTestConfiguration {
-    private static final SimpleDateFormat ISO_DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+public class VacancyRepositoryImplTest extends AbstractJUnit4SpringContextTests {
+    private static final double BRISTOL_LATITUDE = 51.4549291;
+    private static final double BRISTOL_LONGITUDE = -2.6278111;
+    private static final int MAX_TEN_RESULTS_PER_PAGE = 10;
+    private static final int PAGE_ONE = 0;
+    private static final int TEN_DAYS_AGO = -10;
     private static final Timestamp THIRTY_DAYS_FROM_NOW = getTime(30, 0);
+    private static final int THIRTY_MILES_FROM_PLACE = 30;
     private static final int TWENTY_DAYS_AGO = -20;
-    private static final int TWENTY_DAYS_FROM_NOW = 20;
-    public static final int THIRTY_MILES_FROM_PLACE = 30;
-    public static final int PAGE_ONE = 0;
-    public static final int MAX_TEN_RESULTS_PER_PAGE = 10;
 
     @Inject
     private VacancyRepository vacancyRepository;
 
     @Inject
     private DepartmentRepository departmentRepository;
-
-    private Department department1;
-    private Department department2;
-    private Department department3;
 
     private Vacancy vacancy1;
     private Vacancy vacancy2;
@@ -67,9 +67,10 @@ public class VacancyRepositoryImplTest extends SearchTestConfiguration {
     }
 
     private void createVacancy1() {
-        department1 = departmentRepository.save(Department.builder().name("Department One").build());
+        Department department1 = departmentRepository.save(Department.builder().name("Department One").build());
 
-        vacancy1 = VacancyFixture.getPrototype();
+        vacancy1 = VacancyFixture.getInstance().getPrototype();
+        vacancy1.setClosingDate(THIRTY_DAYS_FROM_NOW);
         vacancy1.setDepartment(department1);
         vacancy1.setDisplayCscContent(true);
         vacancy1.setIdentifier(398457345L);
@@ -83,12 +84,13 @@ public class VacancyRepositoryImplTest extends SearchTestConfiguration {
     }
 
     private void createVacancy2() {
-        department2 = departmentRepository.save(Department.builder().name("Department Two").build());
+        Department department2 = departmentRepository.save(Department.builder().name("Department Two").build());
 
         vacancy2 = Vacancy.builder()
                 .identifier(398457346L)
                 .title("testTitle2")
                 .description("testDescription2")
+                .department(department2)
                 .location("Bristol")
                 .grade("testGrade2")
                 .role("testRole2")
@@ -112,12 +114,13 @@ public class VacancyRepositoryImplTest extends SearchTestConfiguration {
     }
 
     private void createVacancy3() {
-        department3 = departmentRepository.save(Department.builder().name("Department Three").build());
+        Department department3 = departmentRepository.save(Department.builder().name("Department Three").build());
 
         vacancy3 = Vacancy.builder()
                 .identifier(398457347L)
                 .title("testTitle3")
                 .description("testDescription3")
+                .department(department3)
                 .location("Bristol")
                 .grade("testGrade3")
                 .role("testRole3")
@@ -197,7 +200,7 @@ public class VacancyRepositoryImplTest extends SearchTestConfiguration {
     public void testFindAllPaginated_page1With1Result() {
         Page<Vacancy> vacancies = vacancyRepository.findAll(new PageRequest(0, 1));
 
-        assertThat(vacancies.getTotalElements(), is(equalTo(Long.valueOf(3l))));
+        assertThat(vacancies.getTotalElements(), is(equalTo(3L)));
         assertThat(vacancies.getTotalPages(), is(3));
         assertThat(vacancies.getNumberOfElements(), is(1));
         assertThat(vacancies.getSize(), is(1));
@@ -207,14 +210,11 @@ public class VacancyRepositoryImplTest extends SearchTestConfiguration {
 
     @Test
     public void search_locationAndKeywordSupplied() {
-        SearchParameters searchParameters = SearchParameters.builder()
-                .vacancySearchParameters(buildVacancySearchParamters("test", "bristol"))
-                .coordinates(BRISTOL_COORDINATES)
-                .build();
+        SearchParameters searchParameters = buildSearchParameters("test");
 
         Page<Vacancy> vacancies = vacancyRepository.search(searchParameters, new PageRequest(PAGE_ONE, MAX_TEN_RESULTS_PER_PAGE));
 
-        assertThat(vacancies.getTotalElements(), is(equalTo(Long.valueOf(3l))));
+        assertThat(vacancies.getTotalElements(), is(equalTo(3L)));
         assertThat(vacancies.getTotalPages(), is(1));
         assertThat(vacancies.getNumberOfElements(), is(3));
         assertThat(vacancies.getSize(), is(10));
@@ -224,8 +224,15 @@ public class VacancyRepositoryImplTest extends SearchTestConfiguration {
         assertThat(vacancies.getContent().get(2), is(equalTo(vacancy3)));
     }
 
-    private VacancySearchParameters buildVacancySearchParamters(String keyword, String place, String ... departmentIds ) {
-        Location location = Location.builder().place(place).radius(THIRTY_MILES_FROM_PLACE).build();
+    private SearchParameters buildSearchParameters(String keyword, String ... departmentIds) {
+        return SearchParameters.builder()
+                .vacancySearchParameters(buildVacancySearchParameters(keyword, departmentIds))
+                .coordinates(Coordinates.builder().latitude(BRISTOL_LATITUDE).longitude(BRISTOL_LONGITUDE).build())
+                .build();
+    }
+
+    private VacancySearchParameters buildVacancySearchParameters(String keyword, String ... departmentIds ) {
+        Location location = Location.builder().place("bristol").radius(THIRTY_MILES_FROM_PLACE).build();
 
         return VacancySearchParameters.builder()
                 .keyword(keyword)
@@ -236,17 +243,145 @@ public class VacancyRepositoryImplTest extends SearchTestConfiguration {
 
     @Test
     public void search_noResultsForlocationAndKeywordAndDepartment() {
-        SearchParameters searchParameters = SearchParameters.builder()
-                .vacancySearchParameters(buildVacancySearchParamters("test", "bristol", "100000"))
-                .coordinates(BRISTOL_COORDINATES)
-                .build();
+        SearchParameters searchParameters = buildSearchParameters("test", "100000");
 
+        doNoResultsExpectedTests(searchParameters);
+    }
+
+    private void doNoResultsExpectedTests(SearchParameters searchParameters) {
         Page<Vacancy> vacancies = vacancyRepository.search(searchParameters, new PageRequest(PAGE_ONE, MAX_TEN_RESULTS_PER_PAGE));
 
-        assertThat(vacancies.getTotalElements(), is(equalTo(Long.valueOf(0l))));
+        assertThat(vacancies.getTotalElements(), is(equalTo(0L)));
         assertThat(vacancies.getTotalPages(), is(0));
         assertThat(vacancies.getNumberOfElements(), is(0));
         assertThat(vacancies.getSize(), is(10));
         assertThat(vacancies.getContent().isEmpty(), is (true));
+    }
+
+    @Test
+    public void search_locationAndKeywordAndDepartment() {
+        SearchParameters searchParameters = buildSearchParameters("test", String.valueOf(vacancy1.getDepartment().getId()));
+
+        doReturnOneVacancyOnlyTests(searchParameters, vacancy1);
+    }
+
+    private void doReturnOneVacancyOnlyTests(SearchParameters searchParameters, Vacancy expectedVacacny) {
+        Page<Vacancy> vacancies = vacancyRepository.search(searchParameters, new PageRequest(PAGE_ONE, MAX_TEN_RESULTS_PER_PAGE));
+
+        assertThat(vacancies.getTotalElements(), is(equalTo(1L)));
+        assertThat(vacancies.getTotalPages(), is(1));
+        assertThat(vacancies.getNumberOfElements(), is(1));
+        assertThat(vacancies.getSize(), is(10));
+        assertThat(vacancies.getContent().size(), is (1));
+        assertThat(vacancies.getContent().get(0), is(equalTo(expectedVacacny)));
+    }
+
+    @Test
+    public void search_locationAndKeywordAndEmptyDepartment() {
+        SearchParameters searchParameters = buildSearchParameters("SearchQueryTitle");
+
+        doReturnOneVacancyOnlyTests(searchParameters, vacancy1);
+    }
+
+    @Test
+    public void search_locationAndKeywordAndDepartments() {
+        vacancy2.setDescription("testTitle " + vacancy2.getDescription());
+        vacancy2 = vacancyRepository.save(vacancy2);
+
+        String departmentOneId = String.valueOf(vacancy1.getDepartment().getId());
+        String departmentTwoId = String.valueOf(vacancy2.getDepartment().getId());
+
+        SearchParameters searchParameters = buildSearchParameters("testTitle", departmentOneId, departmentTwoId);
+
+        Page<Vacancy> vacancies = vacancyRepository.search(searchParameters, new PageRequest(PAGE_ONE, MAX_TEN_RESULTS_PER_PAGE));
+
+        assertThat(vacancies.getTotalElements(), is(equalTo(2L)));
+        assertThat(vacancies.getTotalPages(), is(1));
+        assertThat(vacancies.getNumberOfElements(), is(2));
+        assertThat(vacancies.getSize(), is(10));
+        assertThat(vacancies.getContent().size(), is (2));
+        assertThat(vacancies.getContent().get(0), is(equalTo(vacancy1)));
+        assertThat(vacancies.getContent().get(1), is(equalTo(vacancy2)));
+    }
+
+    @Test
+    public void search_locationAndKeywordAndUnknownDepartment() {
+        SearchParameters searchParameters = buildSearchParameters("testTitle", "1000000");
+
+        doNoResultsExpectedTests(searchParameters);
+    }
+
+    @Test
+    public void search_locationAndDepartment() {
+        SearchParameters searchParameters = buildSearchParameters(null, String.valueOf(vacancy1.getDepartment().getId().toString()));
+
+        doReturnOneVacancyOnlyTests(searchParameters, vacancy1);
+    }
+
+    @Test
+    public void search_locationAndDepartmentAndUnknownKeyword() {
+        SearchParameters searchParameters = buildSearchParameters("BlitheringEejit", String.valueOf(vacancy1.getDepartment().getId().toString()));
+
+        doNoResultsExpectedTests(searchParameters);
+    }
+
+    @Test
+    public void search_onlyInternalSearchesAllowed() {
+        doClosedPublicSearchTests(TEN_DAYS_AGO, 10);
+    }
+
+    private void doClosedPublicSearchTests(Integer internalDateNumDaysFromNow, Integer governmentDateNumDaysFromNow) {
+        if (governmentDateNumDaysFromNow != null) {
+            vacancy3.setGovernmentOpeningDate(getTime(governmentDateNumDaysFromNow, 0));
+        }
+
+        if (internalDateNumDaysFromNow != null) {
+            vacancy3.setInternalOpeningDate(getTime(internalDateNumDaysFromNow, 0));
+        }
+
+        vacancy3.setPublicOpeningDate(getTime(1, -1));
+
+        this.vacancyRepository.save(vacancy3);
+
+        SearchParameters searchParameters = buildSearchParameters("testTitle3", String.valueOf(vacancy3.getDepartment().getId().toString()));
+
+        doNoResultsExpectedTests(searchParameters);
+    }
+
+    @Test
+    public void search_internalAndGovtSearchesAllowed() {
+        doClosedPublicSearchTests(TWENTY_DAYS_AGO, TEN_DAYS_AGO);
+    }
+
+    @Test
+    public void search_noOpeningDatesSet(){
+        vacancy3.setPublicOpeningDate(null);
+        this.vacancyRepository.save(vacancy3);
+
+        SearchParameters searchParameters = buildSearchParameters("testTitle3", String.valueOf(vacancy3.getDepartment().getId().toString()));
+
+        doNoResultsExpectedTests(searchParameters);
+    }
+
+    @Test
+    public void search_publicSearchesAllowedYesterday() {
+        doOpenPublicSearchTests(-1, 0);
+    }
+
+    private void doOpenPublicSearchTests(int publicDateNumDaysFromNow, int numHoursFromNow) {
+        vacancy3.setGovernmentOpeningDate(getTime(TEN_DAYS_AGO, 0));
+        vacancy3.setInternalOpeningDate(getTime(TWENTY_DAYS_AGO, 0));
+        vacancy3.setPublicOpeningDate(getTime(publicDateNumDaysFromNow, numHoursFromNow));
+
+        vacancy3 = this.vacancyRepository.save(vacancy3);
+
+        SearchParameters searchParameters = buildSearchParameters("testTitle3", String.valueOf(vacancy3.getDepartment().getId().toString()));
+
+        doReturnOneVacancyOnlyTests(searchParameters, vacancy3);
+    }
+
+    @Test
+    public void search_publicSearchesAllowedToday() {
+        doOpenPublicSearchTests(0, -1);
     }
 }

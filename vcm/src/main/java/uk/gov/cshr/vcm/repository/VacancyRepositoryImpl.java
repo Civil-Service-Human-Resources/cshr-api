@@ -53,6 +53,7 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom {
         selectQuery.setParameter(SEARCH_FROM_LONGITUDE_VALUE, searchParameters.getLongitude());
         selectQuery.setParameter(SEARCH_FROM_LATITUDE_VALUE, searchParameters.getLatitude());
         selectQuery.setParameter(DISTANCE, searchParameters.getRadius());
+
         countQuery.setParameter(SEARCH_FROM_LONGITUDE_VALUE, searchParameters.getLongitude());
         countQuery.setParameter(SEARCH_FROM_LATITUDE_VALUE, searchParameters.getLatitude());
         countQuery.setParameter(DISTANCE, searchParameters.getRadius());
