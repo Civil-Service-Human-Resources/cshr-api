@@ -1,11 +1,10 @@
 package uk.gov.cshr.vcm.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import java.net.URI;
 import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
@@ -28,8 +27,6 @@ import uk.gov.cshr.vcm.repository.VacancyRepository;
 @ResponseBody
 @Api(value = "vacancyservice")
 public class VacancyController {
-
-    private static final Logger log = LoggerFactory.getLogger(VacancyController.class);
 
     private final VacancyRepository vacancyRepository;
 
