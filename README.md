@@ -7,8 +7,8 @@
 
 ## Setup
 
-* Clone this repository 
-* Run `make` or `./bin/build.sh` - this will setup `.env` file, create docker bridge network and build docker images. 
+* Clone this repository
+* Run `make` or `./bin/build.sh` - this will setup `.env` file, create docker bridge network and build docker images.
 
 ## Running API
 
@@ -30,7 +30,7 @@ For production add the following in your env properties file:
 *Note: If you are running the env_dev properties file the build.sh copies this to env properties if env properties does not exist. Docker will use the env properties file in its work so ensure this version of the file has the profile you require.*
 
 ### Setting the location service url
-If you are working with a local development environment and want to run this serivce and the location service via docker you will need to modify the env properties files.
+If you are working with a local development environment and want to run this service and the location service via docker you will need to modify the env properties files.
 
 Open env_dev properties and find:
 
@@ -49,4 +49,4 @@ Modify the hostname so that it is using the ip address of your local machine.  E
 
 ## Todo
 * Pass DB configuration to docker container as env variables and/or docker secrets
-* Docker multistage build uses version `0.0.1` of the `war` release. This should be version agnostic. 
+* Docker multistage build uses version `0.0.1` of the `war` release. This should be version agnostic.

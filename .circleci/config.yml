@@ -4,10 +4,12 @@ jobs:
     environment:
       - COMPOSE_FILE: "docker-compose.yml"
       - BINTRAY_URL: "cshr-docker-rpg.bintray.io"
+      - CIRCLE_DOCKER_RUN_ARGUMENTS: "-v /var/run/docker.sock:/var/run/docker.sock"
 
     machine: true
     steps:
       - checkout
+      - setup_remote_docker
 
       - run:
           name: Build image
