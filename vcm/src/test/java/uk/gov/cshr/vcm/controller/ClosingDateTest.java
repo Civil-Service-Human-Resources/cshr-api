@@ -139,12 +139,10 @@ public class ClosingDateTest extends SearchTestConfiguration {
                 department.getDisabilityLogo());
     }
 
-    public Page<Vacancy> findVancancies() throws Exception {
-
+    private Page<Vacancy> findVancancies() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
-                /*.keyword("SearchQueryDescription")*/
                 .location(new Location("bristol", 30))
                 .build();
 

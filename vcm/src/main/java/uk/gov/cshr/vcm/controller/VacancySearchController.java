@@ -61,7 +61,7 @@ public class VacancySearchController {
         if (!foundVacancy.isPresent() && log.isDebugEnabled()) {
             log.debug("No vacancy found for id " + vacancyId);
         } else if (foundVacancy.isPresent() && foundVacancy.get().getClosingDate().before(new Date())) {
-            throw new VacancyClosedException(vacancyId);
+            throw new VacancyClosedException();
         }
 
         return foundVacancy.map(ResponseEntity.ok()::body).orElse(ResponseEntity.notFound().build());
