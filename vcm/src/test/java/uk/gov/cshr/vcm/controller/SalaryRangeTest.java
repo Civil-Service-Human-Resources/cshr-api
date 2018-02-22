@@ -61,8 +61,8 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
     public static final double NEWCASTLE_LATITUDE = 54.9806308;
     public static final double NEWCASTLE_LONGITUDE = -1.6167437;
 
-    public static final Coordinates BRISTOL = new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE);
-    public static final Coordinates NEWCASTLE = new Coordinates(NEWCASTLE_LONGITUDE, NEWCASTLE_LATITUDE);
+    public static final Coordinates BRISTOL = new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West");
+    public static final Coordinates NEWCASTLE = new Coordinates(NEWCASTLE_LONGITUDE, NEWCASTLE_LATITUDE, "North East");
 
     final private MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(),
@@ -99,10 +99,10 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         createdDepartments.add(department);
 
         given(locationService.find("bristol"))
-                .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE));
+                .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
 
         given(locationService.find("newcastle"))
-                .willReturn(new Coordinates(NEWCASTLE_LONGITUDE, NEWCASTLE_LATITUDE));
+                .willReturn(new Coordinates(NEWCASTLE_LONGITUDE, NEWCASTLE_LATITUDE, "North East"));
     }
 
     @After

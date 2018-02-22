@@ -27,7 +27,13 @@ public class SearchQueryBuilder {
         StringBuilder query = new StringBuilder(selectClause);
 
         query.append(" FROM vacancies WHERE public_opening_date IS NOT NULL AND public_opening_date <= current_timestamp");
-        query.append(" AND (point(:searchFromLongitudeValue, :searchFromLatitudeValue) <@> point(longitude, latitude)) < :distance");
+
+        query.append(" AND ((point(:searchFromLongitudeValue, :searchFromLatitudeValue) <@> point(longitude, latitude) < :distance)");
+
+        if (StringUtils.isNotBlank(searchParameters.getCoordinates().getRegion())) {
+            query.append(" or (regions ILIKE :region))");
+        }
+
         query.append(" AND closing_date > current_timestamp");
 
         if (StringUtils.isNotBlank(searchParameters.getKeyword())) {

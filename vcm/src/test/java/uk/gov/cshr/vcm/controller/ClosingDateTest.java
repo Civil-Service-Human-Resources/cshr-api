@@ -27,6 +27,7 @@ import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -52,6 +53,7 @@ import uk.gov.cshr.vcm.repository.VacancyRepository;
 import uk.gov.cshr.vcm.service.LocationService;
 
 @Ignore
+@ActiveProfiles("dev")
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = VcmApplication.class)
 @ContextConfiguration
@@ -104,7 +106,7 @@ public class ClosingDateTest extends AbstractTestNGSpringContextTests {
         createdDepartments.add(department);
 
         given(locationService.find(any()))
-                .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE));
+                .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
     }
 
     @After
@@ -132,12 +134,27 @@ public class ClosingDateTest extends AbstractTestNGSpringContextTests {
         Page<Vacancy> result = findVancancies();
         List<Vacancy> resultsList = result.getContent();
 
-        Assert.assertEquals("Expected results", 2, resultsList.size());
+        Assert.assertTrue("Expected results", !resultsList.isEmpty());
 
         resultsList.stream().filter((vacancy) -> (vacancy.getClosingDate().compareTo(new Date()) == -1))
                 .forEachOrdered((vacancy) -> {
                     fail("vacancy.getClosingDate() in past: " + vacancy.getClosingDate());
                 });
+    }
+
+    @Test
+    public void testFindRegionalVacancies() throws Exception {
+
+        createVacancyWithRegions(department, "South West, Scotland");
+
+        Page<Vacancy> result = findVancancies();
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertTrue("Expected results", !resultsList.isEmpty());
+
+        for (Vacancy vacancy : resultsList) {
+
+        }
     }
 
     @Test
@@ -220,16 +237,39 @@ public class ClosingDateTest extends AbstractTestNGSpringContextTests {
         return new Timestamp(date.getTime());
     }
 
+    private Vacancy createVacancyWithRegions(Department department, String regions) {
+
+        Vacancy vacancy = createVacancyPrototype();
+        vacancy.setRegions(regions);
+        vacancy.setLatitude(null);
+        vacancy.setLongitude(null);
+        vacancy.setDepartment(department);
+        vacancyRepository.save(vacancy);
+        createdVacancies.add(vacancy);
+        return vacancy;
+    }
+
     private Vacancy createVacancyWithClosingDate(Timestamp closingDate, Department department) {
 
-        Vacancy vacancy = Vacancy.builder()
+        Vacancy vacancy = createVacancyPrototype();
+
+        vacancy.setDepartment(department);
+        vacancy.setClosingDate(closingDate);
+        vacancyRepository.save(vacancy);
+        createdVacancies.add(vacancy);
+        return vacancy;
+    }
+
+    private Vacancy createVacancyPrototype() {
+
+        return Vacancy.builder()
                 .title("testTile1 SearchQueryTitle")
                 .description("testDescription1 SearchQueryDescription")
                 .location("testLocation1 SearchQueryLocation")
                 .grade("testGrade1 SearchQueryGrade")
                 .responsibilities("testResponsibilities1")
                 .workingHours("testWorkingHours1")
-                .closingDate(closingDate)
+                .closingDate(THIRTY_DAYS_FROM_NOW)
                 .publicOpeningDate(YESTERDAY)
                 .contactName("testContactName1")
                 .contactDepartment("testContactDepartment1")
@@ -244,11 +284,5 @@ public class ClosingDateTest extends AbstractTestNGSpringContextTests {
                 .identifier(1L)
                 .role("role")
                 .build();
-
-        vacancy.setDepartment(department);
-        vacancy.setClosingDate(closingDate);
-        vacancyRepository.save(vacancy);
-        createdVacancies.add(vacancy);
-        return vacancy;
     }
 }
