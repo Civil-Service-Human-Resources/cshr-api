@@ -16,7 +16,6 @@ import org.junit.After;
 import org.junit.Assert;
 import static org.junit.Assert.fail;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.mockito.BDDMockito.given;
@@ -52,14 +51,13 @@ import uk.gov.cshr.vcm.repository.DepartmentRepository;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
 import uk.gov.cshr.vcm.service.LocationService;
 
-@Ignore
 @ActiveProfiles("dev")
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = VcmApplication.class)
 @ContextConfiguration
 @WebAppConfiguration
 @TestExecutionListeners(MockitoTestExecutionListener.class)
-public class ClosingDateTest extends AbstractTestNGSpringContextTests {
+public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
     public static final double BRISTOL_LATITUDE = 51.4549291;
     public static final double BRISTOL_LONGITUDE = -2.6278111;
@@ -131,7 +129,7 @@ public class ClosingDateTest extends AbstractTestNGSpringContextTests {
         createVacancyWithClosingDate(TOMORROW, department);
         createVacancyWithClosingDate(THIRTY_DAYS_FROM_NOW, department);
 
-        Page<Vacancy> result = findVancancies();
+        Page<Vacancy> result = findVancancies("bristol");
         List<Vacancy> resultsList = result.getContent();
 
         Assert.assertTrue("Expected results", !resultsList.isEmpty());
@@ -143,17 +141,41 @@ public class ClosingDateTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void testFindRegionalVacancies() throws Exception {
+    public void testFindRegionalVacanciesBristol() throws Exception {
+
+        given(locationService.find("bristol"))
+                .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
 
         createVacancyWithRegions(department, "South West, Scotland");
+        createVacancyWithRegions(department, "North East, Scotland");
 
-        Page<Vacancy> result = findVancancies();
+        Page<Vacancy> result = findVancancies("bristol");
         List<Vacancy> resultsList = result.getContent();
 
         Assert.assertTrue("Expected results", !resultsList.isEmpty());
 
         for (Vacancy vacancy : resultsList) {
+            Assert.assertTrue("Regional Vacancy",
+                    vacancy.getRegions() != null && vacancy.getRegions().contains("South West"));
+        }
+    }
 
+    @Test
+    public void testFindRegionalVacanciesNewcastle() throws Exception {
+
+        given(locationService.find("newcastle"))
+                .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "North East"));
+
+        createVacancyWithRegions(department, "North East, Scotland");
+        createVacancyWithRegions(department, "South West, Scotland");
+
+        Page<Vacancy> result = findVancancies("newcastle");
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertTrue("Expected results", !resultsList.isEmpty());
+
+        for (Vacancy vacancy : resultsList) {
+            Assert.assertTrue("Regional Vacancy", vacancy.getRegions().contains("North East"));
         }
     }
 
@@ -208,13 +230,13 @@ public class ClosingDateTest extends AbstractTestNGSpringContextTests {
                 department.getDisabilityLogo());
     }
 
-    public Page<Vacancy> findVancancies() throws Exception {
+    public Page<Vacancy> findVancancies(String place) throws Exception {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
                 .keyword("SearchQueryDescription")
-                .location(new Location("bristol", 30))
+                .location(new Location(place, 30))
                 .build();
 
         ObjectMapper mapper = new ObjectMapper();
