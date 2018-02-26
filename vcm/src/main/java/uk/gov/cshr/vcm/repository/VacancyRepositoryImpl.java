@@ -1,5 +1,12 @@
 package uk.gov.cshr.vcm.repository;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -7,18 +14,11 @@ import org.springframework.data.domain.Pageable;
 import uk.gov.cshr.vcm.model.SearchParameters;
 import uk.gov.cshr.vcm.model.Vacancy;
 
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * This class is responsible for providing custom dynamic JPA queries for working with Vacancies
  */
 public class VacancyRepositoryImpl implements VacancyRepositoryCustom {
+
     private static final String DEPT = "dept";
     private static final String DISTANCE = "distance";
     private static final String KEYWORD = "keyword";
@@ -27,6 +27,7 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom {
     private static final String SEARCH_FROM_LATITUDE_VALUE = "searchFromLatitudeValue";
     private static final String SEARCH_FROM_LONGITUDE_VALUE = "searchFromLongitudeValue";
     private static final String WILDCARD = "%";
+    private static final String REGION = "region";
 
     @PersistenceContext
     private EntityManager em;
@@ -83,6 +84,11 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom {
             }
         }
 
+        if (StringUtils.isNotBlank(searchParameters.getCoordinates().getRegion())) {
+            selectQuery.setParameter(REGION, WILDCARD + searchParameters.getCoordinates().getRegion() + WILDCARD);
+            countQuery.setParameter(REGION, WILDCARD + searchParameters.getCoordinates().getRegion() + WILDCARD);
+        }
+
         selectQuery.setFirstResult(pageable.getOffset()).setMaxResults(pageable.getPageSize());
 
         BigInteger total = (BigInteger) countQuery.getSingleResult();
@@ -91,6 +97,4 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom {
 
         return new PageImpl<>(vacancies, pageable, total.longValueExact());
     }
-
-
 }
