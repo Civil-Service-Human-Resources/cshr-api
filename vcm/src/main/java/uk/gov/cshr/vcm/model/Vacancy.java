@@ -117,4 +117,7 @@ public class Vacancy implements Serializable {
 
     @Column(name = "selectionprocessdetails")
     private String selectionProcessDetails;
+
+    @Column(name = "regions")
+    private String regions;
 }
