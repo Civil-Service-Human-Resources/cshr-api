@@ -9,6 +9,7 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TimeZone;
 import javax.inject.Inject;
 import org.assertj.core.api.Assertions;
 import static org.hamcrest.Matchers.hasSize;
@@ -43,6 +44,9 @@ import uk.gov.cshr.vcm.repository.VacancyRepository;
 public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
     private static final SimpleDateFormat ISO_DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    {
+        ISO_DATEFORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
+    }
     private static final int TEN_DAYS_AGO = -10;
     private static final Timestamp THIRTY_DAYS_FROM_NOW = getTime(30);
     private static final int TWENTY_DAYS_AGO = -20;
@@ -476,7 +480,8 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
     public void search_invalidHttpVerb() throws Exception {
         String path = "/vacancy/search?page=0&size=1";
 
-        mvc.perform(get(path).contentType(APPLICATION_JSON_UTF8).content(requestBody)).andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
+        mvc.perform(get(path).contentType(APPLICATION_JSON_UTF8).content(requestBody))
+				.andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
     }
 
     @Test
@@ -834,7 +839,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
     private static Timestamp getTime(int numberOfDaysFromNow) {
         Date date = Date.from(LocalDateTime.now().plusDays(numberOfDaysFromNow).atZone(ZoneId.systemDefault()).toInstant());
-
         return new Timestamp(date.getTime());
     }
 
