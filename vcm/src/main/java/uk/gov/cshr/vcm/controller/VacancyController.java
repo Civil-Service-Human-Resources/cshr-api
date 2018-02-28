@@ -7,7 +7,6 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -22,7 +21,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
 
-@Profile("dev")
+//@Profile("dev")
 @RestController
 @RequestMapping(value = "/vacancy", produces = MediaType.APPLICATION_JSON_VALUE)
 @ResponseBody
@@ -39,7 +38,7 @@ public class VacancyController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    @ApiOperation(value = "create", nickname = "create")
+    @ApiOperation(value = "Create a Vacancy", nickname = "create")
     public ResponseEntity<Vacancy> create(@RequestBody Vacancy vacancy) {
 
         Vacancy savedVacancy = vacancyRepository.save(vacancy);
@@ -51,8 +50,8 @@ public class VacancyController {
         return ResponseEntity.created(location).body(savedVacancy);
     }
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/{vacancyId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "update", nickname = "update")
+    @RequestMapping(method = RequestMethod.PUT, value = "/{vacancyId}")
+    @ApiOperation(value = "Update a Vacancy", nickname = "update")
     public ResponseEntity<Vacancy> update(@PathVariable Long vacancyId, @RequestBody Vacancy vacancyUpdate) {
 
         Optional<Vacancy> foundVacancy = vacancyRepository.findById(vacancyId);
@@ -66,20 +65,19 @@ public class VacancyController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, value = "/{vacancyId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "delete", nickname = "delete")
+    @RequestMapping(method = RequestMethod.DELETE, value = "/{vacancyId}")
+    @ApiOperation(value = "Delete a Vacancy", nickname = "delete")
     public ResponseEntity<Vacancy> deleteById(@PathVariable Long vacancyId) {
 
         vacancyRepository.delete(vacancyId);
-
         return ResponseEntity.noContent().build();
     }
 
     @RequestMapping(method = RequestMethod.GET)
     @ApiOperation(value = "Find all vacancies with support for pagination", nickname = "findAll")
     public ResponseEntity<Page<Vacancy>> findAll(Pageable pageable) {
-        Page<Vacancy> vacancies = vacancyRepository.findAll(pageable);
 
+        Page<Vacancy> vacancies = vacancyRepository.findAll(pageable);
         return ResponseEntity.ok().body(vacancies);
     }
 }
