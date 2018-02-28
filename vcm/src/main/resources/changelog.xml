@@ -131,4 +131,22 @@
             <column name="regions" type="TEXT" />
         </addColumn>
     </changeSet>
+    <changeSet author="gordon" id="17">
+        <modifyDataType
+                columnName="closing_date"
+                newDataType="TIMESTAMP WITH TIME ZONE"
+                tableName="vacancies"/>
+        <modifyDataType
+                columnName="government_opening_date"
+                newDataType="TIMESTAMP WITH TIME ZONE"
+                tableName="vacancies"/>
+        <modifyDataType
+                columnName="internal_opening_date"
+                newDataType="TIMESTAMP WITH TIME ZONE"
+                tableName="vacancies"/>
+        <modifyDataType
+                columnName="public_opening_date"
+                newDataType="TIMESTAMP WITH TIME ZONE"
+                tableName="vacancies"/>
+    </changeSet>
 </databaseChangeLog>
