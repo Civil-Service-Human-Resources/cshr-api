@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class VacancyException extends RuntimeException {
-    
+public class VacancyException extends Exception {
+
     private VacancyError vacancyError;
 }
