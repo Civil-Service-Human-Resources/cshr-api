@@ -16,7 +16,6 @@ import org.junit.After;
 import org.junit.Assert;
 import static org.junit.Assert.fail;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.mockito.BDDMockito.given;
@@ -53,7 +52,7 @@ import uk.gov.cshr.vcm.repository.DepartmentRepository;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
 import uk.gov.cshr.vcm.service.LocationService;
 
-@Ignore
+//@Ignore
 @ActiveProfiles("dev")
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = VcmApplication.class)
@@ -269,6 +268,39 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         assertThat(vacancyError.getStatus(), is(HttpStatus.SERVICE_UNAVAILABLE));
         assertThat(vacancyError.getMessage(),
                 containsString(LocationServiceException.SERVICE_UNAVAILABLE_MESSAGE));
+
+        Mockito.reset(locationService);
+    }
+
+    @Test
+    public void testRuntimeException() throws LocationServiceException, Exception {
+
+        String errorMessage = "bad times";
+
+        given(locationService.find(any())).willThrow(new RuntimeException(errorMessage));
+
+        VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
+                .keyword("SearchQueryDescription")
+                .location(new Location("bristol", 30))
+                .build();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(vacancySearchParameters);
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/search")
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(json)
+                .accept(APPLICATION_JSON_UTF8))
+                .andExpect(status().isInternalServerError())
+                .andReturn();
+
+        String response = mvcResult.getResponse().getContentAsString();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        VacancyError vacancyError = objectMapper.readValue(response, VacancyError.class);
+
+        assertThat(vacancyError.getStatus(), is(HttpStatus.INTERNAL_SERVER_ERROR));
+        assertThat(vacancyError.getMessage(), containsString(errorMessage));
 
         Mockito.reset(locationService);
     }
