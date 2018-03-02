@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://db:5432/cshr
+    url: jdbc:postgresql://localhost:5432/cshr
     username: postgres
     password: qwerty
   jpa:
@@ -14,3 +14,7 @@ server:
   port: 8080
 liquibase:
     change-log: classpath:/changelog.xml
+security:
+    oauth2:
+        resource:
+            filter-order: 3
