@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,9 +21,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
 import uk.gov.cshr.vcm.controller.exception.VacancyClosedException;
 import uk.gov.cshr.vcm.controller.exception.VacancyError;
-import uk.gov.cshr.vcm.exception.LocationServiceException;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
@@ -33,7 +32,7 @@ import uk.gov.cshr.vcm.service.SearchService;
 @RestController
 @RequestMapping(value = "/vacancy", produces = MediaType.APPLICATION_JSON_VALUE)
 @ResponseBody
-@Api(value = "vacancyservice")
+@Api(value = "vacancySearchService")
 public class VacancySearchController {
 
     private static final Logger log = LoggerFactory.getLogger(VacancySearchController.class);
@@ -48,13 +47,16 @@ public class VacancySearchController {
         this.vacancyRepository = vacancyRepository;
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/{vacancyId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Find a specific vacancy for an id", nickname = "findById")
-    @ApiResponse(code = 410, response = VacancyClosedException.class, message = VacancyClosedException.CLOSED_MESSAGE)
-    @ApiResponses(value = {
-            @ApiResponse(code = 410, message = VacancyClosedException.CLOSED_MESSAGE, response = VacancyError.class)
-    })
-    public ResponseEntity<Vacancy> findById(@PathVariable Long vacancyId) {
+    @RequestMapping(method = RequestMethod.GET, value = "/{vacancyId}")
+    @ApiOperation(value = "Find a specific vacancy", nickname = "findById")
+	@ApiResponses(value = {
+		@ApiResponse(
+				code = 410,
+				message = VacancyClosedException.CLOSED_MESSAGE,
+				response = VacancyError.class)
+	})
+    public ResponseEntity<Vacancy> findById(@PathVariable Long vacancyId)
+			throws VacancyClosedException {
 
         Optional<Vacancy> foundVacancy = vacancyRepository.findById(vacancyId);
 
@@ -67,21 +69,20 @@ public class VacancySearchController {
         return foundVacancy.map(ResponseEntity.ok()::body).orElse(ResponseEntity.notFound().build());
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Search for vacancies by location and keyword with support for pagination", nickname = "search")
-    public ResponseEntity<Page<Vacancy>> search(@ApiParam(name = "searchParameters",
-            value = "The values supplied to perform the search with", required = true)
-            @RequestBody VacancySearchParameters vacancySearchParameters, Pageable pageable) {
+    @RequestMapping(method = RequestMethod.POST, value = "/search")
+    @ApiOperation(value = "Search for vacancies by location and keyword with support for pagination")
+	@ApiResponses(value = {
+		@ApiResponse(
+				code = 503,
+				message = LocationServiceException.SERVICE_UNAVAILABLE_MESSAGE,
+				response = VacancyError.class)
+	})
+    public ResponseEntity<Page<Vacancy>> search(
+			@ApiParam(name = "searchParameters", value = "The values supplied to perform the search", required = true)
+            @RequestBody VacancySearchParameters vacancySearchParameters, Pageable pageable)
+			throws LocationServiceException {
 
-        ResponseEntity<Page<Vacancy>> response;
-
-        try {
-            Page<Vacancy> vacancies = searchService.search(vacancySearchParameters, pageable);
-            response = ResponseEntity.ok().body(vacancies);
-        } catch (LocationServiceException ex) {
-            response = ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
-        }
-
-        return response;
+		Page<Vacancy> vacancies = searchService.search(vacancySearchParameters, pageable);
+		return ResponseEntity.ok().body(vacancies);
     }
 }

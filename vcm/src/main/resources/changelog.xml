@@ -1,0 +1,152 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+                            http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd"
+                            logicalFilePath="changelog.xml">
+
+    <changeSet author="gordon" id="1">
+        <createTable tableName="departments">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="TEXT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="gordon" id="2">
+        <createTable tableName="vacancies">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="closing_date" type="TIMESTAMP(6) WITHOUT TIME ZONE"/>
+            <column name="contact_department" type="TEXT"/>
+            <column name="contact_email" type="TEXT"/>
+            <column name="contact_name" type="TEXT"/>
+            <column name="contact_telephone" type="TEXT"/>
+            <column name="description" type="TEXT"/>
+            <column name="eligibility" type="TEXT"/>
+            <column name="government_opening_date" type="TIMESTAMP(6) WITHOUT TIME ZONE"/>
+            <column name="grade" type="TEXT"/>
+            <column name="internal_opening_date" type="TIMESTAMP(6) WITHOUT TIME ZONE"/>
+            <column name="latitude" type="FLOAT8"/>
+            <column name="location" type="TEXT"/>
+            <column name="longitude" type="FLOAT8"/>
+            <column name="number_vacancies" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="public_opening_date" type="TIMESTAMP(6) WITHOUT TIME ZONE"/>
+            <column name="responsibilities" type="TEXT"/>
+            <column name="role" type="TEXT"/>
+            <column name="salary_max" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="salary_min" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="TEXT"/>
+            <column name="working_hours" type="TEXT"/>
+            <column name="dept_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="gordon" id="3">
+        <addPrimaryKey columnNames="id" constraintName="departments_pkey" tableName="departments"/>
+    </changeSet>
+    <changeSet author="gordon" id="4">
+        <addPrimaryKey columnNames="id" constraintName="vacancies_pkey" tableName="vacancies"/>
+    </changeSet>
+    <changeSet author="gordon" id="5">
+        <addForeignKeyConstraint baseColumnNames="dept_id"
+                                 baseTableName="vacancies"
+                                 constraintName="fk_vacancies_departments"
+                                 deferrable="true"
+                                 initiallyDeferred="true"
+                                 onDelete="NO ACTION"
+                                 onUpdate="NO ACTION"
+                                 referencedColumnNames="id"
+                                 referencedTableName="departments"/>
+    </changeSet>
+    <changeSet author="gordon" id="6">
+        <sql>CREATE EXTENSION cube;</sql>
+        <sql>CREATE EXTENSION earthdistance;</sql>
+    </changeSet>
+
+    <changeSet author="gordon" id="7">
+        <dropNotNullConstraint
+            columnDataType="int"
+            columnName="salary_max"
+            tableName="vacancies"/>
+        <addNotNullConstraint
+            columnDataType="int"
+            columnName="salary_min"
+            tableName="vacancies"/>
+    </changeSet>
+    <changeSet author="gordon" id="8">
+        <addColumn tableName="vacancies">
+            <column name="shortdescription" type="text"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="gordon" id="9">
+        <addColumn tableName="vacancies">
+            <column name="displaycsccontent" type="boolean"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="gordon" id="10">
+        <addDefaultValue columnDataType="boolean"
+                         columnName="displaycsccontent"
+                         defaultValueBoolean="false"
+                         tableName="vacancies"/>
+    </changeSet>
+    <changeSet author="Seamus Singh" id="11">
+        <addColumn tableName="vacancies">
+            <column name="identifier" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="gordon" id="12">
+        <addColumn tableName="vacancies">
+            <column name="selectionprocesspetails" type="TEXT" />
+        </addColumn>
+    </changeSet>
+    <changeSet author="gordon" id="13">
+        <addColumn tableName="departments">
+            <column name="disabilitylogo" type="TEXT" />
+        </addColumn>
+    </changeSet>
+    <changeSet author="gordon" id="14">
+        <renameColumn newColumnName="selectionprocessdetails"
+            oldColumnName="selectionprocesspetails"
+            tableName="vacancies"/>
+    </changeSet>
+    <changeSet author="gordon" id="15">
+        <addColumn tableName="vacancies">
+            <column name="applyurl" type="TEXT" />
+        </addColumn>
+    </changeSet>
+    <changeSet author="gordon" id="16">
+        <addColumn tableName="vacancies">
+            <column name="regions" type="TEXT" />
+        </addColumn>
+    </changeSet>
+    <changeSet author="gordon" id="17">
+        <modifyDataType
+                columnName="closing_date"
+                newDataType="TIMESTAMP WITH TIME ZONE"
+                tableName="vacancies"/>
+        <modifyDataType
+                columnName="government_opening_date"
+                newDataType="TIMESTAMP WITH TIME ZONE"
+                tableName="vacancies"/>
+        <modifyDataType
+                columnName="internal_opening_date"
+                newDataType="TIMESTAMP WITH TIME ZONE"
+                tableName="vacancies"/>
+        <modifyDataType
+                columnName="public_opening_date"
+                newDataType="TIMESTAMP WITH TIME ZONE"
+                tableName="vacancies"/>
+    </changeSet>
+</databaseChangeLog>

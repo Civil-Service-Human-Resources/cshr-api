@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
@@ -40,9 +41,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.cshr.vcm.VcmApplication;
+import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
 import uk.gov.cshr.vcm.controller.exception.VacancyClosedException;
 import uk.gov.cshr.vcm.controller.exception.VacancyError;
-import uk.gov.cshr.vcm.exception.LocationServiceException;
 import uk.gov.cshr.vcm.model.Coordinates;
 import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.model.Location;
@@ -104,9 +105,6 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                         .build());
 
         createdDepartments.add(department);
-
-        given(locationService.find(any()))
-                .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
     }
 
     @After
@@ -124,10 +122,15 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     @Test
     public void testExcludeClosedVacancies() throws Exception {
 
+        given(locationService.find(any()))
+                .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
+
         createVacancyWithClosingDate(YESTERDAY, department);
 
         // beacuse these are timestamp basesd this job will be closed
-        createVacancyWithClosingDate(TODAY, department);
+        Timestamp earlierToday = new Timestamp(TODAY.getTime() - 10000);
+        createVacancyWithClosingDate(earlierToday, department);
+
         createVacancyWithClosingDate(TOMORROW, department);
         createVacancyWithClosingDate(THIRTY_DAYS_FROM_NOW, department);
 
@@ -136,7 +139,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         Assert.assertTrue("Expected results", !resultsList.isEmpty());
 
-        resultsList.stream().filter((vacancy) -> (vacancy.getClosingDate().compareTo(new Date()) == -1))
+        resultsList.stream().filter((vacancy) -> (vacancy.getClosingDate().before(new Date())))
                 .forEachOrdered((vacancy) -> {
                     fail("vacancy.getClosingDate() in past: " + vacancy.getClosingDate());
                 });
@@ -184,6 +187,9 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     @Test
     public void testGetClosedVacancy() throws Exception {
 
+        given(locationService.find(any()))
+                .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
+
         Vacancy closedVacancy = createVacancyWithClosingDate(YESTERDAY, department);
 
         MvcResult mvcResult = this.mockMvc.perform(get("/vacancy/" + closedVacancy.getId())
@@ -204,6 +210,9 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
     @Test
     public void testUpdateClosedVacancy() throws Exception {
+
+        given(locationService.find(any()))
+                .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -230,6 +239,71 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         Assert.assertEquals("dept disability logo",
                 vacancy.getDepartment().getDisabilityLogo(),
                 department.getDisabilityLogo());
+    }
+
+    @Test
+    public void testLocationServiceUnavailable() throws LocationServiceException, Exception {
+
+        given(locationService.find(any())).willThrow(new LocationServiceException());
+
+        VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
+                .keyword("SearchQueryDescription")
+                .location(new Location("bristol", 30))
+                .build();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(vacancySearchParameters);
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/search")
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(json)
+                .accept(APPLICATION_JSON_UTF8))
+                .andExpect(status().isServiceUnavailable())
+                .andReturn();
+
+        String response = mvcResult.getResponse().getContentAsString();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        VacancyError vacancyError = objectMapper.readValue(response, VacancyError.class);
+
+        assertThat(vacancyError.getStatus(), is(HttpStatus.SERVICE_UNAVAILABLE));
+        assertThat(vacancyError.getMessage(),
+                containsString(LocationServiceException.SERVICE_UNAVAILABLE_MESSAGE));
+
+        Mockito.reset(locationService);
+    }
+
+    @Test
+    public void testRuntimeException() throws LocationServiceException, Exception {
+
+        String errorMessage = "bad times";
+
+        given(locationService.find(any())).willThrow(new RuntimeException(errorMessage));
+
+        VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
+                .keyword("SearchQueryDescription")
+                .location(new Location("bristol", 30))
+                .build();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(vacancySearchParameters);
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/search")
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(json)
+                .accept(APPLICATION_JSON_UTF8))
+                .andExpect(status().isInternalServerError())
+                .andReturn();
+
+        String response = mvcResult.getResponse().getContentAsString();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        VacancyError vacancyError = objectMapper.readValue(response, VacancyError.class);
+
+        assertThat(vacancyError.getStatus(), is(HttpStatus.INTERNAL_SERVER_ERROR));
+        assertThat(vacancyError.getMessage(), containsString(errorMessage));
+
+        Mockito.reset(locationService);
     }
 
     public Page<Vacancy> findVancancies(String place) throws Exception {
