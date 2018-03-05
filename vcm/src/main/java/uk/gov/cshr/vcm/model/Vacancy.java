@@ -18,8 +18,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
 
 @Entity
+@Indexed
 @Builder
 @Data
 @AllArgsConstructor
@@ -37,15 +40,19 @@ public class Vacancy implements Serializable {
     @NonNull
     private Long identifier;
 
+    @Field
     @NonNull
     private String title;
 
+    @Field
     @NonNull
     private String description;
 
+    @Field
     @Column(name = "shortdescription")
     private String shortDescription;
 
+    @Field
     @NonNull
     private String location;
 
@@ -55,12 +62,14 @@ public class Vacancy implements Serializable {
     @NonNull
     private String role;
 
+    @Field
     @NonNull
     private String responsibilities;
 
     @NonNull
     private String workingHours;
 
+    @Field
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT+0")
     @NonNull
     private Timestamp closingDate;
@@ -92,9 +101,11 @@ public class Vacancy implements Serializable {
     @Column(name = "public_opening_date")
     private Timestamp publicOpeningDate;
 
+    @Field
     @NonNull
     private Integer salaryMin;
 
+    @Field
     private Integer salaryMax;
 
     private Integer numberVacancies;
@@ -123,6 +134,7 @@ public class Vacancy implements Serializable {
     @ApiModelProperty(notes = "URL linking to external system")
     private String applyURL;
 
+    @Field
     @Column(name = "regions")
     private String regions;
 }
