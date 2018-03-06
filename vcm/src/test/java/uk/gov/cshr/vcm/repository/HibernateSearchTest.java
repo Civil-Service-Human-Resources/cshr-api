@@ -80,6 +80,7 @@ public class HibernateSearchTest extends AbstractTestNGSpringContextTests {
 
         Vacancy vacancy = getVacancyPrototype();
         vacancy.setTitle("engineer");
+        vacancy.setSalaryMax(10001);
         saveVacancy(vacancy);
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()

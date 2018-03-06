@@ -9,6 +9,7 @@ import javax.transaction.Transactional;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
+import org.hibernate.search.query.dsl.MustJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -64,6 +65,10 @@ public class HibernateSearchService {
 //        }
 //look for 0 <= starred < 3
         Integer minSalary = vacancySearchParameters.getMinSalary();
+        if (minSalary == null) {
+            minSalary = 0;
+        }
+
         Integer maxSalary = vacancySearchParameters.getMaxSalary();
 
         Query maxQuery = qb
@@ -75,7 +80,7 @@ public class HibernateSearchService {
         Query minQuery = qb
                 .range()
                 .onField("salaryMin")
-                .from(0).to(maxSalary).excludeLimit()
+                .from(0).to(maxSalary)
                 .createQuery();
 
 //look for myths strictly BC
@@ -93,14 +98,16 @@ public class HibernateSearchService {
                 .above(new Date()).excludeLimit()
                 .createQuery();
 
-        Query luceneQuery = qb
-                .bool()
-                .must(fuzzyQuery)
-                .must(maxQuery)
-                .must(minQuery)
-                //                .must(openQuery)
-                //                .must(closedQuery)
-                .createQuery();
+        MustJunction mustJunction = qb
+                .bool().must(fuzzyQuery);
+
+        mustJunction = mustJunction.must(minQuery);
+
+//                .must(maxQuery)
+//                .must(minQuery)
+        //                .must(openQuery)
+        //                .must(closedQuery)
+        Query luceneQuery = mustJunction.createQuery();
 
         System.out.println("luceneQuery=" + luceneQuery);
 
