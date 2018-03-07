@@ -149,4 +149,12 @@
                 newDataType="TIMESTAMP WITH TIME ZONE"
                 tableName="vacancies"/>
     </changeSet>
+    <changeSet author="gordon" id="18">
+        <addUniqueConstraint columnNames="identifier"
+                constraintName="uk_identifier"
+                deferrable="true"
+                disabled="false"
+                initiallyDeferred="true"
+                tableName="vacancies"/>
+    </changeSet>
 </databaseChangeLog>
