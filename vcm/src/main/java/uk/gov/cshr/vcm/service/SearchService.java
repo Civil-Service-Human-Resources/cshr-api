@@ -1,7 +1,6 @@
 package uk.gov.cshr.vcm.service;
 
 import java.util.ArrayList;
-import javax.annotation.Resource;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +13,6 @@ import uk.gov.cshr.vcm.model.Coordinates;
 import uk.gov.cshr.vcm.model.SearchParameters;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
-import uk.gov.cshr.vcm.repository.VacancyRepository;
 
 @Service
 public class SearchService {
@@ -23,8 +21,10 @@ public class SearchService {
     @Inject
     private LocationService locationService;
 
-    @Resource
-    private VacancyRepository vacancyRepository;
+//    @Resource
+//    private VacancyRepository vacancyRepository;
+    @Inject
+    private HibernateSearchService hibernateSearchService;
 
     public Page<Vacancy> search(VacancySearchParameters vacancySearchParameters, Pageable pageable)
 			throws LocationServiceException {
@@ -40,7 +40,7 @@ public class SearchService {
                     .vacancySearchParameters(vacancySearchParameters)
                     .coordinates(coordinates)
                     .build();
-            vacancies = vacancyRepository.search(searchParameters, pageable);
+            vacancies = hibernateSearchService.search(searchParameters, pageable);
         } else {
             debug("No Coordinates for %s with radius of %d exist", vacancySearchParameters.getLocation().getPlace(), vacancySearchParameters.getLocation().getRadius());
             vacancies = new PageImpl<>(new ArrayList<Vacancy>());

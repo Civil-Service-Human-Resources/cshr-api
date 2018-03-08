@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/cshr
+    url: jdbc:postgresql://db:5432/cshr
     username: postgres
     password: qwerty
   jpa:
@@ -12,7 +12,7 @@ spring:
             search:
                 default:
                     directory_provider: filesystem
-                    indexBase: indexpath
+                    indexBase: /target/indexpath
   location:
     service:
       url: http://location-service.dev.cshr-gov.uk/findlocation/{searchTerm} # will be overridden by an env variable

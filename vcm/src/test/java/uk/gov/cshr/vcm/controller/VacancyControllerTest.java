@@ -914,7 +914,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.totalElements", is(0)));
     }
 
-    @Test(enabled = false)
+    @Test(enabled = true)
     public void search_noOpeningDatesSet() throws Exception {
         doClosedPublicSearchTests(null, null, null);
         vacancy3.setGovernmentOpeningDate(getTime(TEN_DAYS_AGO));

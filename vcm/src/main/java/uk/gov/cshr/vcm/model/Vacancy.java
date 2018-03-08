@@ -18,11 +18,30 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.hibernate.search.annotations.Analyze;
+import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Latitude;
+import org.hibernate.search.annotations.Longitude;
+import org.hibernate.search.annotations.Resolution;
+import org.hibernate.search.annotations.Spatial;
+import org.hibernate.search.annotations.Store;
+import uk.gov.cshr.vcm.service.RegionFieldBridge;
 
+//@AnalyzerDef(name = "customanalyzer",
+//        tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+//        filters = {
+//            @TokenFilterDef(factory = LowerCaseFilterFactory.class)
+//            ,
+//    @TokenFilterDef(factory = SnowballPorterFilterFactory.class, params = {
+//        @Parameter(name = "language", value = "English")
+//    })
+//        })
 @Entity
 @Indexed
+@Spatial
 @Builder
 @Data
 @AllArgsConstructor
@@ -93,10 +112,12 @@ public class Vacancy implements Serializable {
     @Column(name = "government_opening_date")
     private Timestamp governmentOpeningDate;
 
+    @DateBridge(resolution = Resolution.MILLISECOND)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT+0")
     @Column(name = "internal_opening_date")
     private Timestamp internalOpeningDate;
 
+    @DateBridge(resolution = Resolution.MILLISECOND)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT+0")
     @Column(name = "public_opening_date")
     private Timestamp publicOpeningDate;
@@ -113,11 +134,13 @@ public class Vacancy implements Serializable {
     /**
      * If a vacancy has no longitude ensure it is null not 0 (zero) since 0 is a valid point in latitude
      */
+    @Longitude
     private Double longitude;
 
     /**
      * If a vacancy has no latitude ensure it is null not 0 (zero) since 0 is a valid point in latitude
      */
+    @Latitude
     private Double latitude;
 
     @ManyToOne
@@ -134,7 +157,11 @@ public class Vacancy implements Serializable {
     @ApiModelProperty(notes = "URL linking to external system")
     private String applyURL;
 
-    @Field
+    // @Field(index=Index.YES, analyze=Analyze.YES, store=Store.NO, bridge=@FieldBridge(impl=DHLCSKeywordFieldBridge.class))
+//    @Field(store = Store.YES)
+    @Field(bridge = @FieldBridge(impl = RegionFieldBridge.class), store = Store.YES, analyze = Analyze.NO)
+//    @RegionFieldBridge
+//    @Analyzer(definition = "customanalyzer")
     @Column(name = "regions")
     private String regions;
 }

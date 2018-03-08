@@ -2,11 +2,9 @@ package uk.gov.cshr.vcm.repository;
 
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
-import uk.gov.cshr.vcm.controller.exception.VacancyClosedException;
 import uk.gov.cshr.vcm.model.Vacancy;
 
 import javax.transaction.Transactional;
-import java.util.Date;
 import java.util.Optional;
 
 @Repository
@@ -17,4 +15,7 @@ public interface VacancyRepository extends PagingAndSortingRepository<Vacancy, L
 
         return Optional.ofNullable(this.findOne(id));
     }
+
+    @Override
+    public <S extends Vacancy> S save(S entity);
 }

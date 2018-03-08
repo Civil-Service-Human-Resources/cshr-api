@@ -27,7 +27,7 @@ import uk.gov.cshr.vcm.controller.exception.VacancyError;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
-import uk.gov.cshr.vcm.service.HibernateSearchService;
+import uk.gov.cshr.vcm.service.SearchService;
 
 @RestController
 @RequestMapping(value = "/vacancy", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -38,7 +38,7 @@ public class VacancySearchController {
     private static final Logger log = LoggerFactory.getLogger(VacancySearchController.class);
 
     @Inject
-    private HibernateSearchService searchService;
+    private SearchService searchService;
 
     private final VacancyRepository vacancyRepository;
 

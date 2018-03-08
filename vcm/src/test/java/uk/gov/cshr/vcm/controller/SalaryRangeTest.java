@@ -148,19 +148,16 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
 
         Assert.assertTrue("Expected results", !resultsList.isEmpty());
 
-        boolean vacancyFound = false;
-
         for (Vacancy vacancy : resultsList) {
 
-            if (vacancy.getSalaryMin().equals(14000)) {
-                vacancyFound = true;
+            if (vacancy.getSalaryMin() > 40000) {
+                Fail.fail("Vacancy with salary range " + vacancy.getSalaryMin() + "-" + vacancy.getSalaryMax() + "  when filtering for 30000-40000");
             }
-            else {
+
+            if (vacancy.getSalaryMax() < 30000) {
                 Fail.fail("Vacancy with salary range " + vacancy.getSalaryMin() + "-" + vacancy.getSalaryMax() + "  when filtering for 30000-40000");
             }
         }
-
-        Assert.assertTrue(vacancyFound);
     }
 
     @Test
@@ -292,6 +289,8 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         Assert.assertTrue(resultsList.contains(v3));
         Assert.assertTrue(resultsList.contains(v4));
         Assert.assertTrue(resultsList.contains(v5));
+
+        System.out.println("Success");
     }
 
     @Test
@@ -547,7 +546,7 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         Vacancy vacancy = getVacancyPrototype(coordinates);
         vacancy.setDepartment(department);
         vacancy.setSalaryMin(salaryMin);
-        vacancy.setSalaryMax(salaryMax);
+        vacancy.setSalaryMax(salaryMax != null ? salaryMax : salaryMin);
         vacancyRepository.save(vacancy);
         createdVacancies.add(vacancy);
         return vacancy;

@@ -8,14 +8,11 @@ import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
-import org.springframework.data.domain.Page;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -24,9 +21,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import uk.gov.cshr.vcm.VcmApplication;
 import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
 import uk.gov.cshr.vcm.model.Department;
-import uk.gov.cshr.vcm.model.Location;
 import uk.gov.cshr.vcm.model.Vacancy;
-import uk.gov.cshr.vcm.model.VacancySearchParameters;
 import uk.gov.cshr.vcm.service.HibernateSearchService;
 
 @RunWith(SpringRunner.class)
@@ -75,23 +70,23 @@ public class HibernateSearchTest extends AbstractTestNGSpringContextTests {
         }
     }
 
-    @Test
-    public void testSearchVacancy() throws LocationServiceException {
-
-        Vacancy vacancy = getVacancyPrototype();
-        vacancy.setTitle("engineer");
-        vacancy.setSalaryMax(10001);
-        saveVacancy(vacancy);
-
-        VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
-                .location(Location.builder().place("Bristol").radius(30).build())
-                .keyword("engineer")
-                .build();
-
-        Page<Vacancy> results = hibernateSearchService.search(vacancySearchParameters, null);
-        Assert.assertFalse(results.getContent().isEmpty());
-        Assert.assertEquals(vacancy.getId(), results.getContent().get(0).getId());
-    }
+//    @Test
+//    public void testSearchVacancy() throws LocationServiceException {
+//
+//        Vacancy vacancy = getVacancyPrototype();
+//        vacancy.setTitle("engineer");
+//        vacancy.setSalaryMax(10001);
+//        saveVacancy(vacancy);
+//
+//        VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
+//                .location(Location.builder().place("Bristol").radius(30).build())
+//                .keyword("engineer")
+//                .build();
+//
+//        Page<Vacancy> results = hibernateSearchService.search(vacancySearchParameters, null);
+//        Assert.assertFalse(results.getContent().isEmpty());
+//        Assert.assertEquals(vacancy.getId(), results.getContent().get(0).getId());
+//    }
 
     private Vacancy getVacancyPrototype() {
 
