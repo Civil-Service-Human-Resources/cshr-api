@@ -538,6 +538,7 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
                 .numberVacancies(1)
                 .latitude(coordinates.getLatitude())
                 .longitude(coordinates.getLongitude())
+                .identifier(System.currentTimeMillis())
                 .build();
 
         return vacancyPrototype;
