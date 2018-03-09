@@ -128,6 +128,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             .longitude(-2.6278111)
             .displayCscContent(Boolean.TRUE)
             .selectionProcessDetails("selectionProcessDetails")
+			.nationalityStatement("nationalityStatement")
             .build();
 
     private Vacancy vacancy2 = Vacancy.builder()
@@ -365,6 +366,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.eligibility", is(this.requestBodyVacancy.getEligibility())))
                 .andExpect(jsonPath("$.salaryMin", is(this.requestBodyVacancy.getSalaryMin())))
                 .andExpect(jsonPath("$.salaryMax", is(this.requestBodyVacancy.getSalaryMax())))
+				.andExpect(jsonPath("$.nationalityStatement", is(this.requestBodyVacancy.getNationalityStatement())))
                 .andExpect(jsonPath("$.numberVacancies", is(this.requestBodyVacancy.getNumberVacancies())));
     }
 

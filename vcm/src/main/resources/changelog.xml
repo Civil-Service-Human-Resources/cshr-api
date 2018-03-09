@@ -161,4 +161,9 @@
 		<dropColumn columnName="role"
 				tableName="vacancies" />
 	</changeSet>
+    <changeSet author="gordon" id="20">
+        <addColumn tableName="vacancies">
+            <column name="nationalitystatement" type="TEXT" />
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
