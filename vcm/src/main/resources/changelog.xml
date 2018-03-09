@@ -157,4 +157,8 @@
                 initiallyDeferred="true"
                 tableName="vacancies"/>
     </changeSet>
+	<changeSet author="gordon" id="19">
+		<dropColumn columnName="role"
+				tableName="vacancies" />
+	</changeSet>
 </databaseChangeLog>

@@ -380,7 +380,6 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .latitude(BRISTOL_LATITUDE)
                 .longitude(BRISTOL_LONGITUDE)
                 .identifier(System.currentTimeMillis())
-                .role("role")
                 .build();
     }
 }

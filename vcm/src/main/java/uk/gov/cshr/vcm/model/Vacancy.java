@@ -53,9 +53,6 @@ public class Vacancy implements Serializable {
     private String grade;
 
     @NonNull
-    private String role;
-
-    @NonNull
     private String responsibilities;
 
     @NonNull
