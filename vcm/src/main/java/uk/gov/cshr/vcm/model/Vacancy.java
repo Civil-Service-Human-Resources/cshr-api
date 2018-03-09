@@ -122,4 +122,7 @@ public class Vacancy implements Serializable {
 
     @Column(name = "regions")
     private String regions;
+
+	@Column(name = "nationalitystatement")
+	private String nationalityStatement;
 }
