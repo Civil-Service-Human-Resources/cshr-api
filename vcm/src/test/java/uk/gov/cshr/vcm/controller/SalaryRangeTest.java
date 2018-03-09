@@ -534,7 +534,6 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
                 .eligibility("testEligibility1")
                 .salaryMin(0)
                 .identifier(1L)
-                .role("bacon")
                 .numberVacancies(1)
                 .latitude(coordinates.getLatitude())
                 .longitude(coordinates.getLongitude())
