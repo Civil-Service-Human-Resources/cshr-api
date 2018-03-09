@@ -9,16 +9,28 @@
 
 	<name>vcm</name>
 
+    <properties>
+
+        <database-driver>org.postgresql.Driver</database-driver>
+
+        <admin-url>jdbc:postgresql://db:5432/</admin-url>
+        <admin-user>postgres</admin-user>
+        <admin-password>qwerty</admin-password>
+
+        <database>cshr</database>
+        <database-url>jdbc:postgresql://db:5432/cshr</database-url>
+        <database-user>postgres</database-user>
+        <database-password>qwerty</database-password>
+        <postgres.version>9.4-1206-jdbc42</postgres.version>
+        <testng.version>6.10</testng.version>
+    </properties>
+
 	<parent>
 		<groupId>uk.gov.cshr</groupId>
 		<artifactId>cshr</artifactId>
 		<version>0.0.1</version>
 	</parent>
 
-	<properties>
-		<postgres.version>9.4-1206-jdbc42</postgres.version>
-        <testng.version>6.10</testng.version>
-	</properties>
 
 	<dependencies>
 
@@ -28,6 +40,11 @@
 			<version>${postgres.version}</version>
 		</dependency>
 
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+        </dependency>
+
         <!-- Testing -->
         <dependency>
             <groupId>org.testng</groupId>
@@ -36,4 +53,29 @@
             <scope>test</scope>
         </dependency>
 	</dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-maven-plugin</artifactId>
+                <version>3.5.3</version>
+
+                <dependencies>
+                    <dependency>
+                        <groupId>postgresql</groupId>
+                        <artifactId>postgresql</artifactId>
+                        <version>9.1-901-1.jdbc4</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <changeLogFile>changelog.xml</changeLogFile>
+                    <driver>org.postgresql.Driver</driver>
+                    <url>${database-url}</url>
+                    <username>${database-user}</username>
+                    <password>${database-password}</password>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

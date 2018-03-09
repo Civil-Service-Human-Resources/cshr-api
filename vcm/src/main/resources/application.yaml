@@ -12,3 +12,5 @@ spring:
       url: http://location-service.dev.cshr-gov.uk/findlocation/{searchTerm} # will be overridden by an env variable
 server:
   port: 8080
+liquibase:
+    change-log: classpath:/changelog.xml
