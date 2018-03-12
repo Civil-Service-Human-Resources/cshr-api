@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.cshr.vcm.VcmApplication;
-import uk.gov.cshr.vcm.exception.LocationServiceException;
+import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
 import uk.gov.cshr.vcm.model.Coordinates;
 import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.model.Location;
@@ -534,10 +534,10 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
                 .eligibility("testEligibility1")
                 .salaryMin(0)
                 .identifier(1L)
-                .role("bacon")
                 .numberVacancies(1)
                 .latitude(coordinates.getLatitude())
                 .longitude(coordinates.getLongitude())
+                .identifier(System.currentTimeMillis())
                 .build();
 
         return vacancyPrototype;

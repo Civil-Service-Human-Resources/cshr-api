@@ -1,6 +1,8 @@
 package uk.gov.cshr.vcm.controller;
 
 import io.swagger.annotations.ApiOperation;
+import java.net.URI;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
-
-import java.net.URI;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/department", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -42,7 +41,7 @@ public class DepartmentController {
         return ResponseEntity.ok().body(departments);
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/{departmentId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(method = RequestMethod.GET, value = "/{departmentId}")
     @ApiOperation(value = "Find a specific department", nickname = "findById")
     public ResponseEntity<Department> findById(@PathVariable Long departmentId) {
 
@@ -58,6 +57,7 @@ public class DepartmentController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
+    @ApiOperation(value = "Create a department", nickname = "create")
     public ResponseEntity<Department> create(@RequestBody Department department) {
 
         Department savedDepartment = departmentRepository.save(department);
@@ -69,7 +69,8 @@ public class DepartmentController {
         return ResponseEntity.created(location).body(savedDepartment);
     }
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/{departmentId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(method = RequestMethod.PUT, value = "/{departmentId}")
+    @ApiOperation(value = "Update a department", nickname = "update")
     public ResponseEntity<Department> update(@PathVariable Long departmentId, @RequestBody Department departmentUpdate) {
 
         Optional<Department> foundDepartment = departmentRepository.findById(departmentId);
@@ -88,7 +89,8 @@ public class DepartmentController {
         }).orElse(notFound);
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, value = "/{departmentId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(method = RequestMethod.DELETE, value = "/{departmentId}")
+    @ApiOperation(value = "Delete a department", nickname = "deleteById")
     public ResponseEntity<Department> deleteById(@PathVariable Long departmentId) {
 
         departmentRepository.delete(departmentId);
