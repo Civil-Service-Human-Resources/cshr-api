@@ -150,6 +150,7 @@
                 tableName="vacancies"/>
     </changeSet>
     <changeSet author="gordon" id="18">
+		<sql>update vacancies set identifier = id</sql>
         <addUniqueConstraint columnNames="identifier"
                 constraintName="uk_identifier"
                 deferrable="true"
