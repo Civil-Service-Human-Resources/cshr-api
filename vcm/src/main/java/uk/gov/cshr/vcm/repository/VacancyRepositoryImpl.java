@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -28,6 +29,7 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom {
     private static final String SEARCH_FROM_LONGITUDE_VALUE = "searchFromLongitudeValue";
     private static final String WILDCARD = "%";
     private static final String REGION = "region";
+    private static final String OVERSEAS_JOB = "overseasJob";
 
     @PersistenceContext
     private EntityManager em;
@@ -53,9 +55,11 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom {
         selectQuery.setParameter(SEARCH_FROM_LONGITUDE_VALUE, searchParameters.getLongitude());
         selectQuery.setParameter(SEARCH_FROM_LATITUDE_VALUE, searchParameters.getLatitude());
         selectQuery.setParameter(DISTANCE, searchParameters.getRadius());
+        selectQuery.setParameter(OVERSEAS_JOB, BooleanUtils.isTrue(searchParameters.getOverseasJob()));
         countQuery.setParameter(SEARCH_FROM_LONGITUDE_VALUE, searchParameters.getLongitude());
         countQuery.setParameter(SEARCH_FROM_LATITUDE_VALUE, searchParameters.getLatitude());
         countQuery.setParameter(DISTANCE, searchParameters.getRadius());
+        countQuery.setParameter(OVERSEAS_JOB, BooleanUtils.isTrue(searchParameters.getOverseasJob()));
 
         if (StringUtils.isNotBlank(searchParameters.getKeyword())) {
             selectQuery.setParameter(KEYWORD, WILDCARD + searchParameters.getKeyword() + WILDCARD);
