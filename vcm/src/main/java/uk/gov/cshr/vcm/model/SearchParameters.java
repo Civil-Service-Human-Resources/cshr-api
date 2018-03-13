@@ -50,4 +50,8 @@ public class SearchParameters {
     public Integer getSalaryMax() {
         return vacancySearchParameters != null ? vacancySearchParameters.getMaxSalary() : null;
     }
+
+    public Boolean getOverseasJob() {
+        return vacancySearchParameters != null ? vacancySearchParameters.getOverseasJob() : null;
+    }
 }

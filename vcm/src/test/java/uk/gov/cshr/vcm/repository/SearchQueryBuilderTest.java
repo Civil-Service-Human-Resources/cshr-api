@@ -57,11 +57,11 @@ public class SearchQueryBuilderTest {
 
     private void doCountQueryTest(SearchParameters parameters, String expectedResourceFileName) throws IOException {
 
+        String actualQuery = builder.buildCountQuery(parameters);
+
         try (InputStream inputStream = SearchQueryBuilderTest.class.getResourceAsStream(expectedResourceFileName)) {
 
             byte[] expectedQuery = ByteStreams.toByteArray(inputStream);
-            String actualQuery = builder.buildCountQuery(parameters);
-
             assertThat(actualQuery, equalTo(new String(expectedQuery)));
         }
     }
@@ -78,10 +78,11 @@ public class SearchQueryBuilderTest {
 
     private void doSelectValuesQueryTest(SearchParameters parameters, String expectedResourceFileName) throws IOException {
 
+        String actualQuery = builder.buildCountQuery(parameters);
+
         try (InputStream inputStream = SearchQueryBuilderTest.class.getResourceAsStream(expectedResourceFileName)) {
 
             byte[] expectedQuery = ByteStreams.toByteArray(inputStream);
-            String actualQuery = builder.buildSelectValuesQuery(parameters);
             assertThat(actualQuery, equalTo(new String(expectedQuery)));
         }
     }
@@ -143,6 +144,6 @@ public class SearchQueryBuilderTest {
 
     @Test
     public void buildSelectValuesQuery_allParametersSuppliedWithRogueDepartment() throws IOException {
-        doSelectValuesQueryTest(buildParameters(BRISTOL, KEYWORD, new String[]{"1","   ","2"}), ALL_PARAMETERS_SELECT_VALUES_QUERY);
+        doSelectValuesQueryTest(buildParameters(BRISTOL, KEYWORD, new String[]{"1", "   ", "2"}), ALL_PARAMETERS_SELECT_VALUES_QUERY);
     }
 }

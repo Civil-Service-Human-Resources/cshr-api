@@ -166,4 +166,13 @@
             <column name="nationalitystatement" type="TEXT" />
         </addColumn>
     </changeSet>
+    <changeSet author="gordon" id="21">
+        <addColumn tableName="vacancies">
+            <column name="overseasjob" type="boolean" />
+        </addColumn>
+        <addDefaultValue columnDataType="boolean"
+            columnName="overseasjob"
+            defaultValueBoolean="true"
+            tableName="vacancies"/>
+    </changeSet>
 </databaseChangeLog>

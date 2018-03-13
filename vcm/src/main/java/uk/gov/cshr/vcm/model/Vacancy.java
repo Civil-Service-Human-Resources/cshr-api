@@ -124,5 +124,8 @@ public class Vacancy implements Serializable {
     private String regions;
 
 	@Column(name = "nationalitystatement")
-	private String nationalityStatement;
+    private String nationalityStatement;
+
+    @Column(name = "overseasjob")
+    private Boolean overseasJob;
 }
