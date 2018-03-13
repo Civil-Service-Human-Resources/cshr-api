@@ -33,6 +33,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import uk.gov.cshr.vcm.VcmApplication;
 import uk.gov.cshr.vcm.model.Department;
+import uk.gov.cshr.vcm.model.NationalityStatement;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
@@ -128,7 +129,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             .longitude(-2.6278111)
             .displayCscContent(Boolean.TRUE)
             .selectionProcessDetails("selectionProcessDetails")
-			.nationalityStatement("nationalityStatement")
+            .nationalityStatement(NationalityStatement.NON_RESERVED)
             .build();
 
     private Vacancy vacancy2 = Vacancy.builder()
