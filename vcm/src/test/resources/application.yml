@@ -1,16 +1,13 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/cshrtest
-    username: postgres
-    password: qwerty
+    url: jdbc:h2:mem:USERS;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false
+    username: sa
+    password:
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    database-platform: org.hibernate.dialect.H2Dialect
     show-sql: true
-    hibernate.ddl-auto: drop # validate schema on run.  Updates handled by Liquibase.
-  location:
-    service:
-      url: http://location-service.dev.cshr-gov.uk/findlocation/{searchTerm} # will be overridden by an env variable
+    hibernate.ddl-auto: create
 server:
-  port: 8080
+  port: 9095
 liquibase:
-    change-log: classpath:/changelog.xml
+    enabled: false
