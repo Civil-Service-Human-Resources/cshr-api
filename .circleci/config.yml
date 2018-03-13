@@ -16,16 +16,6 @@ jobs:
             export DOCKER_SERVICE_TAG="$CIRCLE_WORKFLOW_ID"
             docker-compose build api
 
-      - run:
-          name: Login to Docker Hub
-          command: docker login -u $HUB_USERNAME -p $HUB_PASSWORD
-
-      - run:
-          name: Tag and push images
-          command: |
-            export DOCKER_SERVICE_TAG="$CIRCLE_WORKFLOW_ID"
-            docker-compose push api
-
       # Tag and push the image to Bintray
       - run:
           name: Login to Bintray
