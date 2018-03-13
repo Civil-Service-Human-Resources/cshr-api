@@ -33,6 +33,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import uk.gov.cshr.vcm.VcmApplication;
 import uk.gov.cshr.vcm.model.Department;
+import uk.gov.cshr.vcm.model.NationalityStatement;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
@@ -73,7 +74,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             .description("testDescription")
             .location("testLocation")
             .grade("testGrade")
-            .role("testRole")
             .responsibilities("testResponsibilities")
             .workingHours("testWorkingHours")
             .closingDate(THIRTY_DAYS_FROM_NOW)
@@ -93,7 +93,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             "\"description\":\"" + requestBodyVacancy.getDescription() + "\"," +
             "\"location\":\"" + requestBodyVacancy.getLocation() + "\"," +
             "\"grade\":\"" + requestBodyVacancy.getGrade() + "\"," +
-            "\"role\":\"" + requestBodyVacancy.getRole() + "\"," +
             "\"responsibilities\":\"" + requestBodyVacancy.getResponsibilities() + "\"," +
             "\"workingHours\":\"" + requestBodyVacancy.getWorkingHours() + "\"," +
             "\"closingDate\":\"" + ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()) + "\"," +
@@ -115,7 +114,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             .shortDescription("shortDescription")
             .location("testLocation1 SearchQueryLocation")
             .grade("testGrade1 SearchQueryGrade")
-            .role("testRole1 SearchQueryRole")
             .responsibilities("testResponsibilities1")
             .workingHours("testWorkingHours1")
             .closingDate(THIRTY_DAYS_FROM_NOW)
@@ -131,6 +129,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             .longitude(-2.6278111)
             .displayCscContent(Boolean.TRUE)
             .selectionProcessDetails("selectionProcessDetails")
+            .nationalityStatement(NationalityStatement.NON_RESERVED)
             .build();
 
     private Vacancy vacancy2 = Vacancy.builder()
@@ -140,7 +139,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             .description("testDescription2")
             .location("testLocation2")
             .grade("testGrade2")
-            .role("testRole2")
             .responsibilities("testResponsibilities2")
             .workingHours("testWorkingHours2")
             .closingDate(THIRTY_DAYS_FROM_NOW)
@@ -163,7 +161,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             .description("testDescription3")
             .location("testLocation3")
             .grade("testGrade3")
-            .role("testRole3")
             .responsibilities("testResponsibilities3")
             .workingHours("testWorkingHours2")
             .closingDate(THIRTY_DAYS_FROM_NOW)
@@ -228,7 +225,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[0].description", is(this.vacancy1.getDescription())))
                 .andExpect(jsonPath("$.content[0].location", is(this.vacancy1.getLocation())))
                 .andExpect(jsonPath("$.content[0].grade", is(this.vacancy1.getGrade())))
-                .andExpect(jsonPath("$.content[0].role", is(this.vacancy1.getRole())))
                 .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy1.getResponsibilities())))
                 .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy1.getWorkingHours())))
                 .andExpect(jsonPath("$.content[0].closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
@@ -245,7 +241,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[1].description", is(this.vacancy2.getDescription())))
                 .andExpect(jsonPath("$.content[1].location", is(this.vacancy2.getLocation())))
                 .andExpect(jsonPath("$.content[1].grade", is(this.vacancy2.getGrade())))
-                .andExpect(jsonPath("$.content[1].role", is(this.vacancy2.getRole())))
                 .andExpect(jsonPath("$.content[1].responsibilities", is(this.vacancy2.getResponsibilities())))
                 .andExpect(jsonPath("$.content[1].workingHours", is(this.vacancy2.getWorkingHours())))
                 .andExpect(jsonPath("$.content[1].closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
@@ -262,7 +257,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[2].description", is(this.vacancy3.getDescription())))
                 .andExpect(jsonPath("$.content[2].location", is(this.vacancy3.getLocation())))
                 .andExpect(jsonPath("$.content[2].grade", is(this.vacancy3.getGrade())))
-                .andExpect(jsonPath("$.content[2].role", is(this.vacancy3.getRole())))
                 .andExpect(jsonPath("$.content[2].responsibilities", is(this.vacancy3.getResponsibilities())))
                 .andExpect(jsonPath("$.content[2].workingHours", is(this.vacancy3.getWorkingHours())))
                 .andExpect(jsonPath("$.content[2].closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
@@ -295,7 +289,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.selectionProcessDetails", is(this.vacancy1.getSelectionProcessDetails())))
                 .andExpect(jsonPath("$.location", is(this.vacancy1.getLocation())))
                 .andExpect(jsonPath("$.grade", is(this.vacancy1.getGrade())))
-                .andExpect(jsonPath("$.role", is(this.vacancy1.getRole())))
                 .andExpect(jsonPath("$.responsibilities", is(this.vacancy1.getResponsibilities())))
                 .andExpect(jsonPath("$.workingHours", is(this.vacancy1.getWorkingHours())))
                 .andExpect(jsonPath("$.closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
@@ -364,7 +357,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.description", is(this.requestBodyVacancy.getDescription())))
                 .andExpect(jsonPath("$.location", is(this.requestBodyVacancy.getLocation())))
                 .andExpect(jsonPath("$.grade", is(this.requestBodyVacancy.getGrade())))
-                .andExpect(jsonPath("$.role", is(this.requestBodyVacancy.getRole())))
                 .andExpect(jsonPath("$.responsibilities", is(this.requestBodyVacancy.getResponsibilities())))
                 .andExpect(jsonPath("$.workingHours", is(this.requestBodyVacancy.getWorkingHours())))
                 .andExpect(jsonPath("$.closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
@@ -375,6 +367,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.eligibility", is(this.requestBodyVacancy.getEligibility())))
                 .andExpect(jsonPath("$.salaryMin", is(this.requestBodyVacancy.getSalaryMin())))
                 .andExpect(jsonPath("$.salaryMax", is(this.requestBodyVacancy.getSalaryMax())))
+				.andExpect(jsonPath("$.nationalityStatement", is(this.requestBodyVacancy.getNationalityStatement())))
                 .andExpect(jsonPath("$.numberVacancies", is(this.requestBodyVacancy.getNumberVacancies())));
     }
 
@@ -443,7 +436,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[0].description", is(this.vacancy1.getDescription())))
                 .andExpect(jsonPath("$.content[0].location", is(this.vacancy1.getLocation())))
                 .andExpect(jsonPath("$.content[0].grade", is(this.vacancy1.getGrade())))
-                .andExpect(jsonPath("$.content[0].role", is(this.vacancy1.getRole())))
                 .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy1.getResponsibilities())))
                 .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy1.getWorkingHours())))
                 .andExpect(jsonPath("$.content[0].closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
@@ -528,7 +520,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[0].description", is(this.vacancy1.getDescription())))
                 .andExpect(jsonPath("$.content[0].location", is(this.vacancy1.getLocation())))
                 .andExpect(jsonPath("$.content[0].grade", is(this.vacancy1.getGrade())))
-                .andExpect(jsonPath("$.content[0].role", is(this.vacancy1.getRole())))
                 .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy1.getResponsibilities())))
                 .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy1.getWorkingHours())))
                 .andExpect(jsonPath("$.content[0].closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
@@ -621,7 +612,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[0].description", is(this.vacancy1.getDescription())))
                 .andExpect(jsonPath("$.content[0].location", is(this.vacancy1.getLocation())))
                 .andExpect(jsonPath("$.content[0].grade", is(this.vacancy1.getGrade())))
-                .andExpect(jsonPath("$.content[0].role", is(this.vacancy1.getRole())))
                 .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy1.getResponsibilities())))
                 .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy1.getWorkingHours())))
                 .andExpect(jsonPath("$.content[0].closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
@@ -664,7 +654,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[0].description", is(this.vacancy1.getDescription())))
                 .andExpect(jsonPath("$.content[0].location", is(this.vacancy1.getLocation())))
                 .andExpect(jsonPath("$.content[0].grade", is(this.vacancy1.getGrade())))
-                .andExpect(jsonPath("$.content[0].role", is(this.vacancy1.getRole())))
                 .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy1.getResponsibilities())))
                 .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy1.getWorkingHours())))
                 .andExpect(jsonPath("$.content[0].closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
@@ -709,7 +698,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[0].description", is(this.vacancy1.getDescription())))
                 .andExpect(jsonPath("$.content[0].location", is(this.vacancy1.getLocation())))
                 .andExpect(jsonPath("$.content[0].grade", is(this.vacancy1.getGrade())))
-                .andExpect(jsonPath("$.content[0].role", is(this.vacancy1.getRole())))
                 .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy1.getResponsibilities())))
                 .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy1.getWorkingHours())))
                 .andExpect(jsonPath("$.content[0].closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
@@ -728,7 +716,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[1].description", is(this.vacancy2.getDescription())))
                 .andExpect(jsonPath("$.content[1].location", is(this.vacancy2.getLocation())))
                 .andExpect(jsonPath("$.content[1].grade", is(this.vacancy2.getGrade())))
-                .andExpect(jsonPath("$.content[1].role", is(this.vacancy2.getRole())))
                 .andExpect(jsonPath("$.content[1].responsibilities", is(this.vacancy2.getResponsibilities())))
                 .andExpect(jsonPath("$.content[1].workingHours", is(this.vacancy2.getWorkingHours())))
                 .andExpect(jsonPath("$.content[1].closingDate", is(this.vacancy2.getClosingDate())))
@@ -797,7 +784,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[0].description", is(this.vacancy1.getDescription())))
                 .andExpect(jsonPath("$.content[0].location", is(this.vacancy1.getLocation())))
                 .andExpect(jsonPath("$.content[0].grade", is(this.vacancy1.getGrade())))
-                .andExpect(jsonPath("$.content[0].role", is(this.vacancy1.getRole())))
                 .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy1.getResponsibilities())))
                 .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy1.getWorkingHours())))
                 .andExpect(jsonPath("$.content[0].closingDate", is(this.vacancy1.getClosingDate())))
@@ -979,7 +965,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[0].description", is(this.vacancy3.getDescription())))
                 .andExpect(jsonPath("$.content[0].location", is(this.vacancy3.getLocation())))
                 .andExpect(jsonPath("$.content[0].grade", is(this.vacancy3.getGrade())))
-                .andExpect(jsonPath("$.content[0].role", is(this.vacancy3.getRole())))
                 .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy3.getResponsibilities())))
                 .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy3.getWorkingHours())))
                 .andExpect(jsonPath("$.content[0].closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))

@@ -6,6 +6,8 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -77,9 +79,6 @@ public class Vacancy implements Serializable {
 
     @NonNull
     private String grade;
-
-    @NonNull
-    private String role;
 
     @Field
     @NonNull
@@ -164,4 +163,8 @@ public class Vacancy implements Serializable {
 //    @Analyzer(definition = "customanalyzer")
     @Column(name = "regions")
     private String regions;
+
+    @Column(name = "nationalitystatement")
+    @Enumerated(EnumType.STRING)
+    private NationalityStatement nationalityStatement;
 }
