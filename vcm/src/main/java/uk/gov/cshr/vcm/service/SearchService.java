@@ -1,5 +1,6 @@
 package uk.gov.cshr.vcm.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import javax.inject.Inject;
 import org.slf4j.Logger;
@@ -27,7 +28,7 @@ public class SearchService {
     private HibernateSearchService hibernateSearchService;
 
     public Page<Vacancy> search(VacancySearchParameters vacancySearchParameters, Pageable pageable)
-			throws LocationServiceException {
+            throws LocationServiceException, IOException {
 		
         debug("staring search()");
         Coordinates coordinates = locationService.find(vacancySearchParameters.getLocation().getPlace());

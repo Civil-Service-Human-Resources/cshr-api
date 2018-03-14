@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -15,6 +16,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,15 +25,15 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
+import org.hibernate.search.annotations.EncodingType;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Latitude;
 import org.hibernate.search.annotations.Longitude;
+import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.Store;
-import uk.gov.cshr.vcm.service.RegionFieldBridge;
 
 //@AnalyzerDef(name = "customanalyzer",
 //        tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
@@ -51,6 +54,7 @@ import uk.gov.cshr.vcm.service.RegionFieldBridge;
 @Table(name = "vacancies")
 @SequenceGenerator(name = "vacancies_id_seq", sequenceName = "vacancies_id_seq", allocationSize = 1)
 public class Vacancy implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -61,11 +65,11 @@ public class Vacancy implements Serializable {
     @NonNull
     private Long identifier;
 
-    @Field
+    @Field(store = Store.YES)
     @NonNull
     private String title;
 
-    @Field
+    @Field(store = Store.YES)
     @NonNull
     private String description;
 
@@ -87,10 +91,12 @@ public class Vacancy implements Serializable {
     @NonNull
     private String workingHours;
 
-    @Field
+    @Field(store = Store.YES, analyze = Analyze.NO)
+    @DateBridge(resolution = Resolution.MINUTE, encoding = EncodingType.STRING)
+    @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT+0")
     @NonNull
-    private Timestamp closingDate;
+    private Date closingDate;
 
     @NonNull
     private String contactName;
@@ -107,25 +113,31 @@ public class Vacancy implements Serializable {
     @NonNull
     private String eligibility;
 
+    @Field(store = Store.YES)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT+0")
     @Column(name = "government_opening_date")
     private Timestamp governmentOpeningDate;
 
+    @Field(store = Store.YES)
     @DateBridge(resolution = Resolution.MILLISECOND)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT+0")
     @Column(name = "internal_opening_date")
     private Timestamp internalOpeningDate;
 
-    @DateBridge(resolution = Resolution.MILLISECOND)
+    @Field(store = Store.YES, analyze = Analyze.NO)
+    @DateBridge(resolution = Resolution.MINUTE, encoding = EncodingType.STRING)
+    @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT+0")
     @Column(name = "public_opening_date")
-    private Timestamp publicOpeningDate;
+    private Date publicOpeningDate;
 
-    @Field
+    @Field(store = Store.YES, analyze = Analyze.NO)
+    @NumericField
     @NonNull
     private Integer salaryMin;
 
-    @Field
+    @Field(store = Store.YES, analyze = Analyze.NO)
+    @NumericField
     private Integer salaryMax;
 
     private Integer numberVacancies;
@@ -133,12 +145,14 @@ public class Vacancy implements Serializable {
     /**
      * If a vacancy has no longitude ensure it is null not 0 (zero) since 0 is a valid point in latitude
      */
+    @Field(store = Store.YES, analyze = Analyze.NO)
     @Longitude
     private Double longitude;
 
     /**
      * If a vacancy has no latitude ensure it is null not 0 (zero) since 0 is a valid point in latitude
      */
+    @Field(store = Store.YES, analyze = Analyze.NO)
     @Latitude
     private Double latitude;
 
@@ -158,9 +172,10 @@ public class Vacancy implements Serializable {
 
     // @Field(index=Index.YES, analyze=Analyze.YES, store=Store.NO, bridge=@FieldBridge(impl=DHLCSKeywordFieldBridge.class))
 //    @Field(store = Store.YES)
-    @Field(bridge = @FieldBridge(impl = RegionFieldBridge.class), store = Store.YES, analyze = Analyze.NO)
+//    @Field(bridge = @FieldBridge(impl = RegionFieldBridge.class), store = Store.YES, analyze = Analyze.NO)
 //    @RegionFieldBridge
 //    @Analyzer(definition = "customanalyzer")
+    @Field(store = Store.YES)
     @Column(name = "regions")
     private String regions;
 

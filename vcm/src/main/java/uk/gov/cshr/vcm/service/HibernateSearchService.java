@@ -1,6 +1,7 @@
 package uk.gov.cshr.vcm.service;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -13,8 +14,6 @@ import org.apache.lucene.search.Query;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
-import org.hibernate.search.query.dsl.BooleanJunction;
-import org.hibernate.search.query.dsl.MustJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,59 +61,53 @@ public class HibernateSearchService {
                 .withPrefixLength(1)
                 .onFields("title", "description", "shortDescription")
                 .matching(searchTerm).createQuery();
-
-//                if (searchParameters.getSalaryMin() != null) {
-//            query.append(" AND coalesce(salary_max, salary_min) >= :salary_min");
-//        }
-//
-//        if (searchParameters.getSalaryMax() != null) {
-//            query.append(" AND salary_min <= :salary_max");
-//        }
-//look for 0 <= starred < 3
+        
         Integer minSalary = searchParameters.getSalaryMin();
         Integer maxSalary = searchParameters.getSalaryMax();
-
-        if (minSalary == null) {
-            minSalary = 0;
-        }
-
+//
+//        if (minSalary == null) {
+//            minSalary = 0;
+//        }
+//
         Query minQuery = qb
                 .range()
                 .onField("salaryMax")
                 .from(minSalary).to(Integer.MAX_VALUE)
                 .createQuery();
-
+//
         Query maxQuery = qb
                 .range()
                 .onField("salaryMin")
                 .from(0).to(maxSalary)
                 .createQuery();
-
-
-
-//look for myths strictly BC
-//        Date beforeChrist = ...;
-// query.append(" FROM vacancies WHERE public_opening_date IS NOT NULL AND public_opening_date <= current_timestamp");
-        Query openQuery = qb
-                .range()
-                .onField("publicOpeningDate")
-                .below(new Date())
-                .createQuery();
+//
+//        Query minMax = qb.bool().must(minQuery).must(maxQuery).createQuery();
+//
+//        Query openQuery = qb
+//                .range()
+//                .onField("publicOpeningDate")
+//                .below(new Date())
+//                .createQuery();
+        // 201803130819
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmm");
 
         Query closedQuery = qb
                 .range()
                 .onField("closingDate")
-                .above(new Date())
+                .ignoreFieldBridge()
+                .above(sdf.format(new Date()))
+                .excludeLimit()
                 .createQuery();
 
-        MustJunction mustJunction = qb
-                .bool().must(fuzzyQuery);
+        Query openQuery = qb
+                .range()
+                .onField("publicOpeningDate")
+                .ignoreFieldBridge()
+                .below(sdf.format(new Date()))
+                .excludeLimit()
+                .createQuery();
 
-        if (maxSalary != null) {
-            mustJunction = mustJunction.must(maxQuery);
-        }
-
-        mustJunction = mustJunction.must(minQuery);
+        Query openClosedQuery = qb.bool().must(openQuery).must(closedQuery).createQuery();
 
         Query spatialQuery = qb
                 .spatial()
@@ -123,24 +116,15 @@ public class HibernateSearchService {
                 .andLongitude(searchParameters.getLongitude())
                 .createQuery();
 
-        Query regionQuery = qb.phrase()
-                .onField("regions")
-                .ignoreFieldBridge()
-                .ignoreAnalyzer()
-                .sentence(searchParameters.getCoordinates().getRegion())
-                .createQuery();
-
-        mustJunction = mustJunction.must(openQuery);
-        mustJunction = mustJunction.must(closedQuery);
-
-        Query luceneQuery = mustJunction.createQuery();
-
-        BooleanJunction boolJ = mustJunction.should(spatialQuery);
-        boolJ = boolJ.must(regionQuery).must(luceneQuery);
+        Query regionQuery = qb.phrase().onField("regions").sentence(searchParameters.getCoordinates().getRegion()).createQuery();
 
         Query combinedQuery = qb.bool()
+                .should(fuzzyQuery)
                 .should(regionQuery)
                 .should(spatialQuery)
+                .must(openClosedQuery)
+                .must(minQuery)
+                .must(maxQuery)
                 .createQuery();
 
 

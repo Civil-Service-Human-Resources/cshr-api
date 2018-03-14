@@ -151,17 +151,17 @@
     </changeSet>
     <changeSet author="gordon" id="18">
 		<sql>update vacancies set identifier = id</sql>
-        <addUniqueConstraint columnNames="identifier"
+<!--        <addUniqueConstraint columnNames="identifier"
                 constraintName="uk_identifier"
                 deferrable="true"
                 disabled="false"
                 initiallyDeferred="true"
-                tableName="vacancies"/>
+                tableName="vacancies"/>-->
     </changeSet>
-	<changeSet author="gordon" id="19">
+<!--	<changeSet author="gordon" id="19">
 		<dropColumn columnName="role"
 				tableName="vacancies" />
-	</changeSet>
+	</changeSet>-->
     <changeSet author="gordon" id="20">
         <addColumn tableName="vacancies">
             <column name="nationalitystatement" type="TEXT" />

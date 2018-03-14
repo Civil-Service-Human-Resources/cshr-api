@@ -16,7 +16,7 @@ public class RegionFieldBridge implements FieldBridge {
             String[] keywords = value.toString().split(",");
 
             for (String keyword : keywords) {
-                luceneOptions.addFieldToDocument(name, keyword.trim(), document);
+                luceneOptions.addFieldToDocument(name, keyword.trim().toLowerCase().replaceAll(" ", "_"), document);
 //                luceneOptions.
 //document.
             }

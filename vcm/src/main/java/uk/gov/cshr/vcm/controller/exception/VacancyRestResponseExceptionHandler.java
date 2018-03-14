@@ -18,6 +18,7 @@ public class VacancyRestResponseExceptionHandler extends ResponseEntityException
 
     @ExceptionHandler({RuntimeException.class})
     public ResponseEntity<Object> handleRuntimeException(RuntimeException ex, WebRequest request) {
+        ex.printStackTrace();
         VacancyError vacancyError = new VacancyError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), null);
         return handleExceptionInternal(ex, vacancyError, new HttpHeaders(), vacancyError.getStatus(), request);
     }

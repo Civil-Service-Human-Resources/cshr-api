@@ -52,7 +52,6 @@ import uk.gov.cshr.vcm.repository.DepartmentRepository;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
 import uk.gov.cshr.vcm.service.LocationService;
 
-//@Ignore
 @ActiveProfiles("dev")
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = VcmApplication.class)
@@ -150,8 +149,10 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         given(locationService.find("bristol"))
                 .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
 
-        createVacancyWithRegions(department, "South West, Scotland");
-        createVacancyWithRegions(department, "North East, Scotland");
+//        createVacancyWithRegions(department, "South West, Scotland");
+//        createVacancyWithRegions(department, "North East, Scotland");
+        Vacancy southWest = createVacancyPrototype();
+
 
         Page<Vacancy> result = findVancancies("bristol");
         List<Vacancy> resultsList = result.getContent();
@@ -357,9 +358,17 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         return vacancy;
     }
 
+    private Vacancy saveVacancy(Vacancy vacancy) {
+
+        vacancyRepository.save(vacancy);
+        createdVacancies.add(vacancy);
+        return vacancy;
+    }
+
     private Vacancy createVacancyPrototype() {
 
         return Vacancy.builder()
+                .department(department)
                 .title("testTile1 SearchQueryTitle")
                 .description("testDescription1 SearchQueryDescription")
                 .location("testLocation1 SearchQueryLocation")
