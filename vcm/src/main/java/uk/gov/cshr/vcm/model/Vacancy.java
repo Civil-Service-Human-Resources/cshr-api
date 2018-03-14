@@ -125,6 +125,9 @@ public class Vacancy implements Serializable {
     @Column(name = "regions")
     private String regions;
 
+    @Column(name = "overseasjob")
+    private Boolean overseasJob;
+
     @Column(name = "nationalitystatement")
     @Enumerated(EnumType.STRING)
     private NationalityStatement nationalityStatement;

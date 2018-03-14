@@ -1,5 +1,6 @@
 package uk.gov.cshr.vcm.repository;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.cshr.vcm.model.SearchParameters;
@@ -31,7 +32,14 @@ public class SearchQueryBuilder {
         query.append(" AND ((point(:searchFromLongitudeValue, :searchFromLatitudeValue) <@> point(longitude, latitude) < :distance)");
 
         if (StringUtils.isNotBlank(searchParameters.getCoordinates().getRegion())) {
-            query.append(" or (regions ILIKE :region))");
+            query.append(" OR (regions ILIKE :region))");
+        }
+
+        if (BooleanUtils.isTrue(searchParameters.getOverseasJob())) {
+            query.append(" OR (overseasjob = :overseasJob)");
+        }
+        else {
+            query.append(" AND (overseasjob = :overseasJob OR overseasjob IS NULL)");
         }
 
         query.append(" AND closing_date > current_timestamp");
