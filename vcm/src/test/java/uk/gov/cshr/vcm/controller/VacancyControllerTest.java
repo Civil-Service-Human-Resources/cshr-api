@@ -206,6 +206,24 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
+    public void testDepartments_requestAllRows() throws Exception {
+        String path = "/departments";
+
+        ResultActions sendRequest = mvc.perform(get(path));
+
+        sendRequest.andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testVacancies_requestAllRows() throws Exception {
+        String path = "/vacancies";
+
+        ResultActions sendRequest = mvc.perform(get(path));
+
+        sendRequest.andExpect(status().isNotFound());
+    }
+
+    @Test
     public void testFindAll() throws Exception {
 
         // Given
