@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -13,6 +14,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -29,6 +31,7 @@ import lombok.NonNull;
 @Table(name = "vacancies")
 @SequenceGenerator(name = "vacancies_id_seq", sequenceName = "vacancies_id_seq", allocationSize = 1)
 public class Vacancy implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -47,9 +50,6 @@ public class Vacancy implements Serializable {
 
     @Column(name = "shortdescription")
     private String shortDescription;
-
-    @NonNull
-    private String location;
 
     @NonNull
     private String grade;
@@ -98,16 +98,6 @@ public class Vacancy implements Serializable {
 
     private Integer numberVacancies;
 
-    /**
-     * If a vacancy has no longitude ensure it is null not 0 (zero) since 0 is a valid point in latitude
-     */
-    private Double longitude;
-
-    /**
-     * If a vacancy has no latitude ensure it is null not 0 (zero) since 0 is a valid point in latitude
-     */
-    private Double latitude;
-
     @ManyToOne
     @JoinColumn(name = "dept_id")
     private Department department;
@@ -131,4 +121,7 @@ public class Vacancy implements Serializable {
     @Column(name = "nationalitystatement")
     @Enumerated(EnumType.STRING)
     private NationalityStatement nationalityStatement;
+
+    @OneToMany(mappedBy = "vacancy")
+    private List<VacancyLocation> vacancyLocations;
 }

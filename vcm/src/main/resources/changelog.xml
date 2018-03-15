@@ -176,4 +176,30 @@
             defaultValueBoolean="true"
             tableName="vacancies"/>
     </changeSet>
+    <changeSet author="gordon" id="22">
+        <createTable tableName="vacancylocations">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="latitude" type="FLOAT8"/>
+            <column name="location" type="TEXT"/>
+            <column name="longitude" type="FLOAT8"/>
+            <column name="vacancyid" type="SERIAL">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey columnNames="id" constraintName="vacancylocations_pkey" tableName="vacancylocations"/>
+        <addForeignKeyConstraint
+            baseColumnNames="locationid"
+            baseTableName="vacancylocations"
+            constraintName="fk_vacancylocations_vacancies"
+            deferrable="true"
+            initiallyDeferred="true"
+            onDelete="NO ACTION"
+            onUpdate="NO ACTION"
+            referencedColumnNames="id"
+            referencedTableName="vacancies"/>
+        <sql>insert into vacancylocations (vacancyid, latitude, longitude, location ) values (select id, latitude, longitude, location from vacancies)</sql>
+    </changeSet>
+
 </databaseChangeLog>

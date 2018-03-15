@@ -176,7 +176,7 @@ public class OverseasJobsTest extends AbstractTestNGSpringContextTests {
         Vacancy vacancyPrototype = Vacancy.builder()
                 .title("testTile1 SearchQueryTitle")
                 .description("testDescription1 SearchQueryDescription")
-                .location("testLocation1 SearchQueryLocation")
+                //                .location("testLocation1 SearchQueryLocation")
                 .grade("testGrade1 SearchQueryGrade")
                 .responsibilities("testResponsibilities1")
                 .workingHours("testWorkingHours1")
@@ -190,8 +190,8 @@ public class OverseasJobsTest extends AbstractTestNGSpringContextTests {
                 .salaryMin(0)
                 .identifier(1L)
                 .numberVacancies(1)
-                .latitude(coordinates.getLatitude())
-                .longitude(coordinates.getLongitude())
+                //                .latitude(coordinates.getLatitude())
+                //                .longitude(coordinates.getLongitude())
                 .identifier(System.currentTimeMillis())
                 .build();
 
