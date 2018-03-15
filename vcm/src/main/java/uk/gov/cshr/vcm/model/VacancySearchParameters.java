@@ -31,6 +31,8 @@ public class VacancySearchParameters implements Serializable {
 
     private Integer minSalary;
 
+    private Boolean overseasJob;
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);

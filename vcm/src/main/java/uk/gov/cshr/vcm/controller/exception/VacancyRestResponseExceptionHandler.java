@@ -1,5 +1,7 @@
 package uk.gov.cshr.vcm.controller.exception;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,14 +13,17 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class VacancyRestResponseExceptionHandler extends ResponseEntityExceptionHandler {
 
+    private static final Logger log = LoggerFactory.getLogger(VacancyRestResponseExceptionHandler.class);
+
     @ExceptionHandler({VacancyException.class})
     public ResponseEntity<Object> handleLocationServiceException(VacancyException ex, WebRequest request) {
+        log.error(ex.getMessage(), ex);
         return handleExceptionInternal(ex, ex.getVacancyError(), new HttpHeaders(), ex.getVacancyError().getStatus(), request);
     }
 
     @ExceptionHandler({RuntimeException.class})
     public ResponseEntity<Object> handleRuntimeException(RuntimeException ex, WebRequest request) {
-        ex.printStackTrace();
+        log.error(ex.getMessage(), ex);
         VacancyError vacancyError = new VacancyError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), null);
         return handleExceptionInternal(ex, vacancyError, new HttpHeaders(), vacancyError.getStatus(), request);
     }

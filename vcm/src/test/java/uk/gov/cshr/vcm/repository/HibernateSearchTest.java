@@ -199,9 +199,8 @@ public class HibernateSearchTest extends AbstractTestNGSpringContextTests {
         Vacancy vacancyPrototype = Vacancy.builder()
                 .title("testTile1 SearchQueryTitle")
             .description("testDescription1 SearchQueryDescription")
-            .location("testLocation1 SearchQueryLocation")
-            .grade("testGrade1 SearchQueryGrade")
-            .responsibilities("testResponsibilities1")
+                .grade("testGrade1 SearchQueryGrade")
+                .responsibilities("testResponsibilities1")
             .workingHours("testWorkingHours1")
             .closingDate(THIRTY_DAYS_FROM_NOW)
             .publicOpeningDate(ONE_DAY_AGO)
@@ -213,8 +212,6 @@ public class HibernateSearchTest extends AbstractTestNGSpringContextTests {
             .salaryMin(0)
             .identifier(1L)
                 .numberVacancies(1)
-                .latitude(BRISTOL_LATITUDE)
-                .longitude(BRISTOL_LONGITUDE)
                 .build();
 
         return vacancyPrototype;

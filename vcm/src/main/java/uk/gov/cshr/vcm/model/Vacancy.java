@@ -4,16 +4,19 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -28,8 +31,6 @@ import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.EncodingType;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Latitude;
-import org.hibernate.search.annotations.Longitude;
 import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Spatial;
@@ -76,10 +77,6 @@ public class Vacancy implements Serializable {
     @Field
     @Column(name = "shortdescription")
     private String shortDescription;
-
-    @Field
-    @NonNull
-    private String location;
 
     @NonNull
     private String grade;
@@ -142,20 +139,6 @@ public class Vacancy implements Serializable {
 
     private Integer numberVacancies;
 
-    /**
-     * If a vacancy has no longitude ensure it is null not 0 (zero) since 0 is a valid point in latitude
-     */
-    @Field(store = Store.YES, analyze = Analyze.NO)
-    @Longitude
-    private Double longitude;
-
-    /**
-     * If a vacancy has no latitude ensure it is null not 0 (zero) since 0 is a valid point in latitude
-     */
-    @Field(store = Store.YES, analyze = Analyze.NO)
-    @Latitude
-    private Double latitude;
-
     @ManyToOne
     @JoinColumn(name = "dept_id")
     private Department department;
@@ -179,7 +162,13 @@ public class Vacancy implements Serializable {
     @Column(name = "regions")
     private String regions;
 
+    @Column(name = "overseasjob")
+    private Boolean overseasJob;
+
     @Column(name = "nationalitystatement")
     @Enumerated(EnumType.STRING)
     private NationalityStatement nationalityStatement;
+
+    @OneToMany(mappedBy = "vacancy", fetch = FetchType.EAGER)
+    private List<VacancyLocation> vacancyLocations;
 }

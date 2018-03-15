@@ -2,7 +2,7 @@ version: "3.3"
 
 services:
   api:
-    image: cshr/cshr-api:${DOCKER_SERVICE_TAG}
+    image: cshr-docker-rpg.bintray.io/cshr-api:${DOCKER_SERVICE_TAG}
     networks:
       - cshr-net
 

@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://db:5432/cshr
+    url: jdbc:postgresql://localhost:5432/cshr
     username: postgres
     password: qwerty
   jpa:
@@ -15,10 +15,11 @@ spring:
                     indexBase: /target/indexpath
   location:
     service:
-      url: http://location-service.dev.cshr-gov.uk/findlocation/{searchTerm} # will be overridden by an env variable
+      url: http://localhost:8989/findlocation/{searchTerm} # will be overridden by an env variable
 server:
   port: 8080
 liquibase:
+    enabled: true
     change-log: classpath:/changelog.xml
 security:
     oauth2:

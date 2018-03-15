@@ -7,8 +7,8 @@
 
 ## Setup
 
-* Clone this repository 
-* Run `make` or `./bin/build.sh` - this will setup `.env` file, create docker bridge network and build docker images. 
+* Clone this repository
+* Run `make` or `./bin/build.sh` - this will setup `.env` file, create docker bridge network and build docker images.
 
 ## Running API
 
@@ -47,6 +47,12 @@ Modify the hostname so that it is using the ip address of your local machine.  E
 ## Running Tests
 `make test` or `docker-compose run --rm test`
 
+## Liquibase
+The cshr database can be built or updated by running:-
+
+mvn liquibase:update
+
+
 ## Todo
 * Pass DB configuration to docker container as env variables and/or docker secrets
-* Docker multistage build uses version `0.0.1` of the `war` release. This should be version agnostic. 
+* Docker multistage build uses version `0.0.1` of the `war` release. This should be version agnostic.

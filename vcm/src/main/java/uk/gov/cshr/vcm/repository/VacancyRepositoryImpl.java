@@ -28,6 +28,7 @@ public class VacancyRepositoryImpl implements VacancyRepositoryCustom {
     private static final String SEARCH_FROM_LONGITUDE_VALUE = "searchFromLongitudeValue";
     private static final String WILDCARD = "%";
     private static final String REGION = "region";
+    private static final String OVERSEAS_JOB = "overseasJob";
 
     @PersistenceContext
     private EntityManager em;

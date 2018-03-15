@@ -339,8 +339,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         Vacancy vacancy = createVacancyPrototype();
         vacancy.setRegions(regions);
-        vacancy.setLatitude(null);
-        vacancy.setLongitude(null);
+//        vacancy.setLatitude(null);
+//        vacancy.setLongitude(null);
         vacancy.setDepartment(department);
         vacancyRepository.save(vacancy);
         createdVacancies.add(vacancy);
@@ -371,7 +371,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .department(department)
                 .title("testTile1 SearchQueryTitle")
                 .description("testDescription1 SearchQueryDescription")
-                .location("testLocation1 SearchQueryLocation")
+                //                .location("testLocation1 SearchQueryLocation")
                 .grade("testGrade1 SearchQueryGrade")
                 .responsibilities("testResponsibilities1")
                 .workingHours("testWorkingHours1")
@@ -385,8 +385,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .salaryMin(0)
                 .salaryMax(10)
                 .numberVacancies(1)
-                .latitude(BRISTOL_LATITUDE)
-                .longitude(BRISTOL_LONGITUDE)
+                //                .latitude(BRISTOL_LATITUDE)
+                //                .longitude(BRISTOL_LONGITUDE)
                 .identifier(System.currentTimeMillis())
                 .build();
     }

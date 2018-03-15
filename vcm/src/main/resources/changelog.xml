@@ -151,20 +151,60 @@
     </changeSet>
     <changeSet author="gordon" id="18">
 		<sql>update vacancies set identifier = id</sql>
-<!--        <addUniqueConstraint columnNames="identifier"
+        <addUniqueConstraint columnNames="identifier"
                 constraintName="uk_identifier"
                 deferrable="true"
                 disabled="false"
                 initiallyDeferred="true"
-                tableName="vacancies"/>-->
+                tableName="vacancies"/>
     </changeSet>
-<!--	<changeSet author="gordon" id="19">
+	<changeSet author="gordon" id="19">
 		<dropColumn columnName="role"
 				tableName="vacancies" />
-	</changeSet>-->
+	</changeSet>
     <changeSet author="gordon" id="20">
         <addColumn tableName="vacancies">
             <column name="nationalitystatement" type="TEXT" />
         </addColumn>
     </changeSet>
+    <changeSet author="gordon" id="21">
+        <addColumn tableName="vacancies">
+            <column name="overseasjob" type="boolean" />
+        </addColumn>
+        <addDefaultValue columnDataType="boolean"
+            columnName="overseasjob"
+            defaultValueBoolean="true"
+            tableName="vacancies"/>
+    </changeSet>
+    <changeSet author="gordon" id="22">
+        <createTable tableName="vacancylocations">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="latitude" type="FLOAT8"/>
+            <column name="location" type="TEXT"/>
+            <column name="longitude" type="FLOAT8"/>
+            <column name="vacancyid" type="SERIAL">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey columnNames="id" constraintName="vacancylocations_pkey" tableName="vacancylocations"/>
+        <addForeignKeyConstraint
+            baseColumnNames="vacancyid"
+            baseTableName="vacancylocations"
+            constraintName="fk_vacancylocations_vacancies"
+            deferrable="true"
+            initiallyDeferred="true"
+            onDelete="NO ACTION"
+            onUpdate="NO ACTION"
+            referencedColumnNames="id"
+            referencedTableName="vacancies"/>
+        <sql>insert into vacancylocations (vacancyid, latitude, longitude, location )  select id, latitude, longitude, location from vacancies</sql>
+    </changeSet>
+    <changeSet author="gordon" id="23">
+		<dropColumn columnName="latitude" tableName="vacancies" />
+        <dropColumn columnName="longitude" tableName="vacancies" />
+        <dropColumn columnName="location" tableName="vacancies" />
+	</changeSet>
+
 </databaseChangeLog>
