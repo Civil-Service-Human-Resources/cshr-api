@@ -1,2 +1,2 @@
 psql -f cleardb.sql
-psql -d cshr -f ../resources/dump.sql
+psql -d cshr -f ../dump.sql
