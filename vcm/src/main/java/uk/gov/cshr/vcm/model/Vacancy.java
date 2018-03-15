@@ -9,6 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -122,6 +123,6 @@ public class Vacancy implements Serializable {
     @Enumerated(EnumType.STRING)
     private NationalityStatement nationalityStatement;
 
-    @OneToMany(mappedBy = "vacancy")
+    @OneToMany(mappedBy = "vacancy", fetch = FetchType.EAGER)
     private List<VacancyLocation> vacancyLocations;
 }
