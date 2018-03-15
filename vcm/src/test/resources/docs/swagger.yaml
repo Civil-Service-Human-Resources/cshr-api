@@ -1,4 +1,3 @@
-
 swagger: '2.0'
 info:
   description: Api Documentation
@@ -417,6 +416,8 @@ definitions:
       salaryMin:
         type: integer
         format: int32
+      salaryOverrideDescription:
+        type: string
       selectionProcessDetails:
         type: string
       shortDescription:
