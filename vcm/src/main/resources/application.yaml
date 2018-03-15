@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/cshrtest
+    url: jdbc:postgresql://localhost:5432/cshr
     username: postgres
     password: qwerty
   jpa:
