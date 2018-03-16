@@ -17,7 +17,7 @@ jobs:
             docker-compose build api
 
       - run:
-          name: Login to Acr
+          name: Login to Azure container repo
           command: docker login -u ${ACR_ID} -p ${ACR_PASSWORD} ${AZURE_URL}
 
       - run:
@@ -35,7 +35,7 @@ jobs:
       - checkout
 
       - run:
-          name: Login to Acr
+          name: Login to Azure container repo
           command: docker login -u ${ACR_ID} -p ${ACR_PASSWORD} ${AZURE_URL}
 
       - run:
