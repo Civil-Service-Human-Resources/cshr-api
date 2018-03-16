@@ -131,4 +131,7 @@ public class Vacancy implements Serializable {
     @Column(name = "nationalitystatement")
     @Enumerated(EnumType.STRING)
     private NationalityStatement nationalityStatement;
+
+    @Column(name = "salaryoverridedescription")
+    private String salaryOverrideDescription;
 }
