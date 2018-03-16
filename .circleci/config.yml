@@ -18,7 +18,7 @@ jobs:
 
       - run:
           name: Login to Azure container repo
-          command: docker login -u ${ACR_ID} -p ${ACR_PASSWORD} ${AZURE_URL}
+          command: docker login -u ${ACR_ID} -p ${ACR_PASS} ${AZURE_URL}
 
       - run:
           name: Push the images to Acr
@@ -36,7 +36,7 @@ jobs:
 
       - run:
           name: Login to Azure container repo
-          command: docker login -u ${ACR_ID} -p ${ACR_PASSWORD} ${AZURE_URL}
+          command: docker login -u ${ACR_ID} -p ${ACR_PASS} ${AZURE_URL}
 
       - run:
           name: Pull Current workflow images
