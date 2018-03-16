@@ -47,6 +47,7 @@ import uk.gov.cshr.vcm.model.Coordinates;
 import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.model.Location;
 import uk.gov.cshr.vcm.model.Vacancy;
+import uk.gov.cshr.vcm.model.VacancyLocation;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
@@ -62,6 +63,9 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
     public static final double BRISTOL_LATITUDE = 51.4549291;
     public static final double BRISTOL_LONGITUDE = -2.6278111;
+
+    public static final double NEWCASTLE_LATITUDE = 54.9806308;
+    public static final double NEWCASTLE_LONGITUDE = -1.6167437;
 
     final private MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(),
@@ -90,6 +94,18 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     private final List<Department> createdDepartments = new ArrayList<>();
 
     private Department department;
+
+    private VacancyLocation bristolLocation = VacancyLocation.builder()
+            .latitude(BRISTOL_LATITUDE)
+            .longitude(BRISTOL_LONGITUDE)
+            .location("Bristol")
+            .build();
+
+    private VacancyLocation newcastleLocation = VacancyLocation.builder()
+            .latitude(NEWCASTLE_LATITUDE)
+            .longitude(NEWCASTLE_LONGITUDE)
+            .location("Newcastle")
+            .build();
 
     @Before
     public void before() throws LocationServiceException {
@@ -149,39 +165,30 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         given(locationService.find("bristol"))
                 .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
 
-//        createVacancyWithRegions(department, "South West, Scotland");
-//        createVacancyWithRegions(department, "North East, Scotland");
-        Vacancy southWest = createVacancyPrototype();
+        createVacancyWithRegions(department, "South West, Scotland", bristolLocation);
+        createVacancyWithRegions(department, "North East, Scotland", newcastleLocation);
 
 
         Page<Vacancy> result = findVancancies("bristol");
         List<Vacancy> resultsList = result.getContent();
 
         Assert.assertTrue("Expected results", !resultsList.isEmpty());
-
-        for (Vacancy vacancy : resultsList) {
-            Assert.assertTrue("Regional Vacancy",
-                    vacancy.getRegions() != null && vacancy.getRegions().contains("South West"));
-        }
+        Assert.assertTrue("Expected number results", resultsList.size() == 1);
     }
 
     @Test
     public void testFindRegionalVacanciesNewcastle() throws Exception {
 
         given(locationService.find("newcastle"))
-                .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "North East"));
+                .willReturn(new Coordinates(NEWCASTLE_LONGITUDE, NEWCASTLE_LATITUDE, "North East"));
 
-        createVacancyWithRegions(department, "North East, Scotland");
-        createVacancyWithRegions(department, "South West, Scotland");
+        createVacancyWithRegions(department, "North East, Scotland", newcastleLocation);
+        createVacancyWithRegions(department, "South West, Scotland, North East", bristolLocation);
 
         Page<Vacancy> result = findVancancies("newcastle");
         List<Vacancy> resultsList = result.getContent();
 
-        Assert.assertTrue("Expected results", !resultsList.isEmpty());
-
-        for (Vacancy vacancy : resultsList) {
-            Assert.assertTrue("Regional Vacancy", vacancy.getRegions().contains("North East"));
-        }
+        Assert.assertTrue("Expected results 2", resultsList.size() == 2);
     }
 
     @Test
@@ -327,6 +334,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         String searchResponse = mvcResult.getResponse().getContentAsString();
 
+        System.out.println("searchRespons=" + searchResponse);
+
         return objectMapper.readValue(searchResponse, VacancyPage.class);
     }
 
@@ -335,12 +344,10 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         return new Timestamp(date.getTime());
     }
 
-    private Vacancy createVacancyWithRegions(Department department, String regions) {
+    private Vacancy createVacancyWithRegions(Department department, String regions, VacancyLocation vacancyLocation) {
 
-        Vacancy vacancy = createVacancyPrototype();
+        Vacancy vacancy = createVacancyPrototype(vacancyLocation);
         vacancy.setRegions(regions);
-//        vacancy.setLatitude(null);
-//        vacancy.setLongitude(null);
         vacancy.setDepartment(department);
         vacancyRepository.save(vacancy);
         createdVacancies.add(vacancy);
@@ -349,7 +356,13 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
     private Vacancy createVacancyWithClosingDate(Timestamp closingDate, Department department) {
 
-        Vacancy vacancy = createVacancyPrototype();
+        VacancyLocation vacancyLocation = VacancyLocation.builder()
+                .latitude(BRISTOL_LATITUDE)
+                .longitude(BRISTOL_LONGITUDE)
+                .location("testLocation1 SearchQueryLocation")
+                .build();
+
+        Vacancy vacancy = createVacancyPrototype(vacancyLocation);
 
         vacancy.setDepartment(department);
         vacancy.setClosingDate(closingDate);
@@ -365,13 +378,12 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         return vacancy;
     }
 
-    private Vacancy createVacancyPrototype() {
+    private Vacancy createVacancyPrototype(VacancyLocation vacancyLocation) {
 
-        return Vacancy.builder()
+        Vacancy vacancy = Vacancy.builder()
                 .department(department)
                 .title("testTile1 SearchQueryTitle")
                 .description("testDescription1 SearchQueryDescription")
-                //                .location("testLocation1 SearchQueryLocation")
                 .grade("testGrade1 SearchQueryGrade")
                 .responsibilities("testResponsibilities1")
                 .workingHours("testWorkingHours1")
@@ -385,9 +397,12 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .salaryMin(0)
                 .salaryMax(10)
                 .numberVacancies(1)
-                //                .latitude(BRISTOL_LATITUDE)
-                //                .longitude(BRISTOL_LONGITUDE)
                 .identifier(System.currentTimeMillis())
                 .build();
+
+        vacancyLocation.setVacancy(vacancy);
+        vacancy.setVacancyLocations(new ArrayList<>());
+        vacancy.getVacancyLocations().add(vacancyLocation);
+        return vacancy;
     }
 }

@@ -57,13 +57,22 @@ public class VacancyController {
 
         Optional<Vacancy> foundVacancy = vacancyRepository.findById(vacancyId);
 
-        return foundVacancy.map((Vacancy vacancy) -> {
-            // Attention, mutable state on the argument
-            vacancyUpdate.setId(vacancy.getId());
+        if (foundVacancy.isPresent()) {
+            vacancyUpdate.setId(foundVacancy.get().getId());
             vacancyRepository.save(vacancyUpdate);
+            return ResponseEntity.ok().body(foundVacancy.get());
+        }
+        else {
+            return ResponseEntity.notFound().build();
+        }
 
-            return ResponseEntity.ok().body(vacancy);
-        }).orElse(ResponseEntity.notFound().build());
+//        return foundVacancy.map((Vacancy vacancy) -> {
+//            // Attention, mutable state on the argument
+//            vacancyUpdate.setId(vacancy.getId());
+//            vacancyRepository.save(vacancyUpdate);
+//
+//            return ResponseEntity.ok().body(vacancy);
+//        }).orElse(ResponseEntity.notFound().build());
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/{vacancyId}")

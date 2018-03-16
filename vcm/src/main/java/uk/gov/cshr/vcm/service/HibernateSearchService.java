@@ -8,10 +8,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Query;
-import org.hibernate.search.SearchFactory;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
@@ -23,7 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
 import uk.gov.cshr.vcm.model.SearchParameters;
-import uk.gov.cshr.vcm.model.Vacancy;
+import uk.gov.cshr.vcm.model.VacancyLocation;
 
 @Service
 public class HibernateSearchService {
@@ -49,21 +46,28 @@ public class HibernateSearchService {
     }
 
     @Transactional
-    public Page<Vacancy> search(SearchParameters searchParameters, Pageable pageable) throws LocationServiceException, IOException {
+    public Page<VacancyLocation> search(SearchParameters searchParameters, Pageable pageable) throws LocationServiceException, IOException {
 
         String searchTerm = searchParameters.getKeyword();
 
         FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
-        QueryBuilder qb = fullTextEntityManager.getSearchFactory().buildQueryBuilder().forEntity(Vacancy.class).get();
+        QueryBuilder qb = fullTextEntityManager.getSearchFactory().buildQueryBuilder().forEntity(VacancyLocation.class).get();
 
         Query fuzzyQuery = qb.keyword().fuzzy()
                 .withEditDistanceUpTo(1)
                 .withPrefixLength(1)
-                .onFields("title", "description", "shortDescription")
+                .onFields("vacancy.title", "vacancy.description", "vacancy.shortDescription")
                 .matching(searchTerm).createQuery();
         
         Integer minSalary = searchParameters.getSalaryMin();
+        if (minSalary == null) {
+            minSalary = 0;
+        }
+
         Integer maxSalary = searchParameters.getSalaryMax();
+        if (maxSalary == null) {
+            maxSalary = Integer.MAX_VALUE;
+        }
 //
 //        if (minSalary == null) {
 //            minSalary = 0;
@@ -71,17 +75,24 @@ public class HibernateSearchService {
 //
         Query minQuery = qb
                 .range()
-                .onField("salaryMax")
-                .from(minSalary).to(Integer.MAX_VALUE)
+                .onField("vacancy.salaryMax")
+                .above(minSalary)
                 .createQuery();
 //
         Query maxQuery = qb
                 .range()
-                .onField("salaryMin")
-                .from(0).to(maxSalary)
+                .onField("vacancy.salaryMin")
+                .below(maxSalary)
                 .createQuery();
+
+//        qb.range().
+
 //
-//        Query minMax = qb.bool().must(minQuery).must(maxQuery).createQuery();
+        Query salaryQuery = qb
+                .bool()
+                .must(minQuery)
+                .must(maxQuery)
+                .createQuery();
 //
 //        Query openQuery = qb
 //                .range()
@@ -93,7 +104,7 @@ public class HibernateSearchService {
 
         Query closedQuery = qb
                 .range()
-                .onField("closingDate")
+                .onField("vacancy.closingDate")
                 .ignoreFieldBridge()
                 .above(sdf.format(new Date()))
                 .excludeLimit()
@@ -101,7 +112,7 @@ public class HibernateSearchService {
 
         Query openQuery = qb
                 .range()
-                .onField("publicOpeningDate")
+                .onField("vacancy.publicOpeningDate")
                 .ignoreFieldBridge()
                 .below(sdf.format(new Date()))
                 .excludeLimit()
@@ -116,41 +127,26 @@ public class HibernateSearchService {
                 .andLongitude(searchParameters.getLongitude())
                 .createQuery();
 
-        Query regionQuery = qb.phrase().onField("regions").sentence(searchParameters.getCoordinates().getRegion()).createQuery();
+        Query regionQuery = qb.phrase().onField("vacancy.regions").sentence(searchParameters.getCoordinates().getRegion()).createQuery();
+
+        Query spatialRegion = qb.bool().should(spatialQuery).should(regionQuery).createQuery();
 
         Query combinedQuery = qb.bool()
-                .should(fuzzyQuery)
-                .should(regionQuery)
-                .should(spatialQuery)
+                .must(fuzzyQuery)
+                .must(spatialRegion)
                 .must(openClosedQuery)
-                .must(minQuery)
-                .must(maxQuery)
+                .must(salaryQuery)
                 .createQuery();
 
 
         System.out.println("luceneQuery=" + combinedQuery);
 
-        {
-            SearchFactory searchFactory = fullTextEntityManager.getSearchFactory();
-            IndexReader reader = searchFactory.getIndexReaderAccessor().open(Vacancy.class);
-            try {
-                int docs = reader.numDocs();
-                for (int i = 0; i < docs; i++) {
-                    Document document = reader.document(i);
-                    System.out.println("document=" + document);
-                }
-            }
-            finally {
-                searchFactory.getIndexReaderAccessor().close(reader);
-            }
-        }
-
-        javax.persistence.Query jpaQuery = fullTextEntityManager.createFullTextQuery(combinedQuery, Vacancy.class);
+        javax.persistence.Query jpaQuery = fullTextEntityManager.createFullTextQuery(combinedQuery, VacancyLocation.class);
 
         // execute search
         try {
-            List<Vacancy> results = jpaQuery.getResultList();
-            PageImpl<Vacancy> page = new PageImpl<>(results, pageable, 1);
+            List<VacancyLocation> results = jpaQuery.getResultList();
+            PageImpl<VacancyLocation> page = new PageImpl<>(results, pageable, 1);
 //            page.
 
             return page;

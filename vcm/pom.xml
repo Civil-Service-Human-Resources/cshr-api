@@ -17,8 +17,8 @@
         <admin-user>postgres</admin-user>
         <admin-password>qwerty</admin-password>
 
-        <database>cshr</database>
-        <database-url>jdbc:postgresql://localhost:5432/cshr</database-url>
+        <database>cshrtest</database>
+        <database-url>jdbc:postgresql://localhost:5432/cshrtest</database-url>
         <database-user>postgres</database-user>
         <database-password>qwerty</database-password>
         <postgres.version>9.4-1206-jdbc42</postgres.version>

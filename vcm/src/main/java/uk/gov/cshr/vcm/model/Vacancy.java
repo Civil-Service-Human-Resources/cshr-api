@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -31,9 +33,7 @@ import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.EncodingType;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.NumericField;
 import org.hibernate.search.annotations.Resolution;
-import org.hibernate.search.annotations.Spatial;
 import org.hibernate.search.annotations.Store;
 
 //@AnalyzerDef(name = "customanalyzer",
@@ -47,7 +47,6 @@ import org.hibernate.search.annotations.Store;
 //        })
 @Entity
 @Indexed
-@Spatial
 @Builder
 @Data
 @AllArgsConstructor
@@ -128,13 +127,11 @@ public class Vacancy implements Serializable {
     @Column(name = "public_opening_date")
     private Date publicOpeningDate;
 
-    @Field(store = Store.YES, analyze = Analyze.NO)
-    @NumericField
+    @Field(store = Store.YES)
     @NonNull
     private Integer salaryMin;
 
-    @Field(store = Store.YES, analyze = Analyze.NO)
-    @NumericField
+    @Field(store = Store.YES)
     private Integer salaryMax;
 
     private Integer numberVacancies;
@@ -169,6 +166,17 @@ public class Vacancy implements Serializable {
     @Enumerated(EnumType.STRING)
     private NationalityStatement nationalityStatement;
 
-    @OneToMany(mappedBy = "vacancy", fetch = FetchType.EAGER)
-    private List<VacancyLocation> vacancyLocations;
+//    @ContainedIn
+//    @JsonManagedReference
+//    @JsonIgnoreProperties("vacancy")
+    @OneToMany(mappedBy = "vacancy", fetch = FetchType.EAGER, cascade = {
+        CascadeType.PERSIST, CascadeType.REMOVE})
+    @Builder.Default
+//    @JsonIgnore
+    private List<VacancyLocation> vacancyLocations = new ArrayList<>();
+
+//    @Override
+//    public String toString() {
+//        return "Vacancy: " + id;
+//    }
 }
