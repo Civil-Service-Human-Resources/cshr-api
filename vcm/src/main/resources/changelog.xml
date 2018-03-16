@@ -176,4 +176,9 @@
             defaultValueBoolean="true"
             tableName="vacancies"/>
     </changeSet>
+    <changeSet author="gordon" id="22">
+        <addColumn tableName="vacancies">
+            <column name="salaryoverridedescription" type="TEXT" />
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

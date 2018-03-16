@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.After;
@@ -62,12 +63,11 @@ import uk.gov.cshr.vcm.service.LocationService;
 @TestExecutionListeners(MockitoTestExecutionListener.class)
 public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
-    public static final double BRISTOL_LATITUDE = 51.4549291;
-    public static final double BRISTOL_LONGITUDE = -2.6278111;
-
-    final private MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
+    private static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(),
             Charset.forName("utf8"));
+    private static final double BRISTOL_LATITUDE = 51.4549291;
+    private static final double BRISTOL_LONGITUDE = -2.6278111;
 
     @Inject
     private WebApplicationContext webApplicationContext;
@@ -274,7 +274,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void testRuntimeException() throws LocationServiceException, Exception {
+    public void testRuntimeException() throws Exception {
 
         String errorMessage = "bad times";
 
@@ -306,7 +306,26 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         Mockito.reset(locationService);
     }
 
-    public Page<Vacancy> findVancancies(String place) throws Exception {
+    @Test
+    public void search_salaryOverrideDescriptionReturned() throws Exception {
+        Vacancy vacancy = createVacancyPrototype();
+
+        vacancyRepository.save(vacancy);
+        createdVacancies.add(vacancy);
+
+        given(locationService.find("testLocation1"))
+                .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
+
+        Page<Vacancy> result = findVancancies("testLocation1");
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertTrue("Expected results", resultsList.size() == 1);
+        Vacancy actual = resultsList.get(0);
+
+        assertThat(actual.getSalaryOverrideDescription(), equalTo("This is the salary override description"));
+    }
+
+    private Page<Vacancy> findVancancies(String place) throws Exception {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -380,6 +399,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .latitude(BRISTOL_LATITUDE)
                 .longitude(BRISTOL_LONGITUDE)
                 .identifier(System.currentTimeMillis())
+                .salaryOverrideDescription("This is the salary override description")
                 .build();
     }
 }

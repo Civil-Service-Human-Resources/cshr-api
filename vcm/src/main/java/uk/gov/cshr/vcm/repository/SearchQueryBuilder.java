@@ -35,11 +35,8 @@ public class SearchQueryBuilder {
             query.append(" OR (regions ILIKE :region))");
         }
 
-        if (BooleanUtils.isTrue(searchParameters.getOverseasJob())) {
-            query.append(" OR (overseasjob = :overseasJob)");
-        }
-        else {
-            query.append(" AND (overseasjob = :overseasJob OR overseasjob IS NULL)");
+        if (BooleanUtils.isFalse(searchParameters.getOverseasJob())) {
+            query.append(" AND (overseasjob != true or overseasjob is null )");
         }
 
         query.append(" AND closing_date > current_timestamp");

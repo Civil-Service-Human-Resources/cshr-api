@@ -1,0 +1,529 @@
+swagger: '2.0'
+info:
+  description: Api Documentation
+  version: '1.0'
+  title: Api Documentation
+  termsOfService: 'urn:tos'
+  contact: {}
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0'
+host: 'localhost:8080'
+basePath: /
+tags:
+  - name: vacancy-controller
+    description: Vacancy Controller
+  - name: Vacancy Service
+    description: Apis relating to jobs and vacancies
+  - name: department-controller
+    description: Department Controller
+  - name: vacancy-search-controller
+    description: Vacancy Search Controller
+paths:
+  /department:
+    get:
+      tags:
+        - department-controller
+      summary: Find all departments
+      operationId: findAll
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Page«Department»'
+    post:
+      tags:
+        - department-controller
+      summary: Create a department
+      operationId: create
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: department
+          description: department
+          required: true
+          schema:
+            $ref: '#/definitions/Department'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Department'
+  '/department/{departmentId}':
+    get:
+      tags:
+        - department-controller
+      summary: Find a specific department
+      operationId: findById
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: departmentId
+          in: path
+          description: departmentId
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Department'
+    put:
+      tags:
+        - department-controller
+      summary: Update a department
+      operationId: update
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: departmentId
+          in: path
+          description: departmentId
+          required: true
+          type: integer
+          format: int64
+        - in: body
+          name: departmentUpdate
+          description: departmentUpdate
+          required: true
+          schema:
+            $ref: '#/definitions/Department'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Department'
+    delete:
+      tags:
+        - department-controller
+      summary: Delete a department
+      operationId: deleteById
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: departmentId
+          in: path
+          description: departmentId
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Department'
+  /vacancy:
+    get:
+      tags:
+        - vacancy-controller
+      summary: Find all vacancies with support for pagination
+      operationId: findAll_1
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Page«Vacancy»'
+    post:
+      tags:
+        - vacancy-controller
+      summary: Create a Vacancy
+      operationId: create_1
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: vacancy
+          description: vacancy
+          required: true
+          schema:
+            $ref: '#/definitions/Vacancy'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Vacancy'
+  /vacancy/search:
+    post:
+      tags:
+        - vacancy-search-controller
+      summary: Search for vacancies by location and keyword with support for pagination
+      operationId: searchUsingPOST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: searchParameters
+          description: The values supplied to perform the search
+          required: true
+          schema:
+            $ref: '#/definitions/VacancySearchParameters'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Page«Vacancy»'
+        '503':
+          description: The location service is unavailable.
+          schema:
+            $ref: '#/definitions/VacancyError'
+  '/vacancy/{vacancyId}':
+    get:
+      tags:
+        - vacancy-search-controller
+      summary: Find a specific vacancy
+      operationId: findById_1
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: vacancyId
+          in: path
+          description: vacancyId
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Vacancy'
+        '410':
+          description: Vacancy closed
+          schema:
+            $ref: '#/definitions/VacancyError'
+    put:
+      tags:
+        - vacancy-controller
+      summary: Update a Vacancy
+      operationId: update_1
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: vacancyId
+          in: path
+          description: vacancyId
+          required: true
+          type: integer
+          format: int64
+        - in: body
+          name: vacancyUpdate
+          description: vacancyUpdate
+          required: true
+          schema:
+            $ref: '#/definitions/Vacancy'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Vacancy'
+    delete:
+      tags:
+        - vacancy-controller
+      summary: Delete a Vacancy
+      operationId: delete
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: vacancyId
+          in: path
+          description: vacancyId
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Vacancy'
+definitions:
+  Department:
+    type: object
+    properties:
+      disabilityLogo:
+        type: string
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+  Location:
+    type: object
+    required:
+      - place
+      - radius
+    properties:
+      place:
+        type: string
+        description: the place being searched from
+      radius:
+        type: integer
+        format: int32
+        description: the distance in miles to search from the given place
+    description: The parameters that make a location for search made of a place and a radius to search from this place
+  Page«Department»:
+    type: object
+    properties:
+      content:
+        type: array
+        items:
+          $ref: '#/definitions/Department'
+      first:
+        type: boolean
+      last:
+        type: boolean
+      number:
+        type: integer
+        format: int32
+      numberOfElements:
+        type: integer
+        format: int32
+      size:
+        type: integer
+        format: int32
+      sort:
+        $ref: '#/definitions/Sort'
+      totalElements:
+        type: integer
+        format: int64
+      totalPages:
+        type: integer
+        format: int32
+  Page«Vacancy»:
+    type: object
+    properties:
+      content:
+        type: array
+        items:
+          $ref: '#/definitions/Vacancy'
+      first:
+        type: boolean
+      last:
+        type: boolean
+      number:
+        type: integer
+        format: int32
+      numberOfElements:
+        type: integer
+        format: int32
+      size:
+        type: integer
+        format: int32
+      sort:
+        $ref: '#/definitions/Sort'
+      totalElements:
+        type: integer
+        format: int64
+      totalPages:
+        type: integer
+        format: int32
+  Sort:
+    type: object
+  Vacancy:
+    type: object
+    properties:
+      applyURL:
+        type: string
+        description: URL linking to external system
+      closingDate:
+        type: string
+        example: 'yyyy-MM-dd''T''HH:mm:ss.SSSZ'
+      contactDepartment:
+        type: string
+      contactEmail:
+        type: string
+      contactName:
+        type: string
+      contactTelephone:
+        type: string
+      department:
+        $ref: '#/definitions/Department'
+      description:
+        type: string
+      displayCscContent:
+        type: boolean
+      eligibility:
+        type: string
+      governmentOpeningDate:
+        type: string
+        example: 'yyyy-MM-dd''T''HH:mm:ss.SSSZ'
+      grade:
+        type: string
+      id:
+        type: integer
+        format: int64
+      identifier:
+        type: integer
+        format: int64
+      internalOpeningDate:
+        type: string
+        example: 'yyyy-MM-dd''T''HH:mm:ss.SSSZ'
+      latitude:
+        type: number
+        format: double
+      location:
+        type: string
+      longitude:
+        type: number
+        format: double
+      nationalityStatement:
+        type: string
+        enum:
+          - RESERVED
+          - NON_RESERVED
+          - NONE
+      numberVacancies:
+        type: integer
+        format: int32
+      overseasJob:
+        type: boolean
+      publicOpeningDate:
+        type: string
+        example: 'yyyy-MM-dd''T''HH:mm:ss.SSSZ'
+      regions:
+        type: string
+      responsibilities:
+        type: string
+      salaryMax:
+        type: integer
+        format: int32
+      salaryMin:
+        type: integer
+        format: int32
+      salaryOverrideDescription:
+        type: string
+      selectionProcessDetails:
+        type: string
+      shortDescription:
+        type: string
+      title:
+        type: string
+      workingHours:
+        type: string
+  VacancyError:
+    type: object
+    properties:
+      errors:
+        type: array
+        items:
+          type: string
+      message:
+        type: string
+      status:
+        type: string
+        enum:
+          - '100'
+          - '101'
+          - '102'
+          - '103'
+          - '200'
+          - '201'
+          - '202'
+          - '203'
+          - '204'
+          - '205'
+          - '206'
+          - '207'
+          - '208'
+          - '226'
+          - '300'
+          - '301'
+          - '302'
+          - '303'
+          - '304'
+          - '305'
+          - '307'
+          - '308'
+          - '400'
+          - '401'
+          - '402'
+          - '403'
+          - '404'
+          - '405'
+          - '406'
+          - '407'
+          - '408'
+          - '409'
+          - '410'
+          - '411'
+          - '412'
+          - '413'
+          - '414'
+          - '415'
+          - '416'
+          - '417'
+          - '418'
+          - '419'
+          - '420'
+          - '421'
+          - '422'
+          - '423'
+          - '424'
+          - '426'
+          - '428'
+          - '429'
+          - '431'
+          - '451'
+          - '500'
+          - '501'
+          - '502'
+          - '503'
+          - '504'
+          - '505'
+          - '506'
+          - '507'
+          - '508'
+          - '509'
+          - '510'
+          - '511'
+  VacancySearchParameters:
+    type: object
+    required:
+      - location
+    properties:
+      department:
+        type: array
+        description: id of one or more departments to search vacancies for
+        items:
+          type: string
+      keyword:
+        type: string
+        description: word found in title or description of vacancy
+      location:
+        description: location of the vacancy
+        $ref: '#/definitions/Location'
+      maxSalary:
+        type: integer
+        format: int32
+      minSalary:
+        type: integer
+        format: int32
+      overseasJob:
+        type: boolean
+    description: The parameters allowed for when searching for vacancies
