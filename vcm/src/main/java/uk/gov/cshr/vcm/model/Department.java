@@ -29,9 +29,32 @@ public class Department implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO,  generator="departments_id_seq")
     private Long id;
 
+    @Column(name = "identifier")
+    private String identifier;
+
     private @NonNull
     String name;
 
     @Column(name = "disabilitylogo")
     private String disabilityLogo;
+
+    @Column(name = "departmentstatus")
+    @Enumerated(EnumType.STRING)
+    private DepartmentStatus departmentStatus;
+
+    @Column(name = "disabilityconfidencelevel")
+    @Enumerated(EnumType.STRING)
+    private DisabilityConfidenceLevel disabilityConfidenceLevel;
+
+    @Column(name = "disabilityconfidencelevellastupdate")
+    private Timestamp disabilityConfidenceLevelLastUpdate;
+
+    @Column(name = "logoneeded")
+    private Boolean logoNeeded;
+
+    @Column(name = "logopath")
+    private String logoPath;
+
+    @Column(name = "acceptedemailextensions")
+    private String acceptedEmailExtensions;
 }

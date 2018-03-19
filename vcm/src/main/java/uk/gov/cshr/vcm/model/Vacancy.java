@@ -180,4 +180,6 @@ public class Vacancy implements Serializable {
 //    public String toString() {
 //        return "Vacancy: " + id;
 //    }
+    @Column(name = "salaryoverridedescription")
+    private String salaryOverrideDescription;
 }
