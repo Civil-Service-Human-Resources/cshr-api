@@ -1,8 +1,11 @@
 package uk.gov.cshr.vcm.model;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -29,9 +32,32 @@ public class Department implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO,  generator="departments_id_seq")
     private Long id;
 
+    @Column(name = "identifier")
+    private String identifier;
+
     private @NonNull
     String name;
 
     @Column(name = "disabilitylogo")
     private String disabilityLogo;
+
+    @Column(name = "departmentstatus")
+    @Enumerated(EnumType.STRING)
+    private DepartmentStatus departmentStatus;
+
+    @Column(name = "disabilityconfidencelevel")
+    @Enumerated(EnumType.STRING)
+    private DisabilityConfidenceLevel disabilityConfidenceLevel;
+
+    @Column(name = "disabilityconfidencelevellastupdate")
+    private Timestamp disabilityConfidenceLevelLastUpdate;
+
+    @Column(name = "logoneeded")
+    private Boolean logoNeeded;
+
+    @Column(name = "logopath")
+    private String logoPath;
+
+    @Column(name = "acceptedemailextensions")
+    private String acceptedEmailExtensions;
 }
