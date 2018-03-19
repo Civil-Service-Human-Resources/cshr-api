@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.cshr.vcm.model.Vacancy;
+import uk.gov.cshr.vcm.model.VacancyLocation;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
 
 @Profile("dev")
@@ -42,6 +43,10 @@ public class VacancyController {
     @ApiOperation(value = "Create a Vacancy", nickname = "create")
     public ResponseEntity<Vacancy> create(@RequestBody Vacancy vacancy) {
 
+        for (VacancyLocation vacancyLocation : vacancy.getVacancyLocations()) {
+            vacancyLocation.setVacancy(vacancy);
+        }
+
         Vacancy savedVacancy = vacancyRepository.save(vacancy);
 
         URI location = ServletUriComponentsBuilder
@@ -56,6 +61,10 @@ public class VacancyController {
     public ResponseEntity<Vacancy> update(@PathVariable Long vacancyId, @RequestBody Vacancy vacancyUpdate) {
 
         Optional<Vacancy> foundVacancy = vacancyRepository.findById(vacancyId);
+
+        for (VacancyLocation vacancyLocation : vacancyUpdate.getVacancyLocations()) {
+            vacancyLocation.setVacancy(vacancyUpdate);
+        }
 
         if (foundVacancy.isPresent()) {
             vacancyUpdate.setId(foundVacancy.get().getId());

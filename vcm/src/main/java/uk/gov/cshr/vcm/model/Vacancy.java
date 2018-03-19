@@ -170,7 +170,7 @@ public class Vacancy implements Serializable {
 //    @JsonManagedReference
 //    @JsonIgnoreProperties("vacancy")
     @OneToMany(mappedBy = "vacancy", fetch = FetchType.EAGER, cascade = {
-        CascadeType.PERSIST, CascadeType.REMOVE})
+        CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE}, orphanRemoval = true)
     @Builder.Default
 //    @JsonIgnore
     private List<VacancyLocation> vacancyLocations = new ArrayList<>();
