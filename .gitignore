@@ -26,3 +26,4 @@ nbdist/
 ### Docker ###
 .env
 docker-stack.yml
+/vcm/nbactions.xml
