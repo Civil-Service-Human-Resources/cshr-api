@@ -61,8 +61,8 @@ jobs:
     machine: true
     steps:
       - run:
-        name: Notify Jenkins pipeline to deploy change
-        command: curl -X POST --user "circleci:${JENKINS_API_KEY}"  "https://${JENKINS_HOST}/job/deploy-cshr-api/buildWithParameters?dockerTag=${CIRCLE_WORKFLOW_ID}&environment=dev"
+          name: Notify Jenkins pipeline to deploy change
+          command: curl -X POST --user "circleci:${JENKINS_API_KEY}"  "https://${JENKINS_HOST}/job/deploy-cshr-api/buildWithParameters?dockerTag=${CIRCLE_WORKFLOW_ID}&environment=dev"
 
 workflows:
   version: 2
