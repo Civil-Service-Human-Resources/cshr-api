@@ -159,6 +159,7 @@ public class Vacancy implements Serializable {
     @Column(name = "regions")
     private String regions;
 
+    @Field(store = Store.YES)
     @Column(name = "overseasjob")
     private Boolean overseasJob;
 

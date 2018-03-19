@@ -127,9 +127,23 @@ public class HibernateSearchService {
                 .andLongitude(searchParameters.getLongitude())
                 .createQuery();
 
-        Query regionQuery = qb.phrase().onField("vacancy.regions").sentence(searchParameters.getCoordinates().getRegion()).createQuery();
+        Query regionQuery = qb.phrase()
+                .onField("vacancy.regions")
+                .sentence(searchParameters.getCoordinates().getRegion())
+                .createQuery();
 
         Query spatialRegion = qb.bool().should(spatialQuery).should(regionQuery).createQuery();
+
+        if (searchParameters.getOverseasJob() != null && searchParameters.getOverseasJob()) {
+
+            Query overseasQuery = qb.keyword().onField("vacancy.overseasJob")
+                    .matching("true").createQuery();
+
+            spatialRegion = qb.bool()
+                    .should(spatialRegion)
+                    .should(overseasQuery)
+                    .createQuery();
+        }
 
         Query combinedQuery = qb.bool()
                 .must(fuzzyQuery)
@@ -137,7 +151,6 @@ public class HibernateSearchService {
                 .must(openClosedQuery)
                 .must(salaryQuery)
                 .createQuery();
-
 
         System.out.println("luceneQuery=" + combinedQuery);
 
