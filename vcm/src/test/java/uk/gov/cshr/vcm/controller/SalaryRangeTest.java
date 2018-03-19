@@ -47,6 +47,7 @@ import uk.gov.cshr.vcm.model.VacancyLocation;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
+import uk.gov.cshr.vcm.service.HibernateSearchService;
 import uk.gov.cshr.vcm.service.LocationService;
 
 //@Ignore
@@ -79,6 +80,9 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
     @Inject
     private DepartmentRepository departmentRepository;
 
+    @Inject
+    private HibernateSearchService hibernateSearchService;
+
     private MockMvc mockMvc;
 
     @MockBean
@@ -95,8 +99,9 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
     @Before
     public void before() throws LocationServiceException {
 
+        hibernateSearchService.purge();
         vacancyRepository.deleteAll();
-        departmentRepository.deleteAll();;
+        departmentRepository.deleteAll();
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 

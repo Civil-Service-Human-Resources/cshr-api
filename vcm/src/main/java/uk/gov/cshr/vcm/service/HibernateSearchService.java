@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
 import uk.gov.cshr.vcm.model.SearchParameters;
+import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancyLocation;
 
 @Service
@@ -44,6 +45,12 @@ public class HibernateSearchService {
         catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public void purge() {
+        FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
+        fullTextEntityManager.purgeAll(VacancyLocation.class);
+        fullTextEntityManager.purgeAll(Vacancy.class);
     }
 
     @Transactional

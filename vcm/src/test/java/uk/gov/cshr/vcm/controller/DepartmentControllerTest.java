@@ -24,6 +24,7 @@ import org.testng.annotations.Test;
 import uk.gov.cshr.vcm.VcmApplication;
 import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
+import uk.gov.cshr.vcm.repository.VacancyRepository;
 
 @Ignore
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = VcmApplication.class)
@@ -36,6 +37,9 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
     private DepartmentRepository departmentRepository;
+
+    @Autowired
+    private VacancyRepository vacancyRepository;
 
     private MockMvc mvc;
 
@@ -69,6 +73,7 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
 
         this.mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
+        vacancyRepository.deleteAll();
         this.departmentRepository.deleteAll();
 
         Department savedDepartment1 = this.departmentRepository.save(department1);

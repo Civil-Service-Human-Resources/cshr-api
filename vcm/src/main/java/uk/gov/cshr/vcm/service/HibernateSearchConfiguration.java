@@ -11,12 +11,12 @@ import org.springframework.context.annotation.Configuration;
 public class HibernateSearchConfiguration {
 
     @Autowired
-    private EntityManager bentityManager;
+    private EntityManager entityManager;
 
     @Bean
     HibernateSearchService hibernateSearchService() {
 
-        HibernateSearchService hibernateSearchService = new HibernateSearchService(bentityManager);
+        HibernateSearchService hibernateSearchService = new HibernateSearchService(entityManager);
         hibernateSearchService.initializeHibernateSearch();
         return hibernateSearchService;
     }

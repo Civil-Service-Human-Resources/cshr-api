@@ -5,7 +5,6 @@ import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
@@ -41,6 +40,7 @@ import uk.gov.cshr.vcm.model.VacancyLocation;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
+import uk.gov.cshr.vcm.service.HibernateSearchService;
 import uk.gov.cshr.vcm.service.LocationService;
 
 //@Ignore
@@ -87,6 +87,9 @@ public class OverseasJobsTest extends AbstractTestNGSpringContextTests {
     @Inject
     private DepartmentRepository departmentRepository;
 
+    @Inject
+    private HibernateSearchService hibernateSearchService;
+
     private MockMvc mockMvc;
 
     @MockBean
@@ -95,21 +98,18 @@ public class OverseasJobsTest extends AbstractTestNGSpringContextTests {
     private static final Timestamp THIRTY_DAYS_FROM_NOW = getTime(30);
     private static final Timestamp ONE_DAY_AGO = getTime(-1);
 
-    private final List<Vacancy> createdVacancies = new ArrayList<>();
-    private final List<Department> createdDepartments = new ArrayList<>();
-
     private Department department;
 
     @Before
     public void before() throws LocationServiceException {
 
+        hibernateSearchService.purge();
         vacancyRepository.deleteAll();
         departmentRepository.deleteAll();
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
         department = departmentRepository.save(Department.builder().name("Department One").build());
-        createdDepartments.add(department);
 
         given(locationService.find("bristol"))
                 .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
@@ -140,13 +140,11 @@ public class OverseasJobsTest extends AbstractTestNGSpringContextTests {
         Vacancy localVacancy = getVacancyPrototype(BRISTOL_JOB_TITLE, bristolLocation);
         localVacancy.setOverseasJob(Boolean.FALSE);
         vacancyRepository.save(localVacancy);
-        createdVacancies.add(localVacancy);
 
         // this should only come up when overseas is selected
         Vacancy overseasVacancy = getVacancyPrototype(NEWCASTLE_JOB_TITLE, newcastleLocation);
         overseasVacancy.setOverseasJob(Boolean.TRUE);
         vacancyRepository.save(overseasVacancy);
-        createdVacancies.add(overseasVacancy);
 
         Page<Vacancy> result = findVancancies("bristol", DONT_INCLUDE_OVERSEAS);
         List<Vacancy> resultsList = result.getContent();

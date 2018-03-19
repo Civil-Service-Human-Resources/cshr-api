@@ -51,6 +51,7 @@ import uk.gov.cshr.vcm.model.VacancyLocation;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
+import uk.gov.cshr.vcm.service.HibernateSearchService;
 import uk.gov.cshr.vcm.service.LocationService;
 
 @ActiveProfiles("dev")
@@ -85,6 +86,9 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     @MockBean
     private LocationService locationService;
 
+    @Inject
+    private HibernateSearchService hibernateSearchService;
+
     private static final Timestamp YESTERDAY = getTime(-1);
     private static final Timestamp TODAY = getTime(0);
     private static final Timestamp TOMORROW = getTime(+1);
@@ -110,6 +114,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     @Before
     public void before() throws LocationServiceException {
 
+        hibernateSearchService.purge();
         vacancyRepository.deleteAll();
         departmentRepository.deleteAll();;
 
