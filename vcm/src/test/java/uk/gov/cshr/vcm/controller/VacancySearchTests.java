@@ -110,6 +110,9 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     @Before
     public void before() throws LocationServiceException {
 
+        vacancyRepository.deleteAll();
+        departmentRepository.deleteAll();;
+
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
         department = departmentRepository.save(
@@ -124,13 +127,13 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     @After
     public void after() {
 
-        for (Vacancy createdVacancy : createdVacancies) {
-            vacancyRepository.delete(createdVacancy);
-        }
-
-        for (Department createdDepartment : createdDepartments) {
-            departmentRepository.delete(createdDepartment);
-        }
+//        for (Vacancy createdVacancy : createdVacancies) {
+//            vacancyRepository.delete(createdVacancy);
+//        }
+//
+//        for (Department createdDepartment : createdDepartments) {
+//            departmentRepository.delete(createdDepartment);
+//        }
     }
 
     @Test
@@ -157,6 +160,30 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .forEachOrdered((vacancy) -> {
                     fail("vacancy.getClosingDate() in past: " + vacancy.getClosingDate());
                 });
+    }
+
+    @Test
+    public void testFindMultipleLocations() throws Exception {
+
+        given(locationService.find("bristol"))
+                .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
+
+        Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
+        saveVacancy(newcastleVacancy);
+
+        Page<Vacancy> result = findVancancies("bristol");
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertTrue("Expected no results", resultsList.isEmpty());
+
+        newcastleVacancy.getVacancyLocations().add(bristolLocation);
+        bristolLocation.setVacancy(newcastleVacancy);
+        vacancyRepository.save(newcastleVacancy);
+
+        result = findVancancies("bristol");
+        resultsList = result.getContent();
+
+        Assert.assertTrue("Expected results", !resultsList.isEmpty());
     }
 
     @Test

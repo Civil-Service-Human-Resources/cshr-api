@@ -11,6 +11,7 @@ import javax.transaction.Transactional;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
+import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,57 +50,49 @@ public class HibernateSearchService {
     public Page<VacancyLocation> search(SearchParameters searchParameters, Pageable pageable) throws LocationServiceException, IOException {
 
         String searchTerm = searchParameters.getKeyword();
-
-        FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
-        QueryBuilder qb = fullTextEntityManager.getSearchFactory().buildQueryBuilder().forEntity(VacancyLocation.class).get();
-
-        Query fuzzyQuery = qb.keyword().fuzzy()
-                .withEditDistanceUpTo(1)
-                .withPrefixLength(1)
-                .onFields("vacancy.title", "vacancy.description", "vacancy.shortDescription")
-                .matching(searchTerm).createQuery();
-        
         Integer minSalary = searchParameters.getSalaryMin();
         if (minSalary == null) {
             minSalary = 0;
         }
-
         Integer maxSalary = searchParameters.getSalaryMax();
         if (maxSalary == null) {
             maxSalary = Integer.MAX_VALUE;
         }
-//
-//        if (minSalary == null) {
-//            minSalary = 0;
-//        }
-//
+
+        FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
+        QueryBuilder qb = fullTextEntityManager.getSearchFactory().buildQueryBuilder().forEntity(VacancyLocation.class).get();
+
+        BooleanJunction combinedQuery = qb.bool();
+
+        if (searchTerm != null && !searchTerm.isEmpty()) {
+            Query fuzzyQuery = qb.keyword().fuzzy()
+                    .withEditDistanceUpTo(1)
+                    .withPrefixLength(1)
+                    .onFields("vacancy.title", "vacancy.description", "vacancy.shortDescription")
+                    .matching(searchTerm).createQuery();
+            combinedQuery = combinedQuery.must(fuzzyQuery);
+        }
+
         Query minQuery = qb
                 .range()
                 .onField("vacancy.salaryMax")
                 .above(minSalary)
                 .createQuery();
-//
+
         Query maxQuery = qb
                 .range()
                 .onField("vacancy.salaryMin")
                 .below(maxSalary)
                 .createQuery();
 
-//        qb.range().
-
-//
         Query salaryQuery = qb
                 .bool()
                 .must(minQuery)
                 .must(maxQuery)
                 .createQuery();
-//
-//        Query openQuery = qb
-//                .range()
-//                .onField("publicOpeningDate")
-//                .below(new Date())
-//                .createQuery();
-        // 201803130819
+
+        System.out.println("salaryQuery=" + salaryQuery);
+
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmm");
 
         Query closedQuery = qb
@@ -145,16 +138,22 @@ public class HibernateSearchService {
                     .createQuery();
         }
 
-        Query combinedQuery = qb.bool()
-                .must(fuzzyQuery)
+        combinedQuery = combinedQuery
                 .must(spatialRegion)
                 .must(openClosedQuery)
-                .must(salaryQuery)
-                .createQuery();
+                .must(salaryQuery);
+
+//        if (fuzzyQuery != null) {
+//            combinedQuery = qb.bool()
+//                    .should(combinedQuery)
+//                    .must(fuzzyQuery)
+//                    .createQuery();
+//        }
 
         System.out.println("luceneQuery=" + combinedQuery);
 
-        javax.persistence.Query jpaQuery = fullTextEntityManager.createFullTextQuery(combinedQuery, VacancyLocation.class);
+        javax.persistence.Query jpaQuery = fullTextEntityManager.createFullTextQuery(
+                combinedQuery.createQuery(), VacancyLocation.class);
 
         // execute search
         try {

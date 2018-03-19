@@ -89,10 +89,10 @@ public class Vacancy implements Serializable {
 
     @Field(store = Store.YES, analyze = Analyze.NO)
     @DateBridge(resolution = Resolution.MINUTE, encoding = EncodingType.STRING)
-    @Temporal(TemporalType.TIMESTAMP)
+//    @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT+0")
     @NonNull
-    private Date closingDate;
+    private Timestamp closingDate;
 
     @NonNull
     private String contactName;
