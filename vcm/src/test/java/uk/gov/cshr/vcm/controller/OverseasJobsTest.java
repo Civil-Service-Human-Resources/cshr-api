@@ -119,28 +119,27 @@ public class OverseasJobsTest extends AbstractTestNGSpringContextTests {
         boolean INCLUDE_OVERSEAS = true;
         boolean DONT_INCLUDE_OVERSEAS = false;
 
-        // As we're searching Bristol, this 'overseas' vacancy should only come up if
-        // we include overseas jobs.
+        // As we're searching Bristol, this should always come up
+        Vacancy localVacancy = getVacancyPrototype(BRISTOL);
+        localVacancy.setOverseasJob(Boolean.FALSE);
+        vacancyRepository.save(localVacancy);
+        createdVacancies.add(localVacancy);
+
+        // this should only come up when overseas is selected
         Vacancy overseasVacancy = getVacancyPrototype(NEWCASTLE);
         overseasVacancy.setOverseasJob(Boolean.TRUE);
         vacancyRepository.save(overseasVacancy);
         createdVacancies.add(overseasVacancy);
 
-        // we're only searching 'bristol' so this should never come up.
-        Vacancy nationalVacancy = getVacancyPrototype(NEWCASTLE);
-        nationalVacancy.setOverseasJob(Boolean.FALSE);
-        vacancyRepository.save(nationalVacancy);
-        createdVacancies.add(nationalVacancy);
-
-        Page<Vacancy> result = findVancancies("bristol", INCLUDE_OVERSEAS);
+        Page<Vacancy> result = findVancancies("bristol", DONT_INCLUDE_OVERSEAS);
         List<Vacancy> resultsList = result.getContent();
 
         Assert.assertEquals(1, resultsList.size());
 
-        result = findVancancies("bristol", DONT_INCLUDE_OVERSEAS);
+        result = findVancancies("bristol", INCLUDE_OVERSEAS);
         resultsList = result.getContent();
 
-        Assert.assertEquals(0, resultsList.size());
+        Assert.assertEquals(2, resultsList.size());
     }
 
     public Page<Vacancy> findVancancies(String place, Boolean includeOverseas) throws Exception {

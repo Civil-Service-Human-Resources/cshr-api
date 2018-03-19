@@ -176,4 +176,32 @@
             defaultValueBoolean="true"
             tableName="vacancies"/>
     </changeSet>
+    <changeSet author="gordon" id="22">
+        <addColumn tableName="vacancies">
+            <column name="salaryoverridedescription" type="TEXT" />
+        </addColumn>
+    </changeSet>
+    <changeSet author="gordon" id="23">
+        <addColumn tableName="departments">
+            <column name="identifier" type="TEXT" />
+        </addColumn>
+        <addColumn tableName="departments">
+            <column name="departmentstatus" type="TEXT" />
+        </addColumn>
+        <addColumn tableName="departments">
+            <column name="disabilityconfidencelevel" type="TEXT" />
+        </addColumn>
+        <addColumn tableName="departments">
+            <column name="disabilityconfidencelevellastupdate" type="TIMESTAMP WITH TIME ZONE" />
+        </addColumn>
+        <addColumn tableName="departments">
+            <column name="logoneeded" type="boolean" />
+        </addColumn>
+        <addColumn tableName="departments">
+            <column name="logopath" type="TEXT" />
+        </addColumn>
+        <addColumn tableName="departments">
+            <column name="acceptedemailextensions" type="TEXT" />
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
