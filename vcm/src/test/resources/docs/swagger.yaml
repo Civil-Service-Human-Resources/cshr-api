@@ -266,11 +266,32 @@ definitions:
   Department:
     type: object
     properties:
+      acceptedEmailExtensions:
+        type: string
+      departmentStatus:
+        type: string
+        enum:
+          - ACTIVE
+          - DEACTIVATED
+      disabilityConfidenceLevel:
+        type: string
+        enum:
+          - EMPLOYER
+          - LEADER
+          - COMMITTED
+      disabilityConfidenceLevelLastUpdate:
+        $ref: '#/definitions/Timestamp'
       disabilityLogo:
         type: string
       id:
         type: integer
         format: int64
+      identifier:
+        type: string
+      logoNeeded:
+        type: boolean
+      logoPath:
+        type: string
       name:
         type: string
   Location:
@@ -345,6 +366,39 @@ definitions:
         format: int32
   Sort:
     type: object
+  Timestamp:
+    type: object
+    properties:
+      date:
+        type: integer
+        format: int32
+      day:
+        type: integer
+        format: int32
+      hours:
+        type: integer
+        format: int32
+      minutes:
+        type: integer
+        format: int32
+      month:
+        type: integer
+        format: int32
+      nanos:
+        type: integer
+        format: int32
+      seconds:
+        type: integer
+        format: int32
+      time:
+        type: integer
+        format: int64
+      timezoneOffset:
+        type: integer
+        format: int32
+      year:
+        type: integer
+        format: int32
   Vacancy:
     type: object
     properties:
