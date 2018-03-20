@@ -32,12 +32,14 @@ public class SearchQueryBuilder {
         query.append(" AND ((point(:searchFromLongitudeValue, :searchFromLatitudeValue) <@> point(longitude, latitude) < :distance)");
 
         if (StringUtils.isNotBlank(searchParameters.getCoordinates().getRegion())) {
-            query.append(" OR (regions ILIKE :region))");
+            query.append(" OR (regions ILIKE :region)");
         }
 
-        if (BooleanUtils.isFalse(searchParameters.getOverseasJob())) {
-            query.append(" AND (overseasjob != true or overseasjob is null )");
+        if (BooleanUtils.isNotFalse(searchParameters.getOverseasJob())) {
+            query.append(" OR (overseasjob = true)");
         }
+
+        query.append(")");
 
         query.append(" AND closing_date > current_timestamp");
 
