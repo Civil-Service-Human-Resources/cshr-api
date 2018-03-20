@@ -36,15 +36,6 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 
-//@AnalyzerDef(name = "customanalyzer",
-//        tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
-//        filters = {
-//            @TokenFilterDef(factory = LowerCaseFilterFactory.class)
-//            ,
-//    @TokenFilterDef(factory = SnowballPorterFilterFactory.class, params = {
-//        @Parameter(name = "language", value = "English")
-//    })
-//        })
 @Entity
 @Indexed
 @Builder

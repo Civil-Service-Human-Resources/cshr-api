@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.After;
@@ -147,24 +148,31 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         given(locationService.find(any()))
                 .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
 
-        createVacancyWithClosingDate(YESTERDAY, department);
+        createVacancyWithClosingDate("yesterday", YESTERDAY, department);
 
         // beacuse these are timestamp basesd this job will be closed
         Timestamp earlierToday = new Timestamp(TODAY.getTime() - 10000);
-        createVacancyWithClosingDate(earlierToday, department);
+        createVacancyWithClosingDate("earlier today", earlierToday, department);
 
-        createVacancyWithClosingDate(TOMORROW, department);
-        createVacancyWithClosingDate(THIRTY_DAYS_FROM_NOW, department);
+        createVacancyWithClosingDate("tomorrow", TOMORROW, department);
+        createVacancyWithClosingDate("thirty days time", THIRTY_DAYS_FROM_NOW, department);
 
         Page<Vacancy> result = findVancancies("bristol");
         List<Vacancy> resultsList = result.getContent();
 
         Assert.assertTrue("Expected results", !resultsList.isEmpty());
 
-        resultsList.stream().filter((vacancy) -> (vacancy.getClosingDate().before(new Date())))
-                .forEachOrdered((vacancy) -> {
-                    fail("vacancy.getClosingDate() in past: " + vacancy.getClosingDate());
-                });
+        Date now = new Date();
+
+        for (Vacancy vacancy : resultsList) {
+            if (vacancy.getClosingDate().before(now)) {
+                fail("vacancy.getClosingDate() in past: vacancy="
+                        + vacancy.getTitle()
+                        + " closingDate="
+                        + vacancy.getClosingDate()
+                        + " now=" + now);
+            }
+        }
     }
 
     @Test
@@ -229,7 +237,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         given(locationService.find(any()))
                 .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
 
-        Vacancy closedVacancy = createVacancyWithClosingDate(YESTERDAY, department);
+        Vacancy closedVacancy = createVacancyWithClosingDate("yesterday", YESTERDAY, department);
 
         MvcResult mvcResult = this.mockMvc.perform(get("/vacancy/" + closedVacancy.getId())
                 .contentType(APPLICATION_JSON_UTF8)
@@ -255,7 +263,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
-        Vacancy closedVacancy = createVacancyWithClosingDate(YESTERDAY, department);
+        Vacancy closedVacancy = createVacancyWithClosingDate("yesterday", YESTERDAY, department);
         closedVacancy.setClosingDate(THIRTY_DAYS_FROM_NOW);
 
         MvcResult mvcUpdateResult = this.mockMvc.perform(put("/vacancy/" + closedVacancy.getId())
@@ -345,7 +353,27 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         Mockito.reset(locationService);
     }
 
-    public Page<Vacancy> findVancancies(String place) throws Exception {
+    @Test
+    public void search_salaryOverrideDescriptionReturned() throws Exception {
+
+        Vacancy vacancy = createVacancyPrototype(bristolLocation);
+
+        vacancyRepository.save(vacancy);
+        createdVacancies.add(vacancy);
+
+        given(locationService.find("testLocation1"))
+                .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
+
+        Page<Vacancy> result = findVancancies("testLocation1");
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertTrue("Expected results", resultsList.size() == 1);
+        Vacancy actual = resultsList.get(0);
+
+        assertThat(actual.getSalaryOverrideDescription(), equalTo("This is the salary override description"));
+    }
+
+    private Page<Vacancy> findVancancies(String place) throws Exception {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -386,7 +414,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         return vacancy;
     }
 
-    private Vacancy createVacancyWithClosingDate(Timestamp closingDate, Department department) {
+    private Vacancy createVacancyWithClosingDate(String jobTitle, Timestamp closingDate, Department department) {
 
         VacancyLocation vacancyLocation = VacancyLocation.builder()
                 .latitude(BRISTOL_LATITUDE)
@@ -395,6 +423,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .build();
 
         Vacancy vacancy = createVacancyPrototype(vacancyLocation);
+        vacancy.setTitle(jobTitle);
 
         vacancy.setDepartment(department);
         vacancy.setClosingDate(closingDate);
@@ -430,6 +459,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .salaryMax(10)
                 .numberVacancies(1)
                 .identifier(System.currentTimeMillis())
+                .salaryOverrideDescription("This is the salary override description")
                 .build();
 
         vacancyLocation.setVacancy(vacancy);
