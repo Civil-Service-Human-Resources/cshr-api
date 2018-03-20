@@ -72,12 +72,25 @@ public class HibernateSearchService {
         BooleanJunction combinedQuery = qb.bool();
 
         if (searchTerm != null && !searchTerm.isEmpty()) {
-            Query fuzzyQuery = qb.keyword().fuzzy()
+            Query titleQuery = qb.keyword().fuzzy()
                     .withEditDistanceUpTo(1)
                     .withPrefixLength(1)
-                    .onFields("vacancy.title", "vacancy.description", "vacancy.shortDescription")
+                    .onFields("vacancy.title")
+                    .boostedTo(100)
                     .matching(searchTerm).createQuery();
-            combinedQuery = combinedQuery.must(fuzzyQuery);
+
+            Query descriptionQuery = qb.keyword().fuzzy()
+                    .withEditDistanceUpTo(1)
+                    .withPrefixLength(1)
+                    .onFields("vacancy.description", "vacancy.shortDescription")
+                    .matching(searchTerm).createQuery();
+
+            Query keywordQuery = qb.bool()
+                    .should(titleQuery)
+                    .should(descriptionQuery)
+                    .createQuery();
+
+            combinedQuery = combinedQuery.must(keywordQuery);
         }
 
         Query minQuery = qb
@@ -157,7 +170,7 @@ public class HibernateSearchService {
 //                    .createQuery();
 //        }
 
-        System.out.println("luceneQuery=" + combinedQuery);
+        System.out.println("luceneQuery=" + combinedQuery.toString());
 
         javax.persistence.Query jpaQuery = fullTextEntityManager.createFullTextQuery(
                 combinedQuery.createQuery(), VacancyLocation.class);
