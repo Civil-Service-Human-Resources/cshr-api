@@ -28,13 +28,52 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
+import org.apache.lucene.analysis.core.StopFilterFactory;
+import org.apache.lucene.analysis.standard.StandardFilterFactory;
+import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
+import org.apache.lucene.analysis.synonym.SynonymFilterFactory;
 import org.hibernate.search.annotations.Analyze;
+import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.AnalyzerDef;
+import org.hibernate.search.annotations.AnalyzerDefs;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.EncodingType;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Parameter;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
+import org.hibernate.search.annotations.TokenFilterDef;
+import org.hibernate.search.annotations.TokenizerDef;
+
+@AnalyzerDefs({
+    @AnalyzerDef(name = "standardanalyzer1",
+            tokenizer
+            = @TokenizerDef(factory = StandardTokenizerFactory.class),
+            filters = {
+                @TokenFilterDef(factory = StandardFilterFactory.class)
+                ,
+       @TokenFilterDef(factory = LowerCaseFilterFactory.class)
+                ,
+       @TokenFilterDef(factory = StopFilterFactory.class)})
+    ,
+
+    @AnalyzerDef(name = "synonymn",
+            tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+            filters = {
+                @TokenFilterDef(factory = SynonymFilterFactory.class, params = {
+            @Parameter(name = "synonyms", value = "synonyms.txt")
+            ,
+                    @Parameter(name = "ignoreCase", value = "true")
+        })
+                ,
+                @TokenFilterDef(factory = LowerCaseFilterFactory.class)
+                ,
+                @TokenFilterDef(factory = StopFilterFactory.class)})
+})
+// synonyms="synonyms.txt" ignoreCase="true"
 
 @Entity
 @Indexed
@@ -46,6 +85,8 @@ import org.hibernate.search.annotations.Store;
 @SequenceGenerator(name = "vacancies_id_seq", sequenceName = "vacancies_id_seq", allocationSize = 1)
 public class Vacancy implements Serializable {
 
+//    org.apache.lucene.analysis.LowerCaseFilter f;
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -56,7 +97,11 @@ public class Vacancy implements Serializable {
     @NonNull
     private Long identifier;
 
-    @Field(store = Store.YES)
+    @Fields({
+        @Field(name = "title", store = Store.YES, analyzer = @Analyzer(definition = "synonymn"))
+        ,
+        @Field(name = "titleTla", store = Store.YES)
+    })
     @NonNull
     private String title;
 

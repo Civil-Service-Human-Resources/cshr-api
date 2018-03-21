@@ -1,7 +1,6 @@
 package uk.gov.cshr.vcm.service;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import javax.inject.Inject;
@@ -20,13 +19,12 @@ import uk.gov.cshr.vcm.model.VacancySearchParameters;
 
 @Service
 public class SearchService {
+
     private static final Logger log = LoggerFactory.getLogger(SearchService.class);
 
     @Inject
     private LocationService locationService;
 
-//    @Resource
-//    private VacancyRepository vacancyRepository;
     @Inject
     private HibernateSearchService hibernateSearchService;
 
@@ -34,21 +32,34 @@ public class SearchService {
             throws LocationServiceException, IOException {
 		
         debug("staring search()");
-        Coordinates coordinates = locationService.find(vacancySearchParameters.getLocation().getPlace());
 
-        Page<VacancyLocation> vacancyLocations;
+//        if (coordinatesExist(coordinates)) {
+//            debug("Coordinates for %s with radius of %d exist", vacancySearchParameters.getLocation().getPlace(), vacancySearchParameters.getLocation().getRadius());
+//            SearchParameters searchParameters = SearchParameters.builder()
+//                    .vacancySearchParameters(vacancySearchParameters)
+//                    .coordinates(coordinates)
+//                    .build();
+//            vacancyLocations = hibernateSearchService.search(searchParameters, pageable);
+//        }
+//        else {
+//            debug("No Coordinates for %s with radius of %d exist", vacancySearchParameters.getLocation().getPlace(), vacancySearchParameters.getLocation().getRadius());
+//            vacancyLocations = new PageImpl<>(new ArrayList<>());
+//        }
+        SearchParameters searchParameters = SearchParameters.builder()
+                .vacancySearchParameters(vacancySearchParameters)
+                .build();
 
-        if (coordinatesExist(coordinates)) {
-            debug("Coordinates for %s with radius of %d exist", vacancySearchParameters.getLocation().getPlace(), vacancySearchParameters.getLocation().getRadius());
-            SearchParameters searchParameters = SearchParameters.builder()
-                    .vacancySearchParameters(vacancySearchParameters)
-                    .coordinates(coordinates)
-                    .build();
-            vacancyLocations = hibernateSearchService.search(searchParameters, pageable);
-        } else {
-            debug("No Coordinates for %s with radius of %d exist", vacancySearchParameters.getLocation().getPlace(), vacancySearchParameters.getLocation().getRadius());
-            vacancyLocations = new PageImpl<>(new ArrayList<>());
+        if (vacancySearchParameters.getLocation() != null) {
+            Coordinates coordinates = locationService.find(vacancySearchParameters.getLocation().getPlace());
+            if (coordinatesExist(coordinates)) {
+                searchParameters.setCoordinates(coordinates);
+            }
+            else {
+                debug("No Coordinates for %s with radius of %d exist", vacancySearchParameters.getLocation().getPlace(), vacancySearchParameters.getLocation().getRadius());
+            }
         }
+
+        Page<VacancyLocation> vacancyLocations = hibernateSearchService.search(searchParameters, pageable);
 
         HashSet<Vacancy> vacanciesSet = new HashSet<>();
         for (VacancyLocation vacancyLocation : vacancyLocations.getContent()) {

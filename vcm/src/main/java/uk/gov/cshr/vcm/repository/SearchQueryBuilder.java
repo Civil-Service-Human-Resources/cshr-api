@@ -35,25 +35,25 @@ public class SearchQueryBuilder {
             query.append(" OR (regions ILIKE :region))");
         }
 
-        if (BooleanUtils.isFalse(searchParameters.getOverseasJob())) {
+        if (BooleanUtils.isFalse(searchParameters.getVacancySearchParameters().getOverseasJob())) {
             query.append(" AND (overseasjob != true or overseasjob is null )");
         }
 
         query.append(" AND closing_date > current_timestamp");
 
-        if (StringUtils.isNotBlank(searchParameters.getKeyword())) {
+        if (StringUtils.isNotBlank(searchParameters.getVacancySearchParameters().getKeyword())) {
             query.append(" AND CONCAT(title, ' ', description) ILIKE :keyword");
         }
 
-        if (searchParameters.getDepartment() != null && searchParameters.getDepartment().length > 0) {
-            query.append(buildDepartmentClause(searchParameters.getDepartment()));
+        if (searchParameters.getVacancySearchParameters().getDepartment() != null && searchParameters.getVacancySearchParameters().getDepartment().length > 0) {
+            query.append(buildDepartmentClause(searchParameters.getVacancySearchParameters().getDepartment()));
         }
 
-        if (searchParameters.getSalaryMin() != null) {
+        if (searchParameters.getVacancySearchParameters().getMinSalary() != null) {
             query.append(" AND coalesce(salary_max, salary_min) >= :salary_min");
         }
 
-        if (searchParameters.getSalaryMax() != null) {
+        if (searchParameters.getVacancySearchParameters().getMaxSalary() != null) {
             query.append(" AND salary_min <= :salary_max");
         }
 

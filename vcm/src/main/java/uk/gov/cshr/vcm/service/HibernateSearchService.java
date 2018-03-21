@@ -8,6 +8,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
@@ -56,28 +57,79 @@ public class HibernateSearchService {
     @Transactional
     public Page<VacancyLocation> search(SearchParameters searchParameters, Pageable pageable) throws LocationServiceException, IOException {
 
-        String searchTerm = searchParameters.getKeyword();
-        Integer minSalary = searchParameters.getSalaryMin();
-        if (minSalary == null) {
-            minSalary = 0;
-        }
-        Integer maxSalary = searchParameters.getSalaryMax();
-        if (maxSalary == null) {
-            maxSalary = Integer.MAX_VALUE;
-        }
-
         FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
         QueryBuilder qb = fullTextEntityManager.getSearchFactory().buildQueryBuilder().forEntity(VacancyLocation.class).get();
 
         BooleanJunction combinedQuery = qb.bool();
 
+        combinedQuery = searchTermQuery(searchParameters.getVacancySearchParameters().getKeyword(), qb, combinedQuery);
+
+        combinedQuery = addSalaryQuery(searchParameters, qb, combinedQuery);
+
+        combinedQuery = addOpenClosedQuery(qb, combinedQuery);
+
+        if (BooleanUtils.isTrue(searchParameters.getVacancySearchParameters().getOverseasJob())) {
+
+            Query overseasQuery = qb.keyword().onField("vacancy.overseasJob")
+                    .matching("true").createQuery();
+            combinedQuery = combinedQuery.should(overseasQuery);
+
+        }
+        else {
+
+            if (searchParameters.getVacancySearchParameters().getLocation() != null) {
+
+                Query spatialQuery = qb
+                        .spatial()
+                        .within(searchParameters.getVacancySearchParameters().getLocation().getRadius(), Unit.KM)
+                        .ofLatitude(searchParameters.getCoordinates().getLatitude())
+                        .andLongitude(searchParameters.getCoordinates().getLongitude())
+                        .createQuery();
+
+                Query regionQuery = qb.phrase()
+                        .onField("vacancy.regions")
+                        .sentence(searchParameters.getCoordinates().getRegion())
+                        .createQuery();
+
+                combinedQuery = combinedQuery.must(spatialQuery).should(regionQuery);
+            }
+        }
+        
+
+        System.out.println("luceneQuery=" + combinedQuery.createQuery());
+
+        javax.persistence.Query jpaQuery = fullTextEntityManager.createFullTextQuery(
+                combinedQuery.createQuery(), VacancyLocation.class);
+
+        // execute search
+        try {
+            List<VacancyLocation> results = jpaQuery.getResultList();
+            PageImpl<VacancyLocation> page = new PageImpl<>(results, pageable, 1);
+//            page.
+
+            return page;
+        }
+        catch (NoResultException nre) {
+            return new PageImpl<>(new ArrayList<>());
+
+        }
+    }
+
+    private BooleanJunction searchTermQuery(String searchTerm, QueryBuilder qb, BooleanJunction combinedQuery) {
         if (searchTerm != null && !searchTerm.isEmpty()) {
+
             Query titleQuery = qb.keyword().fuzzy()
                     .withEditDistanceUpTo(1)
                     .withPrefixLength(1)
                     .onFields("vacancy.title")
-                    .boostedTo(100)
+                    .boostedTo(1)
                     .matching(searchTerm).createQuery();
+
+            Query titlePhraseQuery = qb.phrase()
+                    .onField("vacancy.title")
+                    .boostedTo(1)
+                    .sentence(searchTerm)
+                    .createQuery();
 
             Query descriptionQuery = qb.keyword().fuzzy()
                     .withEditDistanceUpTo(1)
@@ -88,9 +140,23 @@ public class HibernateSearchService {
             Query keywordQuery = qb.bool()
                     .should(titleQuery)
                     .should(descriptionQuery)
+                    .should(titlePhraseQuery)
                     .createQuery();
 
             combinedQuery = combinedQuery.must(keywordQuery);
+        }
+        return combinedQuery;
+    }
+
+    private BooleanJunction addSalaryQuery(SearchParameters searchParameters, QueryBuilder qb, BooleanJunction combinedQuery) {
+
+        Integer minSalary = searchParameters.getVacancySearchParameters().getMinSalary();
+        if (minSalary == null) {
+            minSalary = 0;
+        }
+        Integer maxSalary = searchParameters.getVacancySearchParameters().getMaxSalary();
+        if (maxSalary == null) {
+            maxSalary = Integer.MAX_VALUE;
         }
 
         Query minQuery = qb
@@ -111,7 +177,10 @@ public class HibernateSearchService {
                 .must(maxQuery)
                 .createQuery();
 
-        System.out.println("salaryQuery=" + salaryQuery);
+        return combinedQuery.must(salaryQuery);
+    }
+
+    private BooleanJunction addOpenClosedQuery(QueryBuilder qb, BooleanJunction combinedQuery) {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmm");
 
@@ -122,7 +191,6 @@ public class HibernateSearchService {
                 .above(sdf.format(new Date()))
                 .excludeLimit()
                 .createQuery();
-
         Query openQuery = qb
                 .range()
                 .onField("vacancy.publicOpeningDate")
@@ -130,62 +198,8 @@ public class HibernateSearchService {
                 .below(sdf.format(new Date()))
                 .excludeLimit()
                 .createQuery();
-
         Query openClosedQuery = qb.bool().must(openQuery).must(closedQuery).createQuery();
-
-        Query spatialQuery = qb
-                .spatial()
-                .within(searchParameters.getRadius(), Unit.KM)
-                .ofLatitude(searchParameters.getLatitude())
-                .andLongitude(searchParameters.getLongitude())
-                .createQuery();
-
-        Query regionQuery = qb.phrase()
-                .onField("vacancy.regions")
-                .sentence(searchParameters.getCoordinates().getRegion())
-                .createQuery();
-
-        Query spatialRegion = qb.bool().should(spatialQuery).should(regionQuery).createQuery();
-
-        if (searchParameters.getOverseasJob() != null && searchParameters.getOverseasJob()) {
-
-            Query overseasQuery = qb.keyword().onField("vacancy.overseasJob")
-                    .matching("true").createQuery();
-
-            spatialRegion = qb.bool()
-                    .should(spatialRegion)
-                    .should(overseasQuery)
-                    .createQuery();
-        }
-
-        combinedQuery = combinedQuery
-                .must(spatialRegion)
-                .must(openClosedQuery)
-                .must(salaryQuery);
-
-//        if (fuzzyQuery != null) {
-//            combinedQuery = qb.bool()
-//                    .should(combinedQuery)
-//                    .must(fuzzyQuery)
-//                    .createQuery();
-//        }
-
-        System.out.println("luceneQuery=" + combinedQuery.toString());
-
-        javax.persistence.Query jpaQuery = fullTextEntityManager.createFullTextQuery(
-                combinedQuery.createQuery(), VacancyLocation.class);
-
-        // execute search
-        try {
-            List<VacancyLocation> results = jpaQuery.getResultList();
-            PageImpl<VacancyLocation> page = new PageImpl<>(results, pageable, 1);
-//            page.
-
-            return page;
-        }
-        catch (NoResultException nre) {
-            return new PageImpl<>(new ArrayList<>());
-
-        }
+        combinedQuery = combinedQuery.must(openClosedQuery);
+        return combinedQuery;
     }
 }

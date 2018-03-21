@@ -12,7 +12,7 @@ spring:
             search:
                 default:
                     directory_provider: filesystem
-                    indexBase: target/indexpath
+                    indexBase: target/testindexpath
   location:
     service:
       url: http://location-service.dev.cshr-gov.uk/findlocation/{searchTerm} # will be overridden by an env variable
