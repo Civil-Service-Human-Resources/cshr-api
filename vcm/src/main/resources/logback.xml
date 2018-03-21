@@ -21,7 +21,7 @@
 	</appender>
 
 	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<File>target/logs/logFile.log</File>
+		<File>/cshr/logFile.log</File>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<FileNamePattern>
 				logFile.%d{yyyy-MM-dd_HH-mm}.log.zip
