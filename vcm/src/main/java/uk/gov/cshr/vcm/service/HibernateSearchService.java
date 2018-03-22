@@ -10,6 +10,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
@@ -63,7 +64,7 @@ public class HibernateSearchService {
 
         BooleanJunction combinedQuery = qb.bool();
 
-        combinedQuery = searchTermQuery(searchParameters.getVacancySearchParameters().getKeyword(), qb, combinedQuery);
+        Query searchtermQuery = searchTermQuery(searchParameters.getVacancySearchParameters().getKeyword(), qb);
 
         combinedQuery = addSalaryQuery(searchParameters, qb, combinedQuery);
 
@@ -98,7 +99,7 @@ public class HibernateSearchService {
                 Query overseasQuery = qb.keyword().onField("vacancy.overseasJob")
                         .matching("true").createQuery();
 
-                boolean includeOverseasJobs = searchParameters.getVacancySearchParameters().getOverseasJob();
+                boolean includeOverseasJobs = BooleanUtils.isTrue(searchParameters.getVacancySearchParameters().getOverseasJob());
 
                 if (!includeOverseasJobs) {
 
@@ -113,12 +114,15 @@ public class HibernateSearchService {
                 }
             }
         }
-        
 
-        System.out.println("luceneQuery=" + combinedQuery.createQuery());
+//        Query finalQuery = qb.bool().must(combinedQuery.createQuery()).must(searchtermQuery).createQuery();
+        Query finalQuery = qb.bool().must(searchtermQuery).must(combinedQuery.createQuery()).createQuery();
+
+        System.out.println("luceneQuery=" + finalQuery);
+        System.out.println("test");
 
         javax.persistence.Query jpaQuery = fullTextEntityManager.createFullTextQuery(
-                combinedQuery.createQuery(), VacancyLocation.class).setProjection("vacancyid");
+                finalQuery, VacancyLocation.class).setProjection("vacancyid");
 
         // execute search
         try {
@@ -140,7 +144,14 @@ public class HibernateSearchService {
                 idList = Arrays.asList(uniqueVacancyIDs.toArray());
             }
             else {
-                idList = Arrays.asList(uniqueVacancyIDs.toArray()).subList(pageNumber * pageSize, pageNumber * pageSize + pageSize);
+
+                int max = pageNumber * pageSize + pageSize;
+
+                if (max > uniqueVacancyIDs.size()) {
+                    max = uniqueVacancyIDs.size();
+                }
+
+                idList = Arrays.asList(uniqueVacancyIDs.toArray()).subList(pageNumber * pageSize, max);
             }
 
 //            Session session = entityManager.unwrap(Session.class);
@@ -172,20 +183,22 @@ public class HibernateSearchService {
         }
     }
 
-    private BooleanJunction searchTermQuery(String searchTerm, QueryBuilder qb, BooleanJunction combinedQuery) {
+    private Query searchTermQuery(String searchTerm, QueryBuilder qb) {
+
         if (searchTerm != null && !searchTerm.isEmpty()) {
 
 
-            Query titleQuery = qb.keyword().fuzzy()
+            Query titleFuzzyQuery = qb.keyword().fuzzy()
                     .withEditDistanceUpTo(1)
                     .withPrefixLength(1)
                     .onField("vacancy.title")
-                    .boostedTo(5f)
+                    .boostedTo(100f)
                     .matching("\"" + searchTerm + "\"").createQuery();
 
             Query titlePhraseQuery = qb.phrase()
                     .onField("vacancy.titleOriginal")
-                    .boostedTo(10f).ignoreAnalyzer()
+                    .boostedTo(100f)
+                    .ignoreAnalyzer()
                     .sentence(searchTerm)
                     .createQuery();
 
@@ -193,17 +206,22 @@ public class HibernateSearchService {
                     .withEditDistanceUpTo(1)
                     .withPrefixLength(1)
                     .onFields("vacancy.description", "vacancy.shortDescription")
+                    .boostedTo(0.5f)
                     .matching(searchTerm).createQuery();
+
+            Query titleQuery = qb.bool()
+                    .should(titleFuzzyQuery)
+                    .should(titlePhraseQuery)
+                    .createQuery();
 
             Query keywordQuery = qb.bool()
                     .should(titleQuery)
                     .should(descriptionQuery)
-                    .should(titlePhraseQuery)
                     .createQuery();
 
-            combinedQuery = combinedQuery.must(keywordQuery);
+            return keywordQuery;
         }
-        return combinedQuery;
+        return null;
     }
 
     private BooleanJunction addSalaryQuery(SearchParameters searchParameters, QueryBuilder qb, BooleanJunction combinedQuery) {
