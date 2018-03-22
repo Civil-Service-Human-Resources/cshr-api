@@ -1,13 +1,10 @@
 package uk.gov.cshr.vcm.service;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
@@ -59,20 +56,14 @@ public class SearchService {
             }
         }
 
-        Page<VacancyLocation> vacancyLocations = hibernateSearchService.search(searchParameters, pageable);
+        Page<Vacancy> vacancies = hibernateSearchService.search(searchParameters, pageable);
 
-        HashSet<Vacancy> vacanciesSet = new HashSet<>();
-        for (VacancyLocation vacancyLocation : vacancyLocations.getContent()) {
-            vacanciesSet.add(vacancyLocation.getVacancy());
+        for (Vacancy vacancy : vacancies.getContent()) {
+            System.out.println("Vacancy=" + vacancy.getTitle());
+            for (VacancyLocation vacancyLocation : vacancy.getVacancyLocations()) {
+                System.out.println("\t" + vacancyLocation.getLocation() + ": " + vacancyLocation.getLatitude() + "," + vacancyLocation.getLongitude());
+            }
         }
-
-        PageImpl vacancies = new PageImpl<>(Arrays.asList(vacanciesSet.toArray()), pageable, 1);
-
-//        Page<Vacancy> vacancies = new PageImpl<>(new ArrayList<>());
-//
-//        for (Vacancy vacancy : vacanciesSet) {
-//            vacancies.getContent().add(vacancy);
-//        }
 
         return vacancies;
     }

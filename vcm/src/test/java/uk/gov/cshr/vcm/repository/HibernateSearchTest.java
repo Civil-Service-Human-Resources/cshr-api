@@ -37,7 +37,6 @@ import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.model.Location;
 import uk.gov.cshr.vcm.model.SearchParameters;
 import uk.gov.cshr.vcm.model.Vacancy;
-import uk.gov.cshr.vcm.model.VacancyLocation;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
 import uk.gov.cshr.vcm.service.HibernateSearchService;
 import uk.gov.cshr.vcm.service.LocationService;
@@ -192,7 +191,7 @@ public class HibernateSearchTest extends AbstractTestNGSpringContextTests {
                 .coordinates(coordinates)
                 .build();
 
-        Page<VacancyLocation> results = hibernateSearchService.search(searchParameters, null);
+        Page<Vacancy> results = hibernateSearchService.search(searchParameters, null);
         Assert.assertEquals(3, results.getContent().size());
 //        Assert.assertEquals(vacancy.getId(), results.getContent().get(0).getId());
     }

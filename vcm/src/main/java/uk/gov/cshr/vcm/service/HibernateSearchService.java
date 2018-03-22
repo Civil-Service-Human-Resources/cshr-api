@@ -3,12 +3,13 @@ package uk.gov.cshr.vcm.service;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
@@ -55,7 +56,7 @@ public class HibernateSearchService {
     }
 
     @Transactional
-    public Page<VacancyLocation> search(SearchParameters searchParameters, Pageable pageable) throws LocationServiceException, IOException {
+    public Page<Vacancy> search(SearchParameters searchParameters, Pageable pageable) throws LocationServiceException, IOException {
 
         FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
         QueryBuilder qb = fullTextEntityManager.getSearchFactory().buildQueryBuilder().forEntity(VacancyLocation.class).get();
@@ -68,14 +69,15 @@ public class HibernateSearchService {
 
         combinedQuery = addOpenClosedQuery(qb, combinedQuery);
 
-        if (BooleanUtils.isTrue(searchParameters.getVacancySearchParameters().getOverseasJob())) {
-
-            Query overseasQuery = qb.keyword().onField("vacancy.overseasJob")
-                    .matching("true").createQuery();
-            combinedQuery = combinedQuery.should(overseasQuery);
-
-        }
-        else {
+//        if (BooleanUtils.isTrue(searchParameters.getVacancySearchParameters().getOverseasJob())) {
+//
+//            Query overseasQuery = qb.keyword().onField("vacancy.overseasJob")
+//                    .matching("true").createQuery();
+//            combinedQuery = combinedQuery.should(overseasQuery);
+//
+//        }
+//        else
+        {
 
             if (searchParameters.getVacancySearchParameters().getLocation() != null) {
 
@@ -91,7 +93,24 @@ public class HibernateSearchService {
                         .sentence(searchParameters.getCoordinates().getRegion())
                         .createQuery();
 
-                combinedQuery = combinedQuery.must(spatialQuery).should(regionQuery);
+                Query regionSpatialQuery = qb.bool().should(spatialQuery).should(regionQuery).createQuery();
+
+                Query overseasQuery = qb.keyword().onField("vacancy.overseasJob")
+                        .matching("true").createQuery();
+
+                boolean includeOverseasJobs = searchParameters.getVacancySearchParameters().getOverseasJob();
+
+                if (!includeOverseasJobs) {
+
+                    combinedQuery = combinedQuery.must(regionSpatialQuery);
+//                    combinedQuery = combinedQuery;
+                }
+                else {
+
+                    Query regionSpatialOverseas = qb.bool().should(regionSpatialQuery).should(overseasQuery).createQuery();
+                    combinedQuery = combinedQuery.must(regionSpatialOverseas);
+
+                }
             }
         }
         
@@ -99,15 +118,53 @@ public class HibernateSearchService {
         System.out.println("luceneQuery=" + combinedQuery.createQuery());
 
         javax.persistence.Query jpaQuery = fullTextEntityManager.createFullTextQuery(
-                combinedQuery.createQuery(), VacancyLocation.class);
+                combinedQuery.createQuery(), VacancyLocation.class).setProjection("vacancyid");
 
         // execute search
         try {
-            List<VacancyLocation> results = jpaQuery.getResultList();
-            PageImpl<VacancyLocation> page = new PageImpl<>(results, pageable, 1);
+            List<Object[]> vacancyIDs = jpaQuery.getResultList();
+
+            LinkedHashSet<Long> uniqueVacancyIDs = new LinkedHashSet<>();
+
+            for (Object[] vacancyID : vacancyIDs) {
+                uniqueVacancyIDs.add((Long) vacancyID[0]);
+            }
+
+            int pageSize = pageable.getPageSize();
+            int offSet = pageable.getOffset();
+            int pageNumber = pageable.getPageNumber();
+
+            List idList;
+
+            if (uniqueVacancyIDs.size() < pageSize) {
+                idList = Arrays.asList(uniqueVacancyIDs.toArray());
+            }
+            else {
+                idList = Arrays.asList(uniqueVacancyIDs.toArray()).subList(pageNumber * pageSize, pageNumber * pageSize + pageSize);
+            }
+
+//            Session session = entityManager.unwrap(Session.class);
+//            Session session = entityManager.unwrap(Session.class);
+//            SessionFactory sessionFactory = session.getSessionFactory();
+//            Session session = Search.getFullTextEntityManager(entityManager).unwrap(Session.class);
+//
+//            MultiIdentifierLoadAccess<Vacancy> multiLoadAccess = session.byMultipleIds(Vacancy.class);
+//            List<Vacancy> vacancies = multiLoadAccess.multiLoad(idList);
+            if (idList.isEmpty()) {
+                return new PageImpl<>(new ArrayList<>());
+            }
+            else {
+                List<Vacancy> vacancies = entityManager
+                        .createQuery("SELECT v FROM Vacancy v WHERE v.id IN (:ids)")
+                        .setParameter("ids", idList)
+                        .getResultList();
+
+                PageImpl<Vacancy> page = new PageImpl<>(vacancies, pageable, uniqueVacancyIDs.size());
 //            page.
 
-            return page;
+                return page;
+            }
+
         }
         catch (NoResultException nre) {
             return new PageImpl<>(new ArrayList<>());
@@ -118,16 +175,17 @@ public class HibernateSearchService {
     private BooleanJunction searchTermQuery(String searchTerm, QueryBuilder qb, BooleanJunction combinedQuery) {
         if (searchTerm != null && !searchTerm.isEmpty()) {
 
+
             Query titleQuery = qb.keyword().fuzzy()
                     .withEditDistanceUpTo(1)
                     .withPrefixLength(1)
-                    .onFields("vacancy.title")
-                    .boostedTo(1)
-                    .matching(searchTerm).createQuery();
+                    .onField("vacancy.title")
+                    .boostedTo(5f)
+                    .matching("\"" + searchTerm + "\"").createQuery();
 
             Query titlePhraseQuery = qb.phrase()
-                    .onField("vacancy.title")
-                    .boostedTo(1)
+                    .onField("vacancy.titleOriginal")
+                    .boostedTo(10f).ignoreAnalyzer()
                     .sentence(searchTerm)
                     .createQuery();
 

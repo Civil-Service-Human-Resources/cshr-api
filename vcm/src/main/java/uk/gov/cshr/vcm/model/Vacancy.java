@@ -100,7 +100,7 @@ public class Vacancy implements Serializable {
     @Fields({
         @Field(name = "title", store = Store.YES, analyzer = @Analyzer(definition = "synonymn"))
         ,
-        @Field(name = "titleTla", store = Store.YES)
+        @Field(name = "titleOriginal", store = Store.YES, analyze = Analyze.NO)
     })
     @NonNull
     private String title;
@@ -195,7 +195,7 @@ public class Vacancy implements Serializable {
     @Column(name = "regions")
     private String regions;
 
-    @Field(store = Store.YES)
+    @Field(store = Store.YES, indexNullAs = "false")
     @Column(name = "overseasjob")
     private Boolean overseasJob;
 

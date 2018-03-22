@@ -175,15 +175,15 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         Assert.assertEquals("Newcastle Job", resultsList.get(0).getTitle());
 
-        Vacancy bristolVacancy = createVacancyPrototype(newcastleLocation);
-        newcastleVacancy.setTitle("Bristol Job");
+        Vacancy bristolVacancy = createVacancyPrototype(bristolLocation);
+        bristolVacancy.setTitle("Bristol Job");
         saveVacancy(bristolVacancy);
 
         result = findVancanciesByKeyword("newcastle");
         resultsList = result.getContent();
 
         Assert.assertEquals("Newcastle Job", resultsList.get(0).getTitle());
-        Assert.assertEquals("1", resultsList.size());
+        Assert.assertEquals("1", 1, resultsList.size());
     }
 
     @Test
@@ -211,7 +211,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void testFindRegionalVacanciesBristol() throws Exception {
+    public void testFilterBristolVacancies() throws Exception {
 
         given(locationService.find("bristol"))
                 .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
@@ -224,7 +224,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         List<Vacancy> resultsList = result.getContent();
 
         Assert.assertTrue("Expected results", !resultsList.isEmpty());
-        Assert.assertTrue("Expected number results", resultsList.size() == 1);
+        Assert.assertEquals("Expected number results", 1, resultsList.size());
     }
 
     @Test
@@ -239,7 +239,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         Page<Vacancy> result = findVancanciesInPlace("newcastle");
         List<Vacancy> resultsList = result.getContent();
 
-        Assert.assertTrue("Expected results 2", resultsList.size() == 2);
+        Assert.assertEquals("Expected results 2", 2, resultsList.size());
     }
 
     @Test
@@ -414,6 +414,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
                 .keyword("SearchQueryDescription")
+                .overseasJob(Boolean.TRUE)
                 .location(new Location(place, 30))
                 .build();
 
@@ -492,6 +493,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .numberVacancies(1)
                 .identifier(System.currentTimeMillis())
                 .salaryOverrideDescription("This is the salary override description")
+                .overseasJob(Boolean.FALSE)
                 .build();
 
         vacancyLocation.setVacancy(vacancy);
