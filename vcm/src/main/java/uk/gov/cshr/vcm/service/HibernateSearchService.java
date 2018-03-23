@@ -109,14 +109,33 @@ public class HibernateSearchService {
                 else {
 
                     Query regionSpatialOverseas = qb.bool().should(regionSpatialQuery).should(overseasQuery).createQuery();
-                    combinedQuery = combinedQuery.must(regionSpatialOverseas);
+                    combinedQuery = combinedQuery.must(regionSpatialOverseas).boostedTo(01.f);
 
                 }
             }
         }
 
 //        Query finalQuery = qb.bool().must(combinedQuery.createQuery()).must(searchtermQuery).createQuery();
-        Query finalQuery = qb.bool().must(searchtermQuery).must(combinedQuery.createQuery()).createQuery();
+        Query finalQuery = qb.bool()
+                .must(searchtermQuery).boostedTo(2f)
+                .must(combinedQuery.createQuery()).boostedTo(01.f)
+                .createQuery();
+
+        if (searchParameters.getVacancySearchParameters().getDepartment().length > 0) {
+
+            StringBuilder stringBuilder = new StringBuilder();
+
+            for (String string : searchParameters.getVacancySearchParameters().getDepartment()) {
+                stringBuilder.append(string).append(" ");
+            }
+
+            Query departmentQuery = qb.keyword()
+                    .onField("vacancy.departmentID")
+                    .matching(stringBuilder.toString())
+                    .createQuery();
+
+            finalQuery = qb.bool().must(finalQuery).must(departmentQuery).createQuery();
+        }
 
         System.out.println("luceneQuery=" + finalQuery);
         System.out.println("test");
@@ -192,36 +211,31 @@ public class HibernateSearchService {
                     .withEditDistanceUpTo(1)
                     .withPrefixLength(1)
                     .onField("vacancy.title")
-                    .boostedTo(100f)
-                    .matching("\"" + searchTerm + "\"").createQuery();
-
-            Query titlePhraseQuery = qb.phrase()
-                    .onField("vacancy.titleOriginal")
-                    .boostedTo(100f)
-                    .ignoreAnalyzer()
-                    .sentence(searchTerm)
-                    .createQuery();
-
-            Query descriptionQuery = qb.keyword().fuzzy()
-                    .withEditDistanceUpTo(1)
-                    .withPrefixLength(1)
-                    .onFields("vacancy.description", "vacancy.shortDescription")
-                    .boostedTo(0.5f)
+                    .boostedTo(2f)
                     .matching(searchTerm).createQuery();
 
-            Query titleQuery = qb.bool()
-                    .should(titleFuzzyQuery)
-                    .should(titlePhraseQuery)
+//            Query titlePhraseQuery = qb.phrase()
+//                    .onField("vacancy.titleOriginal")
+//                    //                    .boostedTo(2f)
+//                    .ignoreAnalyzer()
+//                    .sentence(searchTerm)
+//                    .createQuery();
+
+            Query descriptionQuery = qb.keyword().fuzzy()
+                    .withEditDistanceUpTo(1).boostedTo(0.1f)
+                    .withPrefixLength(0)
+                    .onFields("vacancy.description", "vacancy.shortDescription")
+                    .matching(searchTerm)
                     .createQuery();
 
             Query keywordQuery = qb.bool()
-                    .should(titleQuery)
+                    .should(titleFuzzyQuery)
                     .should(descriptionQuery)
                     .createQuery();
 
             return keywordQuery;
         }
-        return null;
+        return qb.all().createQuery();
     }
 
     private BooleanJunction addSalaryQuery(SearchParameters searchParameters, QueryBuilder qb, BooleanJunction combinedQuery) {

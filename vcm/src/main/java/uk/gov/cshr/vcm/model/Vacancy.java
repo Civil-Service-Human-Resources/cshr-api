@@ -1,6 +1,7 @@
 package uk.gov.cshr.vcm.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -23,6 +24,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -175,6 +177,18 @@ public class Vacancy implements Serializable {
     @ManyToOne
     @JoinColumn(name = "dept_id")
     private Department department;
+
+    @Transient
+    @JsonIgnore
+    @Field(store = Store.YES, name = "departmentID")
+    public String getDepartmentID() {
+        if (department != null) {
+            return department.getId().toString();
+        }
+        else {
+            return null;
+        }
+    }
 
     @Column(name = "displaycsccontent")
     private Boolean displayCscContent;
