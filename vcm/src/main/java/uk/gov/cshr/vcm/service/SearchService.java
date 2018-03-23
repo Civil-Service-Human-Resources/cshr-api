@@ -11,7 +11,6 @@ import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
 import uk.gov.cshr.vcm.model.Coordinates;
 import uk.gov.cshr.vcm.model.SearchParameters;
 import uk.gov.cshr.vcm.model.Vacancy;
-import uk.gov.cshr.vcm.model.VacancyLocation;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
 
 @Service
@@ -57,14 +56,6 @@ public class SearchService {
         }
 
         Page<Vacancy> vacancies = hibernateSearchService.search(searchParameters, pageable);
-
-        for (Vacancy vacancy : vacancies.getContent()) {
-            System.out.println("Vacancy=" + vacancy.getTitle() + ":" + vacancy.getId());
-            for (VacancyLocation vacancyLocation : vacancy.getVacancyLocations()) {
-                System.out.println("\t" + vacancyLocation.getLocation() + ": " + vacancyLocation.getLatitude() + "," + vacancyLocation.getLongitude());
-            }
-        }
-
         return vacancies;
     }
 
