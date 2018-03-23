@@ -21,7 +21,3 @@ server:
 liquibase:
     enabled: true
     change-log: classpath:/changelog.xml
-security:
-    oauth2:
-        resource:
-            filter-order: 3

@@ -995,24 +995,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
     }
 
     private String getVacancyRequestBody() throws JsonProcessingException {
-//    private String requestBody = "{" +
-//            "\"identifier\":\"" + requestBodyVacancy.getIdentifier() + "\"," +
-//            "\"title\":\"" + requestBodyVacancy.getTitle() + "\"," +
-//            "\"description\":\"" + requestBodyVacancy.getDescription() + "\"," +
-// //            "\"location\":\"" + requestBodyVacancy.getLocation() + "\"," +
-//            "\"grade\":\"" + requestBodyVacancy.getGrade() + "\"," +
-//            "\"responsibilities\":\"" + requestBodyVacancy.getResponsibilities() + "\"," +
-//            "\"workingHours\":\"" + requestBodyVacancy.getWorkingHours() + "\"," +
-//            "\"closingDate\":\"" + ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()) + "\"," +
-//            "\"contactName\":\"" + requestBodyVacancy.getContactName() + "\"," +
-//            "\"contactDepartment\":\"" + requestBodyVacancy.getContactDepartment() + "\"," +
-//            "\"contactEmail\":\"" + requestBodyVacancy.getContactEmail() + "\"," +
-//            "\"contactTelephone\":\"" + requestBodyVacancy.getContactTelephone() + "\"," +
-//            "\"eligibility\":\"" + requestBodyVacancy.getEligibility() + "\"," +
-//            "\"salaryMin\":" + requestBodyVacancy.getSalaryMin() + "," +
-//            "\"salaryMax\":" + requestBodyVacancy.getSalaryMax() + "," +
-//            "\"numberVacancies\":" + requestBodyVacancy.getNumberVacancies() + "" +
-//            "}";
 
         VacancyLocation vacancyLocation = VacancyLocation.builder()
                 .latitude(BRISTOL_LATITUDE)
@@ -1041,9 +1023,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .build();
 
         vacancy.getVacancyLocations().add(vacancyLocation);
-
         ObjectMapper objectMapper = new ObjectMapper();
-
         return objectMapper.writeValueAsString(vacancy);
     }
 }
