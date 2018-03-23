@@ -102,8 +102,9 @@ public class Vacancy implements Serializable {
     @Fields({
         @Field(name = "title", store = Store.YES, analyzer = @Analyzer(definition = "synonymn"))
         ,
-        @Field(name = "titleOriginal", store = Store.YES, analyze = Analyze.NO)
+        @Field(name = "titleOriginal", store = Store.YES, analyze = Analyze.YES)
     })
+    @Field(store = Store.YES)
     @NonNull
     private String title;
 

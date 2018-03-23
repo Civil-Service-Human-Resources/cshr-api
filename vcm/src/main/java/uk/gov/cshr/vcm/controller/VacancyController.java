@@ -43,8 +43,10 @@ public class VacancyController {
     @ApiOperation(value = "Create a Vacancy", nickname = "create")
     public ResponseEntity<Vacancy> create(@RequestBody Vacancy vacancy) {
 
-        for (VacancyLocation vacancyLocation : vacancy.getVacancyLocations()) {
-            vacancyLocation.setVacancy(vacancy);
+        if (vacancy.getVacancyLocations() != null) {
+            vacancy.getVacancyLocations().forEach((vacancyLocation) -> {
+                vacancyLocation.setVacancy(vacancy);
+            });
         }
 
         Vacancy savedVacancy = vacancyRepository.save(vacancy);

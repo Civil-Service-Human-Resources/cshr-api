@@ -59,7 +59,7 @@ public class SearchService {
         Page<Vacancy> vacancies = hibernateSearchService.search(searchParameters, pageable);
 
         for (Vacancy vacancy : vacancies.getContent()) {
-            System.out.println("Vacancy=" + vacancy.getTitle());
+            System.out.println("Vacancy=" + vacancy.getTitle() + ":" + vacancy.getId());
             for (VacancyLocation vacancyLocation : vacancy.getVacancyLocations()) {
                 System.out.println("\t" + vacancyLocation.getLocation() + ": " + vacancyLocation.getLatitude() + "," + vacancyLocation.getLongitude());
             }
