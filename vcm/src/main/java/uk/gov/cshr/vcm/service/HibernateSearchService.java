@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.lucene.search.Query;
@@ -18,6 +17,8 @@ import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -31,6 +32,9 @@ import uk.gov.cshr.vcm.model.VacancyLocation;
 @Service
 public class HibernateSearchService {
 
+    private static final Logger log = LoggerFactory.getLogger(HibernateSearchService.class);
+    private static final double MILES_KM_MULTIPLIER = 1.609343502101154;
+
     @Autowired
     private final EntityManager entityManager;
 
@@ -40,15 +44,10 @@ public class HibernateSearchService {
         this.entityManager = entityManager;
     }
 
-    public void initializeHibernateSearch() {
+    public void initializeHibernateSearch() throws InterruptedException {
 
-        try {
-            FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
-            fullTextEntityManager.createIndexer().startAndWait();
-        }
-        catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
+        fullTextEntityManager.createIndexer().startAndWait();
     }
 
     public void purge() {
@@ -76,81 +75,56 @@ public class HibernateSearchService {
                 .must(departmentQuery)
                 .must(searchtermQuery);
 
+        log.debug("luceneQuery=" + everythingElse.createQuery().toString());
 
-        System.out.println("luceneQuery=" + everythingElse.createQuery().toString());
-        System.out.println("test");
-
+        // projection means we only return IDs from search, not hitting the database
         javax.persistence.Query jpaQuery = fullTextEntityManager.createFullTextQuery(
-                everythingElse.createQuery(), VacancyLocation.class).setProjection("vacancyid");
+                everythingElse.createQuery(), VacancyLocation.class)
+                .setProjection("vacancyid");
 
-//        FullTextQuery jpaQuery = fullTextEntityManager.createFullTextQuery(
-//                searchtermQuery, VacancyLocation.class).setProjection("vacancyid");
-//        jpaQuery.enableFullTextFilter("openFilter");
+        List<Object[]> vacancyIDs = jpaQuery.getResultList();
+        LinkedHashSet<Long> uniqueVacancyIDs = new LinkedHashSet<>();
 
-        // execute search
-        try {
-            List<Object[]> vacancyIDs = jpaQuery.getResultList();
+        // remove any duplicate results
+        vacancyIDs.forEach((vacancyID) -> {
+            uniqueVacancyIDs.add(Long.valueOf(vacancyID[0].toString()));
+        });
 
-            LinkedHashSet<Long> uniqueVacancyIDs = new LinkedHashSet<>();
+        int pageSize = pageable.getPageSize();
+        int offSet = pageable.getOffset();
+        int pageNumber = pageable.getPageNumber();
 
-            for (Object[] vacancyID : vacancyIDs) {
-                System.out.println("id=" + Long.valueOf(vacancyID[0].toString()));
-                uniqueVacancyIDs.add(Long.valueOf(vacancyID[0].toString()));
-            }
+        List idList;
 
-            int pageSize = pageable.getPageSize();
-            int offSet = pageable.getOffset();
-            int pageNumber = pageable.getPageNumber();
-
-            List idList;
-
-            if (uniqueVacancyIDs.size() < pageSize) {
-                idList = Arrays.asList(uniqueVacancyIDs.toArray());
-            }
-            else {
-
-                int max = pageNumber * pageSize + pageSize;
-
-                if (max > uniqueVacancyIDs.size()) {
-                    max = uniqueVacancyIDs.size();
-                }
-
-                idList = Arrays.asList(uniqueVacancyIDs.toArray()).subList(pageNumber * pageSize, max);
-            }
-
-//            Session session = entityManager.unwrap(Session.class);
-//            Session session = entityManager.unwrap(Session.class);
-//            SessionFactory sessionFactory = session.getSessionFactory();
-//            Session session = Search.getFullTextEntityManager(entityManager).unwrap(Session.class);
-//
-//            MultiIdentifierLoadAccess<Vacancy> multiLoadAccess = session.byMultipleIds(Vacancy.class);
-//            List<Vacancy> vacancies = multiLoadAccess.multiLoad(idList);
-            if (idList.isEmpty()) {
-                return new PageImpl<>(new ArrayList<>());
-            }
-            else {
-                List<Vacancy> vacancies = entityManager
-                        .createQuery("SELECT v FROM Vacancy v WHERE v.id IN (:ids)")
-                        .setParameter("ids", idList)
-                        .getResultList();
-
-//                Vacancy[] vacanciesSorted = new Vacancy[pageSize];
-//                for (Vacancy vacancy : vacancies) {
-//                    vacanciesSorted[idList.indexOf(vacancy.getId())] = vacancy;
-//                }
-
-                vacancies.sort(Comparator.comparingLong(item -> idList.indexOf(item.getId())));
-
-                PageImpl<Vacancy> page = new PageImpl<>(vacancies, pageable, uniqueVacancyIDs.size());
-//            page.
-
-                return page;
-            }
-
+        // limit resultset to page size
+        if (uniqueVacancyIDs.size() < pageSize) {
+            idList = Arrays.asList(uniqueVacancyIDs.toArray());
         }
-        catch (NoResultException nre) {
-            return new PageImpl<>(new ArrayList<>());
+        else {
 
+            int max = pageNumber * pageSize + pageSize;
+
+            if (max > uniqueVacancyIDs.size()) {
+                max = uniqueVacancyIDs.size();
+            }
+
+            idList = Arrays.asList(uniqueVacancyIDs.toArray()).subList(pageNumber * pageSize, max);
+        }
+
+        if (idList.isEmpty()) {
+            return new PageImpl<>(new ArrayList<>());
+        }
+        else {
+            List<Vacancy> vacancies = entityManager
+                    .createQuery("SELECT v FROM Vacancy v WHERE v.id IN (:ids)")
+                    .setParameter("ids", idList)
+                    .getResultList();
+
+            // rearange the db results to match the lucene relevance order
+            vacancies.sort(Comparator.comparingLong(item -> idList.indexOf(item.getId())));
+
+            PageImpl<Vacancy> page = new PageImpl<>(vacancies, pageable, uniqueVacancyIDs.size());
+            return page;
         }
     }
 
@@ -158,11 +132,13 @@ public class HibernateSearchService {
 
         if (searchParameters.getVacancySearchParameters().getLocation() != null) {
 
+            double kms = searchParameters.getVacancySearchParameters().getLocation().getRadius() * MILES_KM_MULTIPLIER;
+
             BooleanJunction locationQuery = qb.bool();
 
             Query spatialQuery = qb
                     .spatial().boostedTo(01.f)
-                    .within(searchParameters.getVacancySearchParameters().getLocation().getRadius(), Unit.KM)
+                    .within(kms, Unit.KM)
                     .ofLatitude(searchParameters.getCoordinates().getLatitude())
                     .andLongitude(searchParameters.getCoordinates().getLongitude())
                     .createQuery();
@@ -179,12 +155,12 @@ public class HibernateSearchService {
             Query overseasQuery = qb.keyword().onField("vacancy.overseasJob")
                     .matching("true").createQuery();
 
-            boolean includeOverseasJobs = BooleanUtils.isTrue(searchParameters.getVacancySearchParameters().getOverseasJob());
+            boolean includeOverseasJobs = BooleanUtils.isTrue(
+                    searchParameters.getVacancySearchParameters().getOverseasJob());
 
             if (!includeOverseasJobs) {
 
                 locationQuery.must(regionSpatialQuery);
-//                    combinedQuery = combinedQuery;
             }
             else {
 
@@ -203,7 +179,6 @@ public class HibernateSearchService {
     private Query getSearchTermQuery(String searchTerm, QueryBuilder qb) {
 
         if (searchTerm != null && !searchTerm.isEmpty()) {
-
 
             Query titleFuzzyQuery = qb.keyword().fuzzy()
                     .withEditDistanceUpTo(1)
@@ -259,7 +234,9 @@ public class HibernateSearchService {
 
             return keywordQuery;
         }
-        return qb.all().createQuery();
+        else {
+            return qb.all().createQuery();
+        }
     }
 
     private Query getSalaryQuery(SearchParameters searchParameters, QueryBuilder qb) {
@@ -305,6 +282,7 @@ public class HibernateSearchService {
                 .above(sdf.format(new Date()))
                 .excludeLimit()
                 .createQuery();
+
         Query openQuery = qb
                 .range()
                 .onField("vacancy.publicOpeningDate")
@@ -339,6 +317,5 @@ public class HibernateSearchService {
         else {
             return qb.all().createQuery();
         }
-
     }
 }

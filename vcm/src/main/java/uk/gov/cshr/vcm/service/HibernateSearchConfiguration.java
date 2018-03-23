@@ -14,7 +14,7 @@ public class HibernateSearchConfiguration {
     private EntityManager entityManager;
 
     @Bean
-    HibernateSearchService hibernateSearchService() {
+    HibernateSearchService hibernateSearchService() throws InterruptedException {
 
         HibernateSearchService hibernateSearchService = new HibernateSearchService(entityManager);
         hibernateSearchService.initializeHibernateSearch();

@@ -29,18 +29,6 @@ public class SearchService {
 		
         debug("staring search()");
 
-//        if (coordinatesExist(coordinates)) {
-//            debug("Coordinates for %s with radius of %d exist", vacancySearchParameters.getLocation().getPlace(), vacancySearchParameters.getLocation().getRadius());
-//            SearchParameters searchParameters = SearchParameters.builder()
-//                    .vacancySearchParameters(vacancySearchParameters)
-//                    .coordinates(coordinates)
-//                    .build();
-//            vacancyLocations = hibernateSearchService.search(searchParameters, pageable);
-//        }
-//        else {
-//            debug("No Coordinates for %s with radius of %d exist", vacancySearchParameters.getLocation().getPlace(), vacancySearchParameters.getLocation().getRadius());
-//            vacancyLocations = new PageImpl<>(new ArrayList<>());
-//        }
         SearchParameters searchParameters = SearchParameters.builder()
                 .vacancySearchParameters(vacancySearchParameters)
                 .build();
