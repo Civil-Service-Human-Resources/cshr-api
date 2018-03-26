@@ -356,6 +356,9 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
         
         Vacancy vacancy = getVacancyRequestBody();
         vacancy.setTitle("testUpdate");
+
+        vacancy.getVacancyLocations().get(0).setLocation("My New Location Name");
+        
         ObjectMapper objectMapper = new ObjectMapper();
 
         // Given
@@ -371,6 +374,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
         Optional<Vacancy> optionalVacancy = vacancyRepository.findById(vacancy1.getId());
 
         Assert.assertEquals("title", "testUpdate", optionalVacancy.get().getTitle());
+        Assert.assertEquals("location name", "My New Location Name", optionalVacancy.get().getVacancyLocations().get(0).getLocation());
     }
 
     @Test
