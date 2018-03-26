@@ -4,7 +4,6 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -26,12 +25,6 @@ public class VacancySearchParametersTest {
     @After
     public void tearDown() {
         location = null;
-    }
-
-    @Ignore // the backend handles no location now
-    @Test(expected = NullPointerException.class)
-    public void build_noLocationSupplied() {
-        VacancySearchParameters.builder().keyword(KEYWORD).build();
     }
 
     @Test
