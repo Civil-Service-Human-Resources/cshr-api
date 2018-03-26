@@ -24,7 +24,7 @@
 		<File>logs/logFile.log</File>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<FileNamePattern>
-				logFile.%d{yyyy-MM-dd_HH-mm}.log.zip
+				logs/logFile.%d{yyyy-MM-dd_HH-mm}.log.zip
 			</FileNamePattern>
 		</rollingPolicy>
 
