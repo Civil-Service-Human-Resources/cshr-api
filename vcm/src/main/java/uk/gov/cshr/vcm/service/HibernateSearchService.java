@@ -68,18 +68,18 @@ public class HibernateSearchService {
         Query departmentQuery = getDepartmentQuery(searchParameters, qb);
         Query locationQuery = getLocationQuery(searchParameters, qb);
 
-        BooleanJunction everythingElse = qb.bool()
+        BooleanJunction combinedQuery = qb.bool()
                 .must(locationQuery)
                 .must(salaryQuery)
                 .must(openClosed)
                 .must(departmentQuery)
                 .must(searchtermQuery);
 
-        log.debug("luceneQuery=" + everythingElse.createQuery().toString());
+        log.debug("luceneQuery=" + combinedQuery.createQuery().toString());
 
         // projection means we only return IDs from search, not hitting the database
         javax.persistence.Query jpaQuery = fullTextEntityManager.createFullTextQuery(
-                everythingElse.createQuery(), VacancyLocation.class)
+                combinedQuery.createQuery(), VacancyLocation.class)
                 .setProjection("vacancyid");
 
         List<Object[]> vacancyIDs = jpaQuery.getResultList();
@@ -120,7 +120,7 @@ public class HibernateSearchService {
                     .setParameter("ids", idList)
                     .getResultList();
 
-            // rearange the db results to match the lucene relevance order
+            // rearrange the db results to match the lucene relevance order
             vacancies.sort(Comparator.comparingLong(item -> idList.indexOf(item.getId())));
 
             PageImpl<Vacancy> page = new PageImpl<>(vacancies, pageable, uniqueVacancyIDs.size());
@@ -159,14 +159,11 @@ public class HibernateSearchService {
                     searchParameters.getVacancySearchParameters().getOverseasJob());
 
             if (!includeOverseasJobs) {
-
                 locationQuery.must(regionSpatialQuery);
             }
             else {
-
                 Query regionSpatialOverseas = qb.bool().should(regionSpatialQuery).should(overseasQuery).createQuery();
                 locationQuery.must(regionSpatialOverseas);
-
             }
 
             return locationQuery.createQuery();

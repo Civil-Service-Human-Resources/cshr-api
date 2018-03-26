@@ -200,6 +200,19 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     }
 
     @Test
+    public void testNoResults() throws Exception {
+
+        Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
+        newcastleVacancy.setTitle("Newcastle Job");
+        saveVacancy(newcastleVacancy);
+
+        Page<Vacancy> result = findVancanciesByKeyword("zxcvbnm");
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertEquals("Expect no results", 0, resultsList.size());
+    }
+
+    @Test
     public void testFindMultipleLocations() throws Exception {
 
         given(locationService.find("bristol"))
