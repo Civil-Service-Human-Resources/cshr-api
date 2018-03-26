@@ -200,7 +200,6 @@ public class HibernateSearchService {
             
             Query descriptiopnPhraseQuery = qb.phrase()
                     .onField("vacancy.description")
-                    .boostedTo(10f)
                     .ignoreAnalyzer()
                     .sentence(searchTerm)
                     .createQuery();

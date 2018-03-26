@@ -117,6 +117,12 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
             .location("Newcastle")
             .build();
 
+    private final VacancyLocation newcastleLocation2 = VacancyLocation.builder()
+            .latitude(NEWCASTLE_LATITUDE)
+            .longitude(NEWCASTLE_LONGITUDE)
+            .location("Newcastle2")
+            .build();
+
     @Before
     public void before() throws LocationServiceException {
 
@@ -239,6 +245,27 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         Assert.assertEquals("Expect one result", 1, resultsList.size());
         Assert.assertEquals("Find International Business Machines", "International Business Machines",
                 resultsList.get(0).getTitle());
+    }
+
+    @Test
+    public void testTitleMoreRelevantThanDescription() throws Exception {
+
+        Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
+        newcastleVacancy.setTitle("any old title");
+        newcastleVacancy.setDescription("jobs in newcastle are great");
+        saveVacancy(newcastleVacancy);
+
+        Vacancy newcastleVacancy2 = createVacancyPrototype(newcastleLocation2);
+        newcastleVacancy2.setTitle("Newcastle Vacancy");
+        newcastleVacancy2.setDescription("jobs in are great");
+        saveVacancy(newcastleVacancy2);
+
+        Page<Vacancy> result = findVancanciesByKeyword("newcastle");
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertEquals("Expect two results", 2, resultsList.size());
+        Assert.assertEquals("title match is first", newcastleVacancy2.getId(),
+                resultsList.get(0).getId());
     }
 
     @Test
