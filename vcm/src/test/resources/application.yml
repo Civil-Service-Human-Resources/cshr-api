@@ -11,7 +11,7 @@ spring:
         hibernate:
             search:
                 default:
-                    directory_provider: filesystem
+                    directory_provider: ram
                     indexBase: target/testindexpath
   location:
     service:

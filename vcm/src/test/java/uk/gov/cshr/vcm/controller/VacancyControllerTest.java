@@ -18,11 +18,16 @@ import org.assertj.core.api.Assertions;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import org.junit.Assert;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -36,19 +41,23 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import uk.gov.cshr.vcm.VcmApplication;
+import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
 import static uk.gov.cshr.vcm.controller.search.VacancySearchTests.BRISTOL_LATITUDE;
 import static uk.gov.cshr.vcm.controller.search.VacancySearchTests.BRISTOL_LONGITUDE;
+import uk.gov.cshr.vcm.model.Coordinates;
 import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.model.NationalityStatement;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancyLocation;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
+import uk.gov.cshr.vcm.service.LocationService;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = VcmApplication.class)
 @ContextConfiguration
 @WebAppConfiguration
 @ActiveProfiles("dev")
+@TestExecutionListeners(MockitoTestExecutionListener.class)
 public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
     private static final SimpleDateFormat ISO_DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
@@ -68,6 +77,9 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
     @Inject
     private DepartmentRepository departmentRepository;
+
+    @MockBean
+    private LocationService locationService;
 
     private MockMvc mvc;
 
@@ -165,7 +177,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             .build();
 
     @BeforeMethod
-    void setup() {
+    void setup() throws LocationServiceException {
 
         this.mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
@@ -184,6 +196,9 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
         vacancy3.setDepartment(department3);
         Vacancy savedVacancy3 = this.vacancyRepository.save(vacancy3);
         vacancy3.setId(savedVacancy3.getId());
+
+        given(locationService.find(any()))
+            .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
     }
 
     @AfterMethod

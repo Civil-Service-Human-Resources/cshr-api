@@ -55,7 +55,6 @@ public class VacancyLocation implements Serializable {
     @NonNull
     private String location;
 
-//    @JsonBackReference    
     @JsonIgnore
     @IndexedEmbedded
     @ManyToOne
