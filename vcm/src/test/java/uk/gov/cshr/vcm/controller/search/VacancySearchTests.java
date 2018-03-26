@@ -96,12 +96,19 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     private static final Timestamp TOMORROW = getTime(+1);
     private static final Timestamp THIRTY_DAYS_FROM_NOW = getTime(30);
 
-    private Department department;
+    private Department department1;
+    private Department department2;
 
-    private final VacancyLocation bristolLocation = VacancyLocation.builder()
+    private final VacancyLocation bristolLocation1 = VacancyLocation.builder()
             .latitude(BRISTOL_LATITUDE)
             .longitude(BRISTOL_LONGITUDE)
-            .location("Bristol")
+            .location("Bristol1")
+            .build();
+
+    private final VacancyLocation bristolLocation2 = VacancyLocation.builder()
+            .latitude(BRISTOL_LATITUDE)
+            .longitude(BRISTOL_LONGITUDE)
+            .location("Bristol2")
             .build();
 
     private final VacancyLocation newcastleLocation = VacancyLocation.builder()
@@ -119,9 +126,15 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
-        department = departmentRepository.save(
+        department1 = departmentRepository.save(
                 Department.builder()
                         .name("Department One")
+                        .disabilityLogo("disabilityLogo")
+                        .build());
+
+        department2 = departmentRepository.save(
+                Department.builder()
+                        .name("Department two")
                         .disabilityLogo("disabilityLogo")
                         .build());
     }
@@ -136,14 +149,14 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         given(locationService.find(any()))
                 .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
 
-        createVacancyWithClosingDate("yesterday", YESTERDAY, department);
+        createVacancyWithClosingDate("yesterday", YESTERDAY, department1);
 
         // beacuse these are timestamp basesd this job will be closed
         Timestamp earlierToday = new Timestamp(TODAY.getTime() - 10000);
-        createVacancyWithClosingDate("earlier today", earlierToday, department);
+        createVacancyWithClosingDate("earlier today", earlierToday, department1);
 
-        createVacancyWithClosingDate("tomorrow", TOMORROW, department);
-        createVacancyWithClosingDate("thirty days time", THIRTY_DAYS_FROM_NOW, department);
+        createVacancyWithClosingDate("tomorrow", TOMORROW, department1);
+        createVacancyWithClosingDate("thirty days time", THIRTY_DAYS_FROM_NOW, department1);
 
         Page<Vacancy> result = findVancanciesInPlace("bristol");
         List<Vacancy> resultsList = result.getContent();
@@ -175,7 +188,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         Assert.assertEquals("Newcastle Job", resultsList.get(0).getTitle());
 
-        Vacancy bristolVacancy = createVacancyPrototype(bristolLocation);
+        Vacancy bristolVacancy = createVacancyPrototype(bristolLocation1);
         bristolVacancy.setTitle("Bristol Job");
         saveVacancy(bristolVacancy);
 
@@ -200,8 +213,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         Assert.assertTrue("Expected no results", resultsList.isEmpty());
 
-        newcastleVacancy.getVacancyLocations().add(bristolLocation);
-        bristolLocation.setVacancy(newcastleVacancy);
+        newcastleVacancy.getVacancyLocations().add(bristolLocation1);
+        bristolLocation1.setVacancy(newcastleVacancy);
         vacancyRepository.save(newcastleVacancy);
 
         result = findVancanciesInPlace("bristol");
@@ -216,8 +229,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         given(locationService.find("bristol"))
                 .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
 
-        createVacancyWithRegions(department, "South West, Scotland", bristolLocation);
-        createVacancyWithRegions(department, "North East, Scotland", newcastleLocation);
+        createVacancyWithRegions(department1, "South West, Scotland", bristolLocation1);
+        createVacancyWithRegions(department1, "North East, Scotland", newcastleLocation);
 
 
         Page<Vacancy> result = findVancanciesInPlace("bristol");
@@ -228,13 +241,55 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     }
 
     @Test
+    public void testFilterByDepartment() throws Exception {
+
+        given(locationService.find("bristol"))
+                .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
+
+        createVacancyWithRegions(department1, "South West, Scotland", bristolLocation1);
+        createVacancyWithRegions(department2, "North East, Scotland", bristolLocation2);
+
+
+        // return both departments
+        Page<Vacancy> result = findVancanciesByDpartmentInPlace("bristol", 
+                department1.getId().toString(), 
+                department2.getId().toString());
+
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertEquals("Expected number results", 2, resultsList.size());
+
+        // dont filter by any departments
+        result = findVancanciesByDpartmentInPlace("bristol");
+        resultsList = result.getContent();
+        Assert.assertEquals("Expected number results", 2, resultsList.size());
+
+        // filter by  department 1
+        result = findVancanciesByDpartmentInPlace("bristol", department1.getId().toString());
+        resultsList = result.getContent();
+        Assert.assertEquals("Expected number results", 1, resultsList.size());
+        Assert.assertEquals("Department1.id", resultsList.get(0).getDepartment().getId(), department1.getId());
+
+        // filter by  department 2
+        result = findVancanciesByDpartmentInPlace("bristol", department2.getId().toString());
+        resultsList = result.getContent();
+        Assert.assertEquals("Expected number results", 1, resultsList.size());
+        Assert.assertEquals("Department1.id", resultsList.get(0).getDepartment().getId(), department2.getId());
+
+        // filter by  unknown departent
+        result = findVancanciesByDpartmentInPlace("bristol", "-1");
+        resultsList = result.getContent();
+        Assert.assertEquals("Expected number results", 0, resultsList.size());
+    }
+
+    @Test
     public void testFindRegionalVacanciesNewcastle() throws Exception {
 
         given(locationService.find("newcastle"))
                 .willReturn(new Coordinates(NEWCASTLE_LONGITUDE, NEWCASTLE_LATITUDE, "North East"));
 
-        createVacancyWithRegions(department, "North East, Scotland", newcastleLocation);
-        createVacancyWithRegions(department, "South West, Scotland, North East", bristolLocation);
+        createVacancyWithRegions(department1, "North East, Scotland", newcastleLocation);
+        createVacancyWithRegions(department1, "South West, Scotland, North East", bristolLocation1);
 
         Page<Vacancy> result = findVancanciesInPlace("newcastle");
         List<Vacancy> resultsList = result.getContent();
@@ -248,7 +303,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         given(locationService.find(any()))
                 .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
 
-        Vacancy closedVacancy = createVacancyWithClosingDate("yesterday", YESTERDAY, department);
+        Vacancy closedVacancy = createVacancyWithClosingDate("yesterday", YESTERDAY, department1);
 
         MvcResult mvcResult = this.mockMvc.perform(get("/vacancy/" + closedVacancy.getId())
                 .contentType(APPLICATION_JSON_UTF8)
@@ -274,7 +329,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
-        Vacancy closedVacancy = createVacancyWithClosingDate("yesterday", YESTERDAY, department);
+        Vacancy closedVacancy = createVacancyWithClosingDate("yesterday", YESTERDAY, department1);
         closedVacancy.setClosingDate(THIRTY_DAYS_FROM_NOW);
 
         MvcResult mvcUpdateResult = this.mockMvc.perform(put("/vacancy/" + closedVacancy.getId())
@@ -296,7 +351,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         Assert.assertEquals("Date updated", THIRTY_DAYS_FROM_NOW, vacancy.getClosingDate());
         Assert.assertEquals("dept disability logo",
                 vacancy.getDepartment().getDisabilityLogo(),
-                department.getDisabilityLogo());
+                department1.getDisabilityLogo());
     }
 
     @Test
@@ -367,7 +422,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     @Test
     public void search_salaryOverrideDescriptionReturned() throws Exception {
 
-        Vacancy vacancy = createVacancyPrototype(bristolLocation);
+        Vacancy vacancy = createVacancyPrototype(bristolLocation1);
 
         vacancyRepository.save(vacancy);
 
@@ -389,6 +444,34 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
                 .keyword(keyword)
+                .build();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(vacancySearchParameters);
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/search")
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(json)
+                .accept(APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String searchResponse = mvcResult.getResponse().getContentAsString();
+
+        System.out.println("searchRespons=" + searchResponse);
+
+        return objectMapper.readValue(searchResponse, VacancyPage.class);
+    }
+
+    private Page<Vacancy> findVancanciesByDpartmentInPlace(String place, String... departmentIDs) throws Exception {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
+                .keyword("SearchQueryDescription")
+                .overseasJob(Boolean.TRUE)
+                .department(departmentIDs)
+                .location(new Location(place, 30))
                 .build();
 
         ObjectMapper mapper = new ObjectMapper();
@@ -440,16 +523,16 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         return new Timestamp(date.getTime());
     }
 
-    private Vacancy createVacancyWithRegions(Department department, String regions, VacancyLocation vacancyLocation) {
+    private Vacancy createVacancyWithRegions(Department department1, String regions, VacancyLocation vacancyLocation) {
 
         Vacancy vacancy = createVacancyPrototype(vacancyLocation);
         vacancy.setRegions(regions);
-        vacancy.setDepartment(department);
+        vacancy.setDepartment(department1);
         vacancyRepository.save(vacancy);
         return vacancy;
     }
 
-    private Vacancy createVacancyWithClosingDate(String jobTitle, Timestamp closingDate, Department department) {
+    private Vacancy createVacancyWithClosingDate(String jobTitle, Timestamp closingDate, Department department1) {
 
         VacancyLocation vacancyLocation = VacancyLocation.builder()
                 .latitude(BRISTOL_LATITUDE)
@@ -460,7 +543,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         Vacancy vacancy = createVacancyPrototype(vacancyLocation);
         vacancy.setTitle(jobTitle);
 
-        vacancy.setDepartment(department);
+        vacancy.setDepartment(department1);
         vacancy.setClosingDate(closingDate);
         vacancyRepository.save(vacancy);
         return vacancy;
@@ -475,7 +558,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     private Vacancy createVacancyPrototype(VacancyLocation vacancyLocation) {
 
         Vacancy vacancy = Vacancy.builder()
-                .department(department)
+                .department(department1)
                 .title("testTile1 SearchQueryTitle")
                 .description("testDescription1 SearchQueryDescription")
                 .grade("testGrade1 SearchQueryGrade")

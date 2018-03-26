@@ -87,11 +87,10 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             MediaType.APPLICATION_JSON.getSubtype(),
             Charset.forName("utf8"));
 
-    private Vacancy requestBodyVacancy = Vacancy.builder()
+    private Vacancy vacancy4 = Vacancy.builder()
             .identifier(398457344L)
             .title("testTitle")
             .description("testDescription")
-            //            .location("testLocation")
             .grade("testGrade")
             .responsibilities("testResponsibilities")
             .workingHours("testWorkingHours")
@@ -112,7 +111,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             .title("testTile1 SearchQueryTitle")
             .description("testDescription1 SearchQueryDescription")
             .shortDescription("shortDescription")
-            //            .location("testLocation1 SearchQueryLocation")
             .grade("testGrade1 SearchQueryGrade")
             .responsibilities("testResponsibilities1")
             .workingHours("testWorkingHours1")
@@ -125,19 +123,26 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             .salaryMin(0)
             .salaryMax(10)
             .numberVacancies(1)
-            //            .latitude(51.4549291)
-            //            .longitude(-2.6278111)
             .displayCscContent(Boolean.TRUE)
             .selectionProcessDetails("selectionProcessDetails")
             .nationalityStatement(NationalityStatement.NON_RESERVED)
             .build();
+
+    {
+        VacancyLocation vacancyLocation = VacancyLocation.builder()
+        .latitude(BRISTOL_LATITUDE)
+        .longitude(BRISTOL_LONGITUDE)
+        .location("testLocation1 SearchQueryLocation")
+        .build();
+        vacancyLocation.setVacancy(vacancy1);
+        vacancy1.getVacancyLocations().add(vacancyLocation);
+    }
 
     private Vacancy vacancy2 = Vacancy.builder()
             .id(2L)
             .identifier(398457346L)
             .title("testTitle2")
             .description("testDescription2")
-            //            .location("testLocation2")
             .grade("testGrade2")
             .responsibilities("testResponsibilities2")
             .workingHours("testWorkingHours2")
@@ -150,8 +155,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             .salaryMin(0)
             .salaryMax(10)
             .numberVacancies(2)
-            //            .latitude(51.4549291)
-            //            .longitude(-2.6278111)
             .build();
 
     private Vacancy vacancy3 = Vacancy.builder()
@@ -159,7 +162,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             .identifier(398457347L)
             .title("testTitle3")
             .description("testDescription3")
-            //            .location("testLocation3")
             .grade("testGrade3")
             .responsibilities("testResponsibilities3")
             .workingHours("testWorkingHours2")
@@ -172,12 +174,13 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             .salaryMin(0)
             .salaryMax(10)
             .numberVacancies(2)
-            //            .latitude(51.4549291)
-            //            .longitude(-2.6278111)
             .build();
 
     @BeforeMethod
     void setup() throws LocationServiceException {
+
+        this.vacancyRepository.deleteAll();
+        this.departmentRepository.deleteAll();
 
         this.mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
@@ -203,26 +206,21 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
     @AfterMethod
     void tearDown() {
-        this.vacancyRepository.deleteAll();
-
-        this.departmentRepository.deleteAll();
     }
 
     @Test
     public void testDepartments_requestAllRows() throws Exception {
+
         String path = "/departments";
-
         ResultActions sendRequest = mvc.perform(get(path));
-
         sendRequest.andExpect(status().isNotFound());
     }
 
     @Test
     public void testVacancies_requestAllRows() throws Exception {
+
         String path = "/vacancies";
-
         ResultActions sendRequest = mvc.perform(get(path));
-
         sendRequest.andExpect(status().isNotFound());
     }
 
@@ -244,11 +242,10 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[0].id", is(toIntExact(this.vacancy1.getId()))))
                 .andExpect(jsonPath("$.content[0].identifier", is(toIntExact(this.vacancy1.getIdentifier()))))
                 .andExpect(jsonPath("$.content[0].description", is(this.vacancy1.getDescription())))
-                //                .andExpect(jsonPath("$.content[0].location", is(this.vacancy1.getLocation())))
                 .andExpect(jsonPath("$.content[0].grade", is(this.vacancy1.getGrade())))
                 .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy1.getResponsibilities())))
                 .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy1.getWorkingHours())))
-                .andExpect(jsonPath("$.content[0].closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
+                .andExpect(jsonPath("$.content[0].closingDate", is(ISO_DATEFORMAT.format(vacancy4.getClosingDate()))))
                 .andExpect(jsonPath("$.content[0].contactName", is(this.vacancy1.getContactName())))
                 .andExpect(jsonPath("$.content[0].contactDepartment", is(this.vacancy1.getContactDepartment())))
                 .andExpect(jsonPath("$.content[0].contactEmail", is(this.vacancy1.getContactEmail())))
@@ -260,11 +257,10 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[1].id", is(toIntExact(this.vacancy2.getId()))))
                 .andExpect(jsonPath("$.content[1].identifier", is(toIntExact(this.vacancy2.getIdentifier()))))
                 .andExpect(jsonPath("$.content[1].description", is(this.vacancy2.getDescription())))
-                //                .andExpect(jsonPath("$.content[1].location", is(this.vacancy2.getLocation())))
                 .andExpect(jsonPath("$.content[1].grade", is(this.vacancy2.getGrade())))
                 .andExpect(jsonPath("$.content[1].responsibilities", is(this.vacancy2.getResponsibilities())))
                 .andExpect(jsonPath("$.content[1].workingHours", is(this.vacancy2.getWorkingHours())))
-                .andExpect(jsonPath("$.content[1].closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
+                .andExpect(jsonPath("$.content[1].closingDate", is(ISO_DATEFORMAT.format(vacancy4.getClosingDate()))))
                 .andExpect(jsonPath("$.content[1].contactName", is(this.vacancy2.getContactName())))
                 .andExpect(jsonPath("$.content[1].contactDepartment", is(this.vacancy2.getContactDepartment())))
                 .andExpect(jsonPath("$.content[1].contactEmail", is(this.vacancy2.getContactEmail())))
@@ -276,11 +272,10 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[2].id", is(toIntExact(this.vacancy3.getId()))))
                 .andExpect(jsonPath("$.content[2].identifier", is(toIntExact(this.vacancy3.getIdentifier()))))
                 .andExpect(jsonPath("$.content[2].description", is(this.vacancy3.getDescription())))
-                //                .andExpect(jsonPath("$.content[2].location", is(this.vacancy3.getLocation())))
                 .andExpect(jsonPath("$.content[2].grade", is(this.vacancy3.getGrade())))
                 .andExpect(jsonPath("$.content[2].responsibilities", is(this.vacancy3.getResponsibilities())))
                 .andExpect(jsonPath("$.content[2].workingHours", is(this.vacancy3.getWorkingHours())))
-                .andExpect(jsonPath("$.content[2].closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
+                .andExpect(jsonPath("$.content[2].closingDate", is(ISO_DATEFORMAT.format(vacancy4.getClosingDate()))))
                 .andExpect(jsonPath("$.content[2].contactName", is(this.vacancy3.getContactName())))
                 .andExpect(jsonPath("$.content[2].contactDepartment", is(this.vacancy3.getContactDepartment())))
                 .andExpect(jsonPath("$.content[2].contactEmail", is(this.vacancy3.getContactEmail())))
@@ -293,6 +288,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
     @Test
     public void testFindById() throws Exception {
+
         // Given
         String path = "/vacancy/" + vacancy1.getId();
 
@@ -308,11 +304,10 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.shortDescription", is(this.vacancy1.getShortDescription())))
                 .andExpect(jsonPath("$.displayCscContent", is(this.vacancy1.getDisplayCscContent())))
                 .andExpect(jsonPath("$.selectionProcessDetails", is(this.vacancy1.getSelectionProcessDetails())))
-                //                .andExpect(jsonPath("$.location", is(this.vacancy1.getLocation())))
                 .andExpect(jsonPath("$.grade", is(this.vacancy1.getGrade())))
                 .andExpect(jsonPath("$.responsibilities", is(this.vacancy1.getResponsibilities())))
                 .andExpect(jsonPath("$.workingHours", is(this.vacancy1.getWorkingHours())))
-                .andExpect(jsonPath("$.closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
+                .andExpect(jsonPath("$.closingDate", is(ISO_DATEFORMAT.format(vacancy4.getClosingDate()))))
                 .andExpect(jsonPath("$.contactName", is(this.vacancy1.getContactName())))
                 .andExpect(jsonPath("$.contactDepartment", is(this.vacancy1.getContactDepartment())))
                 .andExpect(jsonPath("$.contactEmail", is(this.vacancy1.getContactEmail())))
@@ -325,6 +320,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
     @Test
     public void testFindByIdNotFound() throws Exception {
+
         // Given
         String path = "/vacancy/-1";
 
@@ -333,15 +329,16 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
         // Then
         sendRequest.andExpect(status().isNotFound());
-
     }
 
     @Test
     public void testCreate() throws Exception {
+
         // Given
         String path = "/vacancy";
 
-        Vacancy vacancy = getVacancyRequestBody();
+        Vacancy vacancy = createVacancyPrototype();
+
         ObjectMapper objectMapper = new ObjectMapper();
 
         // When
@@ -361,15 +358,14 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
         Vacancy storedVacancy = vacancyRepository.findOne(createdVacancyId);
 
         Assert.assertTrue(storedVacancy.getTitle().equals("testTile1 SearchQueryTitle"));
-
-//        Assertions.assertThat(storedVacancy).isEqualToIgnoringGivenFields(getVacancyRequestBody(), "id", "vacancyLocations");
+        Assertions.assertThat(storedVacancy).isEqualToIgnoringGivenFields(vacancy, "id", "vacancyLocations");
     }
 
 
     @Test
     public void testUpdate() throws Exception {
         
-        Vacancy vacancy = getVacancyRequestBody();
+        Vacancy vacancy = createVacancyPrototype();
         vacancy.setTitle("testUpdate");
 
         vacancy.getVacancyLocations().get(0).setLocation("My New Location Name");
@@ -394,10 +390,11 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
     @Test
     public void testUpdateNotFound() throws Exception {
+
         // Given
         String path = "/vacancy/-1";
 
-        Vacancy vacancy = getVacancyRequestBody();
+        Vacancy vacancy = createVacancyPrototype();
         ObjectMapper objectMapper = new ObjectMapper();
 
         // When
@@ -405,7 +402,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
         // Then
         sendRequest.andExpect(status().isNotFound());
-
     }
 
     private long getResourceIdFromUrl(String locationUrl) {
@@ -415,6 +411,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
     @Test
     public void testDelete() throws Exception {
+
         // Given
         String path = "/vacancy/" + vacancy1.getId();
         // When
@@ -430,47 +427,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
         validIds.add(vacancy2.getId());
         validIds.add(vacancy3.getId());
         Assertions.assertThat(validIds.contains(vacancy.getId()));
-    }
-
-
-    /**
-     * Current search implementation is primitive, this test will evolve with time
-     * <p>
-     * The test has to be disabled for now until the h2 in memory database has been replaced by a postgres docker instance.
-     * The query in use is not supported by h2 db.
-     *
-     * @throws Exception if any unexpected error occurs
-     */
-    @Test(enabled = false)
-    public void testSearch() throws Exception {
-        // Given
-        String path = "/vacancy/search/location/searchQueryLocation/keyword/search?page=0&size=1";
-
-        // When
-        ResultActions sendRequest = mvc.perform(get(path));
-
-        // Then
-        sendRequest
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$.content", hasSize(1)))
-                .andExpect(jsonPath("$.totalElements", is(1)))
-                .andExpect(jsonPath("$.content[0].id", is(toIntExact(this.vacancy1.getId()))))
-                .andExpect(jsonPath("$.content[0].identifier", is(toIntExact(this.vacancy1.getIdentifier()))))
-                .andExpect(jsonPath("$.content[0].description", is(this.vacancy1.getDescription())))
-                //                .andExpect(jsonPath("$.content[0].location", is(this.vacancy1.getLocation())))
-                .andExpect(jsonPath("$.content[0].grade", is(this.vacancy1.getGrade())))
-                .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy1.getResponsibilities())))
-                .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy1.getWorkingHours())))
-                .andExpect(jsonPath("$.content[0].closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
-                .andExpect(jsonPath("$.content[0].contactName", is(this.vacancy1.getContactName())))
-                .andExpect(jsonPath("$.content[0].contactDepartment", is(this.vacancy1.getContactDepartment())))
-                .andExpect(jsonPath("$.content[0].contactEmail", is(this.vacancy1.getContactEmail())))
-                .andExpect(jsonPath("$.content[0].contactTelephone", is(this.vacancy1.getContactTelephone())))
-                .andExpect(jsonPath("$.content[0].eligibility", is(this.vacancy1.getEligibility())))
-                .andExpect(jsonPath("$.content[0].salaryMin", is(this.vacancy1.getSalaryMin())))
-                .andExpect(jsonPath("$.content[0].salaryMax", is(this.vacancy1.getSalaryMax())))
-                .andExpect(jsonPath("$.content[0].numberVacancies", is(this.vacancy1.getNumberVacancies())));
     }
 
     @Test
@@ -495,7 +451,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
     @Test
     public void search_invalidHttpVerb() throws Exception {
         
-        Vacancy vacancy = getVacancyRequestBody();
+        Vacancy vacancy = createVacancyPrototype();
         ObjectMapper objectMapper = new ObjectMapper();
 
         String path = "/vacancy/search?page=0&size=1";
@@ -516,79 +472,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
         mvc.perform(post(path).contentType(APPLICATION_JSON_UTF8).content(requestBody)).andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
     }
 
-    @Test(enabled = false) // Not seding a location is really a front-end issue
-    public void search_noLocationSupplied() throws Exception {
-        performSearchError400Test("{\"keyword\": \"foo\"}");
-    }
-
-    @Test(enabled = false)
-    public void search_locationAndKeywordSupplied() throws Exception {
-        // Given
-        String path = "/vacancy/search?page=0&size=1";
-
-        String requestBody = "{\n" +
-                "  \"department\": [],\n" +
-                "  \"keyword\": \"search\",\n" +
-                "  \"location\": {\n" +
-                "    \"place\": \"searchQueryLocation\",\n" +
-                "    \"radius\": \"30\"\n" +
-                "  }\n" +
-                "}";
-
-        ResultActions sendRequest = mvc.perform(post(path).contentType(APPLICATION_JSON_UTF8).content(requestBody));
-
-        // Then
-        sendRequest
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$.content", hasSize(1)))
-                .andExpect(jsonPath("$.totalElements", is(1)))
-                .andExpect(jsonPath("$.content[0].id", is(toIntExact(this.vacancy1.getId()))))
-                .andExpect(jsonPath("$.content[0].identifier", is(toIntExact(this.vacancy1.getIdentifier()))))
-                .andExpect(jsonPath("$.content[0].description", is(this.vacancy1.getDescription())))
-                //                .andExpect(jsonPath("$.content[0].location", is(this.vacancy1.getLocation())))
-                .andExpect(jsonPath("$.content[0].grade", is(this.vacancy1.getGrade())))
-                .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy1.getResponsibilities())))
-                .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy1.getWorkingHours())))
-                .andExpect(jsonPath("$.content[0].closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
-                .andExpect(jsonPath("$.content[0].contactName", is(this.vacancy1.getContactName())))
-                .andExpect(jsonPath("$.content[0].contactDepartment", is(this.vacancy1.getContactDepartment())))
-                .andExpect(jsonPath("$.content[0].contactEmail", is(this.vacancy1.getContactEmail())))
-                .andExpect(jsonPath("$.content[0].contactTelephone", is(this.vacancy1.getContactTelephone())))
-                .andExpect(jsonPath("$.content[0].eligibility", is(this.vacancy1.getEligibility())))
-                .andExpect(jsonPath("$.content[0].salaryMin", is(this.vacancy1.getSalaryMin())))
-                .andExpect(jsonPath("$.content[0].salaryMax", is(this.vacancy1.getSalaryMax())))
-                .andExpect(jsonPath("$.content[0].numberVacancies", is(this.vacancy1.getNumberVacancies())))
-                .andExpect(jsonPath("$.content[0].department.id", is(this.vacancy1.getDepartment().getId())))
-                .andExpect(jsonPath("$.content[0].department.name", is(this.vacancy1.getDepartment().getName())));
-    }
-
-    @Test(enabled = false)
-    public void search_noResultsForlocationAndKeywordAndDepartment() throws Exception {
-        // Given
-        String path = "/vacancy/search?page=0&size=1";
-
-        String requestBody = "{\n" +
-                "  \"department\": [\"2\"],\n" +
-                "  \"keyword\": \"search\",\n" +
-                "  \"location\": {\n" +
-                "    \"place\": \"searchQueryLocation\",\n" +
-                "    \"radius\": \"30\"\n" +
-                "  }\n" +
-                "}";
-
-        ResultActions sendRequest = mvc.perform(post(path).contentType(APPLICATION_JSON_UTF8).content(requestBody));
-
-        // Then
-        sendRequest
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$.content", hasSize(0)))
-                .andExpect(jsonPath("$.totalElements", is(0)));
-
-    }
-
-    @Test(enabled = false)
+    @Test
     public void search_noResultsForlocationAndKeywordAndEmptyDepartment() throws Exception {
         // Given
         String path = "/vacancy/search?page=0&size=1";
@@ -611,244 +495,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content", hasSize(0)))
                 .andExpect(jsonPath("$.totalElements", is(0)));
 
-    }
-
-    @Test(enabled = false)
-    public void search_locationAndKeywordAndDepartment() throws Exception {
-        // Given
-        String path = "/vacancy/search?page=0&size=1";
-
-        String requestBody = "{\n" +
-                "  \"department\": [\"1\"],\n" +
-                "  \"keyword\": \"search\",\n" +
-                "  \"location\": {\n" +
-                "    \"place\": \"searchQueryLocation\",\n" +
-                "    \"radius\": \"30\"\n" +
-                "  }\n" +
-                "}";
-
-        ResultActions sendRequest = mvc.perform(post(path).contentType(APPLICATION_JSON_UTF8).content(requestBody));
-
-        // Then
-        sendRequest
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$.content", hasSize(1)))
-                .andExpect(jsonPath("$.totalElements", is(1)))
-                .andExpect(jsonPath("$.content[0].id", is(toIntExact(this.vacancy1.getId()))))
-                .andExpect(jsonPath("$.content[0].identifier", is(toIntExact(this.vacancy1.getIdentifier()))))
-                .andExpect(jsonPath("$.content[0].description", is(this.vacancy1.getDescription())))
-                //                .andExpect(jsonPath("$.content[0].location", is(this.vacancy1.getLocation())))
-                .andExpect(jsonPath("$.content[0].grade", is(this.vacancy1.getGrade())))
-                .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy1.getResponsibilities())))
-                .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy1.getWorkingHours())))
-                .andExpect(jsonPath("$.content[0].closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
-                .andExpect(jsonPath("$.content[0].contactName", is(this.vacancy1.getContactName())))
-                .andExpect(jsonPath("$.content[0].contactDepartment", is(this.vacancy1.getContactDepartment())))
-                .andExpect(jsonPath("$.content[0].contactEmail", is(this.vacancy1.getContactEmail())))
-                .andExpect(jsonPath("$.content[0].contactTelephone", is(this.vacancy1.getContactTelephone())))
-                .andExpect(jsonPath("$.content[0].eligibility", is(this.vacancy1.getEligibility())))
-                .andExpect(jsonPath("$.content[0].salaryMin", is(this.vacancy1.getSalaryMin())))
-                .andExpect(jsonPath("$.content[0].salaryMax", is(this.vacancy1.getSalaryMax())))
-                .andExpect(jsonPath("$.content[0].numberVacancies", is(this.vacancy1.getNumberVacancies())))
-                .andExpect(jsonPath("$.content[0].department.id", is(this.vacancy1.getDepartment().getId())))
-                .andExpect(jsonPath("$.content[0].department.name", is(this.vacancy1.getDepartment().getName())));
-    }
-
-    @Test(enabled = false)
-    public void search_locationAndKeywordAndEmptyDepartment() throws Exception {
-        // Given
-        String path = "/vacancy/search?page=0&size=1";
-
-        String requestBody = "{\n" +
-                "  \"department\": [],\n" +
-                "  \"keyword\": \"search\",\n" +
-                "  \"location\": {\n" +
-                "    \"place\": \"searchQueryLocation\",\n" +
-                "    \"radius\": \"30\"\n" +
-                "  }\n" +
-                "}";
-
-        ResultActions sendRequest = mvc.perform(post(path).contentType(APPLICATION_JSON_UTF8).content(requestBody));
-
-        // Then
-        sendRequest
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$.content", hasSize(1)))
-                .andExpect(jsonPath("$.totalElements", is(1)))
-                .andExpect(jsonPath("$.content[0].id", is(toIntExact(this.vacancy1.getId()))))
-                .andExpect(jsonPath("$.content[0].identifier", is(toIntExact(this.vacancy1.getIdentifier()))))
-                .andExpect(jsonPath("$.content[0].description", is(this.vacancy1.getDescription())))
-                //                .andExpect(jsonPath("$.content[0].location", is(this.vacancy1.getLocation())))
-                .andExpect(jsonPath("$.content[0].grade", is(this.vacancy1.getGrade())))
-                .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy1.getResponsibilities())))
-                .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy1.getWorkingHours())))
-                .andExpect(jsonPath("$.content[0].closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
-                .andExpect(jsonPath("$.content[0].contactName", is(this.vacancy1.getContactName())))
-                .andExpect(jsonPath("$.content[0].contactDepartment", is(this.vacancy1.getContactDepartment())))
-                .andExpect(jsonPath("$.content[0].contactEmail", is(this.vacancy1.getContactEmail())))
-                .andExpect(jsonPath("$.content[0].contactTelephone", is(this.vacancy1.getContactTelephone())))
-                .andExpect(jsonPath("$.content[0].eligibility", is(this.vacancy1.getEligibility())))
-                .andExpect(jsonPath("$.content[0].salaryMin", is(this.vacancy1.getSalaryMin())))
-                .andExpect(jsonPath("$.content[0].salaryMax", is(this.vacancy1.getSalaryMax())))
-                .andExpect(jsonPath("$.content[0].numberVacancies", is(this.vacancy1.getNumberVacancies())))
-                .andExpect(jsonPath("$.content[0].department.id", is(this.vacancy1.getDepartment().getId())))
-                .andExpect(jsonPath("$.content[0].department.name", is(this.vacancy1.getDepartment().getName())));
-    }
-
-    @Test(enabled = false)
-    public void search_locationAndKeywordAndDepartments() throws Exception {
-        // Given
-        String path = "/vacancy/search?page=0&size=1";
-
-        String requestBody = "{\n" +
-                "  \"department\": [\n" +
-                "    \"1\",\"2\"\n" +
-                "  ],\n" +
-                "  \"keyword\": \"search\",\n" +
-                "  \"location\": {\n" +
-                "    \"place\": \"testLocation\",\n" +
-                "    \"radius\": \"30\"\n" +
-                "  }\n" +
-                "}";
-
-        ResultActions sendRequest = mvc.perform(post(path).contentType(APPLICATION_JSON_UTF8).content(requestBody));
-
-        // Then
-        sendRequest
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$.content", hasSize(2)))
-                .andExpect(jsonPath("$.totalElements", is(2)))
-                .andExpect(jsonPath("$.content[0].id", is(toIntExact(this.vacancy1.getId()))))
-                .andExpect(jsonPath("$.content[0].identifier", is(toIntExact(this.vacancy1.getIdentifier()))))
-                .andExpect(jsonPath("$.content[0].description", is(this.vacancy1.getDescription())))
-                //                .andExpect(jsonPath("$.content[0].location", is(this.vacancy1.getLocation())))
-                .andExpect(jsonPath("$.content[0].grade", is(this.vacancy1.getGrade())))
-                .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy1.getResponsibilities())))
-                .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy1.getWorkingHours())))
-                .andExpect(jsonPath("$.content[0].closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
-                .andExpect(jsonPath("$.content[0].contactName", is(this.vacancy1.getContactName())))
-                .andExpect(jsonPath("$.content[0].contactDepartment", is(this.vacancy1.getContactDepartment())))
-                .andExpect(jsonPath("$.content[0].contactEmail", is(this.vacancy1.getContactEmail())))
-                .andExpect(jsonPath("$.content[0].contactTelephone", is(this.vacancy1.getContactTelephone())))
-                .andExpect(jsonPath("$.content[0].eligibility", is(this.vacancy1.getEligibility())))
-                .andExpect(jsonPath("$.content[0].salaryMin", is(this.vacancy1.getSalaryMin())))
-                .andExpect(jsonPath("$.content[0].salaryMax", is(this.vacancy1.getSalaryMax())))
-                .andExpect(jsonPath("$.content[0].numberVacancies", is(this.vacancy1.getNumberVacancies())))
-                .andExpect(jsonPath("$.content[0].department.id", is(this.vacancy1.getDepartment().getId())))
-                .andExpect(jsonPath("$.content[0].department.name", is(this.vacancy1.getDepartment().getName())))
-                .andExpect(jsonPath("$.content[1].id", is(toIntExact(this.vacancy2.getId()))))
-                .andExpect(jsonPath("$.content[1].identifier", is(toIntExact(this.vacancy2.getIdentifier()))))
-                .andExpect(jsonPath("$.content[1].description", is(this.vacancy2.getDescription())))
-                //                .andExpect(jsonPath("$.content[1].location", is(this.vacancy2.getLocation())))
-                .andExpect(jsonPath("$.content[1].grade", is(this.vacancy2.getGrade())))
-                .andExpect(jsonPath("$.content[1].responsibilities", is(this.vacancy2.getResponsibilities())))
-                .andExpect(jsonPath("$.content[1].workingHours", is(this.vacancy2.getWorkingHours())))
-                .andExpect(jsonPath("$.content[1].closingDate", is(this.vacancy2.getClosingDate())))
-                .andExpect(jsonPath("$.content[1].contactName", is(this.vacancy2.getContactName())))
-                .andExpect(jsonPath("$.content[1].contactDepartment", is(this.vacancy2.getContactDepartment())))
-                .andExpect(jsonPath("$.content[1].contactEmail", is(this.vacancy2.getContactEmail())))
-                .andExpect(jsonPath("$.content[1].contactTelephone", is(this.vacancy2.getContactTelephone())))
-                .andExpect(jsonPath("$.content[1].eligibility", is(this.vacancy2.getEligibility())))
-                .andExpect(jsonPath("$.content[1].salaryMin", is(this.vacancy2.getSalaryMin())))
-                .andExpect(jsonPath("$.content[1].salaryMax", is(this.vacancy2.getSalaryMax())))
-                .andExpect(jsonPath("$.content[1].numberVacancies", is(this.vacancy2.getNumberVacancies())))
-                .andExpect(jsonPath("$.content[1].department.id", is(this.vacancy2.getDepartment().getId())))
-                .andExpect(jsonPath("$.content[1].department.name", is(this.vacancy2.getDepartment().getName())));
-    }
-
-    @Test(enabled = false)
-    public void search_locationAndKeywordAndUnknownDepartment() throws Exception {
-        // Given
-        String path = "/vacancy/search?page=0&size=1";
-
-        String requestBody = "{\n" +
-                "  \"department\": [\n" +
-                "    \"3\"\n" +
-                "  ],\n" +
-                "  \"keyword\": \"search\",\n" +
-                "  \"location\": {\n" +
-                "    \"place\": \"testLocation\",\n" +
-                "    \"radius\": \"30\"\n" +
-                "  }\n" +
-                "}";
-
-        ResultActions sendRequest = mvc.perform(post(path).contentType(APPLICATION_JSON_UTF8).content(requestBody));
-
-        // Then
-        sendRequest
-                .andExpect(jsonPath("$.content", hasSize(0)))
-                .andExpect(jsonPath("$.totalElements", is(0)));
-    }
-
-    @Test(enabled = false)
-    public void search_locationAndDepartment() throws Exception {
-        // Given
-        String path = "/vacancy/search?page=0&size=1";
-
-        String requestBody = "{\n" +
-                "  \"department\": [\n" +
-                "    \"1\"\n" +
-                "  ],\n" +
-                "  \"keyword\": \"search\",\n" +
-                "  \"location\": {\n" +
-                "    \"place\": \"testLocation\",\n" +
-                "    \"radius\": \"30\"\n" +
-                "  }\n" +
-                "}";
-
-        ResultActions sendRequest = mvc.perform(post(path).contentType(APPLICATION_JSON_UTF8).content(requestBody));
-
-        // Then
-        sendRequest
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$.content", hasSize(1)))
-                .andExpect(jsonPath("$.totalElements", is(1)))
-                .andExpect(jsonPath("$.content[0].id", is(toIntExact(this.vacancy1.getId()))))
-                .andExpect(jsonPath("$.content[0].identifier", is(toIntExact(this.vacancy1.getIdentifier()))))
-                .andExpect(jsonPath("$.content[0].description", is(this.vacancy1.getDescription())))
-                //                .andExpect(jsonPath("$.content[0].location", is(this.vacancy1.getLocation())))
-                .andExpect(jsonPath("$.content[0].grade", is(this.vacancy1.getGrade())))
-                .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy1.getResponsibilities())))
-                .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy1.getWorkingHours())))
-                .andExpect(jsonPath("$.content[0].closingDate", is(this.vacancy1.getClosingDate())))
-                .andExpect(jsonPath("$.content[0].contactName", is(this.vacancy1.getContactName())))
-                .andExpect(jsonPath("$.content[0].contactDepartment", is(this.vacancy1.getContactDepartment())))
-                .andExpect(jsonPath("$.content[0].contactEmail", is(this.vacancy1.getContactEmail())))
-                .andExpect(jsonPath("$.content[0].contactTelephone", is(this.vacancy1.getContactTelephone())))
-                .andExpect(jsonPath("$.content[0].eligibility", is(this.vacancy1.getEligibility())))
-                .andExpect(jsonPath("$.content[0].salaryMin", is(this.vacancy1.getSalaryMin())))
-                .andExpect(jsonPath("$.content[0].salaryMax", is(this.vacancy1.getSalaryMax())))
-                .andExpect(jsonPath("$.content[0].numberVacancies", is(this.vacancy1.getNumberVacancies())))
-                .andExpect(jsonPath("$.content[0].department.id", is(this.vacancy1.getDepartment().getId())))
-                .andExpect(jsonPath("$.content[0].department.name", is(this.vacancy1.getDepartment().getName())));
-    }
-
-    @Test(enabled = false)
-    public void search_locationAndDepartmentAndUnknownKeyword() throws Exception {
-        // Given
-        String path = "/vacancy/search?page=0&size=1";
-
-        String requestBody = "{\n" +
-                "  \"department\": [\n" +
-                "    \"1\"\n" +
-                "  ],\n" +
-                "  \"keyword\": \"BlitheringEejit\",\n" +
-                "  \"location\": {\n" +
-                "    \"place\": \"testLocation\",\n" +
-                "    \"radius\": \"30\"\n" +
-                "  }\n" +
-                "}";
-
-        ResultActions sendRequest = mvc.perform(post(path).contentType(APPLICATION_JSON_UTF8).content(requestBody));
-
-        // Then
-        sendRequest
-                .andExpect(jsonPath("$.content", hasSize(0)))
-                .andExpect(jsonPath("$.totalElements", is(0)));
     }
 
     private static Timestamp getTime(int numberOfDaysFromNow) {
@@ -995,7 +641,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.content[0].grade", is(this.vacancy3.getGrade())))
                 .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy3.getResponsibilities())))
                 .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy3.getWorkingHours())))
-                .andExpect(jsonPath("$.content[0].closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
+                .andExpect(jsonPath("$.content[0].closingDate", is(ISO_DATEFORMAT.format(vacancy4.getClosingDate()))))
                 .andExpect(jsonPath("$.content[0].contactName", is(this.vacancy3.getContactName())))
                 .andExpect(jsonPath("$.content[0].contactDepartment", is(this.vacancy3.getContactDepartment())))
                 .andExpect(jsonPath("$.content[0].contactEmail", is(this.vacancy3.getContactEmail())))
@@ -1013,7 +659,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
         doOpenPublicSearchTests(0);
     }
 
-    private Vacancy getVacancyRequestBody() throws JsonProcessingException {
+    private Vacancy createVacancyPrototype() throws JsonProcessingException {
 
         VacancyLocation vacancyLocation = VacancyLocation.builder()
                 .latitude(BRISTOL_LATITUDE)
