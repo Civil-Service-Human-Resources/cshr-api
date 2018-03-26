@@ -213,6 +213,35 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     }
 
     @Test
+    public void testFindSynonymFromFullNameSearch() throws Exception {
+
+        Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
+        newcastleVacancy.setTitle("GDS Engineer");
+        saveVacancy(newcastleVacancy);
+
+        Page<Vacancy> result = findVancanciesByKeyword("Government Digital Services");
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertEquals("Expect one result", 1, resultsList.size());
+        Assert.assertEquals("Find GDS Engineer", "GDS Engineer", resultsList.get(0).getTitle());
+    }
+
+    @Test
+    public void testFindFullNameFromSynonymSearch() throws Exception {
+
+        Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
+        newcastleVacancy.setTitle("International Business Machines");
+        saveVacancy(newcastleVacancy);
+
+        Page<Vacancy> result = findVancanciesByKeyword("IBM Manager");
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertEquals("Expect one result", 1, resultsList.size());
+        Assert.assertEquals("Find International Business Machines", "International Business Machines",
+                resultsList.get(0).getTitle());
+    }
+
+    @Test
     public void testFindMultipleLocations() throws Exception {
 
         given(locationService.find("bristol"))
