@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import javax.inject.Inject;
@@ -325,8 +326,11 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
         // Given
         String path = "/vacancy";
 
+        Vacancy vacancy = getVacancyRequestBody();
+        ObjectMapper objectMapper = new ObjectMapper();
+
         // When
-        ResultActions sendRequest = mvc.perform(post(path).contentType(APPLICATION_JSON_UTF8).content(getVacancyRequestBody()));
+        ResultActions sendRequest = mvc.perform(post(path).contentType(APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(vacancy)));
 
         MvcResult sendRequestResult = sendRequest.andReturn();
 
@@ -349,35 +353,24 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
     @Test
     public void testUpdate() throws Exception {
+        
+        Vacancy vacancy = getVacancyRequestBody();
+        vacancy.setTitle("testUpdate");
+        ObjectMapper objectMapper = new ObjectMapper();
+
         // Given
         String path = "/vacancy/" + vacancy1.getId();
 
         // When
-        ResultActions sendRequest = mvc.perform(put(path).contentType(APPLICATION_JSON_UTF8).content(getVacancyRequestBody()));
+        ResultActions sendRequest = mvc.perform(put(path).contentType(APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(vacancy)));
 
         // Then
-//        sendRequest
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-//                .andExpect(jsonPath("$.id", is(toIntExact(this.vacancy1.getId()))))
-//                //                .andExpect(jsonPath("$.identifier", is(toIntExact(this.requestBodyVacancy.getIdentifier()))))
-//                .andExpect(jsonPath("$.description", is(this.requestBodyVacancy.getDescription())))
-//                //                .andExpect(jsonPath("$.location", is(this.requestBodyVacancy.getLocation())))
-//                .andExpect(jsonPath("$.grade", is(this.requestBodyVacancy.getGrade())))
-//                .andExpect(jsonPath("$.responsibilities", is(this.requestBodyVacancy.getResponsibilities())))
-//                .andExpect(jsonPath("$.workingHours", is(this.requestBodyVacancy.getWorkingHours())))
-//                .andExpect(jsonPath("$.closingDate", is(ISO_DATEFORMAT.format(requestBodyVacancy.getClosingDate()))))
-//                .andExpect(jsonPath("$.contactName", is(this.requestBodyVacancy.getContactName())))
-//                .andExpect(jsonPath("$.contactDepartment", is(this.requestBodyVacancy.getContactDepartment())))
-//                .andExpect(jsonPath("$.contactEmail", is(this.requestBodyVacancy.getContactEmail())))
-//                .andExpect(jsonPath("$.contactTelephone", is(this.requestBodyVacancy.getContactTelephone())))
-//                .andExpect(jsonPath("$.eligibility", is(this.requestBodyVacancy.getEligibility())))
-//                .andExpect(jsonPath("$.salaryMin", is(this.requestBodyVacancy.getSalaryMin())))
-//                .andExpect(jsonPath("$.salaryMax", is(this.requestBodyVacancy.getSalaryMax())))
-//				.andExpect(jsonPath("$.nationalityStatement", is(this.requestBodyVacancy.getNationalityStatement())))
-//                .andExpect(jsonPath("$.numberVacancies", is(this.requestBodyVacancy.getNumberVacancies())));
         sendRequest
                 .andExpect(status().isOk());
+
+        Optional<Vacancy> optionalVacancy = vacancyRepository.findById(vacancy1.getId());
+
+        Assert.assertEquals("title", "testUpdate", optionalVacancy.get().getTitle());
     }
 
     @Test
@@ -385,8 +378,11 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
         // Given
         String path = "/vacancy/-1";
 
+        Vacancy vacancy = getVacancyRequestBody();
+        ObjectMapper objectMapper = new ObjectMapper();
+
         // When
-        ResultActions sendRequest = mvc.perform(put(path).contentType(APPLICATION_JSON_UTF8).content(getVacancyRequestBody()));
+        ResultActions sendRequest = mvc.perform(put(path).contentType(APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(vacancy)));
 
         // Then
         sendRequest.andExpect(status().isNotFound());
@@ -479,9 +475,13 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
     @Test
     public void search_invalidHttpVerb() throws Exception {
+        
+        Vacancy vacancy = getVacancyRequestBody();
+        ObjectMapper objectMapper = new ObjectMapper();
+
         String path = "/vacancy/search?page=0&size=1";
 
-        mvc.perform(get(path).contentType(APPLICATION_JSON_UTF8).content(getVacancyRequestBody()))
+        mvc.perform(get(path).contentType(APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(vacancy)))
             				.andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
     }
 
@@ -994,7 +994,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
         doOpenPublicSearchTests(0);
     }
 
-    private String getVacancyRequestBody() throws JsonProcessingException {
+    private Vacancy getVacancyRequestBody() throws JsonProcessingException {
 
         VacancyLocation vacancyLocation = VacancyLocation.builder()
                 .latitude(BRISTOL_LATITUDE)
@@ -1023,7 +1023,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .build();
 
         vacancy.getVacancyLocations().add(vacancyLocation);
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.writeValueAsString(vacancy);
+
+        return vacancy;
     }
 }

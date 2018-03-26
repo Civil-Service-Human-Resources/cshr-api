@@ -3,7 +3,7 @@ jobs:
   build:
     environment:
       - COMPOSE_FILE: "docker-compose.yml"
-      - BINTRAY_URL: "cshr-docker-rpg.bintray.io"
+      - AZURE_URL: "cshrrpg.azurecr.io"
 
     machine: true
     steps:
@@ -17,24 +17,26 @@ jobs:
             docker-compose build api
 
       - run:
-          name: Login to Bintray
-          command: docker login -u cshr -p ${BINTRAY_API_KEY} ${BINTRAY_URL}
+          name: Login to Azure container repo
+          command: docker login -u ${ACR_ID} -p ${ACR_PASS} ${AZURE_URL}
 
       - run:
-          name: Push the images to Bintray
-          command: docker push ${BINTRAY_URL}/cshr-api:${CIRCLE_WORKFLOW_ID}
+          name: Push the images to Acr
+          command: docker push ${AZURE_URL}/cshr-api:${CIRCLE_WORKFLOW_ID}
 
 
   ship:
     environment:
       - COMPOSE_FILE: "docker-compose.yml"
+      - AZURE_URL: "cshrrpg.azurecr.io"
+
     machine: true
     steps:
       - checkout
 
       - run:
-          name: Login to Bintray
-          command: docker login -u cshr -p ${BINTRAY_API_KEY} ${BINTRAY_URL}
+          name: Login to Azure container repo
+          command: docker login -u ${ACR_ID} -p ${ACR_PASS} ${AZURE_URL}
 
       - run:
           name: Pull Current workflow images
@@ -59,8 +61,8 @@ jobs:
     machine: true
     steps:
       - run:
-        name: Notify Jenkins pipeline to deploy change
-        command: curl -X POST --user "circleci:${JENKINS_API_KEY}"  "https://${JENKINS_HOST}/job/deploy-cshr-api/buildWithParameters?dockerTag=${CIRCLE_WORKFLOW_ID}&environment=dev"
+          name: Notify Jenkins pipeline to deploy change
+          command: curl -X POST --user "circleci:${JENKINS_API_KEY}"  "https://${JENKINS_HOST}/job/deploy-cshr-api/buildWithParameters?dockerTag=${CIRCLE_WORKFLOW_ID}&environment=dev"
 
 workflows:
   version: 2

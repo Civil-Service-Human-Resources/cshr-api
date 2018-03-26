@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.cshr.vcm.model.Vacancy;
-import uk.gov.cshr.vcm.model.VacancyLocation;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
 
 @Profile("dev")
@@ -64,11 +63,12 @@ public class VacancyController {
 
         Optional<Vacancy> foundVacancy = vacancyRepository.findById(vacancyId);
 
-        for (VacancyLocation vacancyLocation : vacancyUpdate.getVacancyLocations()) {
-            vacancyLocation.setVacancy(vacancyUpdate);
-        }
-
         if (foundVacancy.isPresent()) {
+
+            vacancyUpdate.getVacancyLocations().forEach((vacancyLocation) -> {
+                vacancyLocation.setVacancy(vacancyUpdate);
+            });
+
             vacancyUpdate.setId(foundVacancy.get().getId());
             vacancyRepository.save(vacancyUpdate);
             return ResponseEntity.ok().body(foundVacancy.get());
@@ -76,14 +76,6 @@ public class VacancyController {
         else {
             return ResponseEntity.notFound().build();
         }
-
-//        return foundVacancy.map((Vacancy vacancy) -> {
-//            // Attention, mutable state on the argument
-//            vacancyUpdate.setId(vacancy.getId());
-//            vacancyRepository.save(vacancyUpdate);
-//
-//            return ResponseEntity.ok().body(vacancy);
-//        }).orElse(ResponseEntity.notFound().build());
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/{vacancyId}")
