@@ -225,4 +225,18 @@
         <dropColumn columnName="longitude" tableName="vacancies" />
         <dropColumn columnName="location" tableName="vacancies" />
 	</changeSet>
+    <changeSet author="gordon" id="26">
+        <addColumn tableName="vacancies">
+            <column name="contracttype" type="TEXT" />
+        </addColumn>
+        <addColumn tableName="vacancies">
+            <column name="workingpattern" type="TEXT" />
+        </addColumn>
+        <addColumn tableName="vacancies">
+            <column name="whatweoffer" type="TEXT" />
+        </addColumn>
+        <addColumn tableName="vacancies">
+            <column name="locationoverride" type="TEXT" />
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
