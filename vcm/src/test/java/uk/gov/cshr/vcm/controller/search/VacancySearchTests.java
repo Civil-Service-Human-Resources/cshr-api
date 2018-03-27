@@ -357,15 +357,15 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
 
         Vacancy fulltimeVacancy = createVacancyPrototype(createBristolLocationPrototype("bristol1"));
-        fulltimeVacancy.setContractTypes(ContractType.FULL_TIME.toString() + ",anythingelse1");
+        fulltimeVacancy.setContractTypes(ContractType.FULL_TIME.toString() + ", anythingelse1");
         saveVacancy(fulltimeVacancy);
 
         Vacancy parttimeVacancy = createVacancyPrototype(createBristolLocationPrototype("bristol1"));
-        parttimeVacancy.setContractTypes(ContractType.PART_TIME.toString() + ",anythingelse2");
+        parttimeVacancy.setContractTypes(ContractType.PART_TIME.toString() + ", anythingelse2");
         saveVacancy(parttimeVacancy);
 
         Vacancy internshipVacancy = createVacancyPrototype(createBristolLocationPrototype("bristol1"));
-        internshipVacancy.setContractTypes(ContractType.INTERNSHIP.toString() + ",anythingelse3");
+        internshipVacancy.setContractTypes(ContractType.INTERNSHIP.toString() + ", anythingelse3");
         saveVacancy(internshipVacancy);
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()

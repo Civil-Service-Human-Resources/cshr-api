@@ -212,6 +212,8 @@ public class Vacancy implements Serializable {
     @Column(name = "contracttype")
     private String contractTypes;
 
+    @ApiModelProperty(notes = "A comma separated list of working patterns",
+                      example = "FULL_TIME, PART_TIME, CONTRACT, TEMPORARY, SEASONAL, INTERNSHIP")
     @Column(name = "workingpattern")
     private String workingPatterns;
 
