@@ -207,12 +207,10 @@ public class Vacancy implements Serializable {
     private String salaryOverrideDescription;
 
     @Column(name = "contracttype")
-    @Enumerated(EnumType.STRING)
-    private ContractType contractType;
+    private String contractType;
 
     @Column(name = "workingpattern")
-    @Enumerated(EnumType.STRING)
-    private WorkingPattern workingPattern;
+    private String workingPattern;
 
     @Column(name = "whatweoffer")
     private String whatWeOffer;
