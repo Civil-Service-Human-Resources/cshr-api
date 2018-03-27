@@ -62,7 +62,7 @@ public class HibernateSearchService {
         FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
         QueryBuilder qb = fullTextEntityManager.getSearchFactory().buildQueryBuilder().forEntity(VacancyLocation.class).get();
 
-        Query searchtermQuery = getSearchTermQuery(searchParameters.getVacancySearchParameters().getKeyword(), qb);
+        Query searchtermQuery = getSearchTermQuery(searchParameters, qb);
         Query salaryQuery = getSalaryQuery(searchParameters, qb);
         Query openClosed = getOpenClosedQuery(qb);
         Query departmentQuery = getDepartmentQuery(searchParameters, qb);
@@ -173,9 +173,13 @@ public class HibernateSearchService {
         }
     }
 
-    private Query getSearchTermQuery(String searchTerm, QueryBuilder qb) {
+    private Query getSearchTermQuery(SearchParameters searchParameters, QueryBuilder qb) {
+
+        String searchTerm = searchParameters.getVacancySearchParameters().getKeyword();
 
         if (searchTerm != null && !searchTerm.isEmpty()) {
+
+            searchTerm = searchTerm.toLowerCase();
 
             Query titleFuzzyQuery = qb.keyword().fuzzy()
                     .withEditDistanceUpTo(1)
