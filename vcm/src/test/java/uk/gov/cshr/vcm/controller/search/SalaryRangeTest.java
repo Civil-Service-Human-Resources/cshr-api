@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.assertj.core.api.Fail;
 import static org.hamcrest.CoreMatchers.not;
+import org.hamcrest.Matchers;
 import static org.hamcrest.Matchers.contains;
 import org.junit.After;
 import org.junit.Assert;
@@ -51,7 +52,6 @@ import uk.gov.cshr.vcm.repository.VacancyRepository;
 import uk.gov.cshr.vcm.service.HibernateSearchService;
 import uk.gov.cshr.vcm.service.LocationService;
 
-//@Ignore
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = VcmApplication.class)
 @ContextConfiguration
@@ -92,9 +92,6 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
     private static final Timestamp THIRTY_DAYS_FROM_NOW = getTime(30);
     private static final Timestamp ONE_DAY_AGO = getTime(-1);
 
-    private final List<Vacancy> createdVacancies = new ArrayList<>();
-    private final List<Department> createdDepartments = new ArrayList<>();
-
     private Department department;
 
     @Before
@@ -107,7 +104,6 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
         department = departmentRepository.save(Department.builder().name("Department One").build());
-        createdDepartments.add(department);
 
         given(locationService.find("bristol"))
                 .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
@@ -118,14 +114,6 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
 
     @After
     public void after() {
-
-//        for (Vacancy createdVacancy : createdVacancies) {
-//            vacancyRepository.delete(createdVacancy);
-//        }
-//
-//        for (Department createdDepartment : createdDepartments) {
-//            departmentRepository.delete(createdDepartment);
-//        }
     }
 
     @Test
@@ -274,13 +262,6 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         Vacancy v4 = createVacancyWithSalaryRange(60000, 65000, department, BRISTOL);
         Vacancy v5 = createVacancyWithSalaryRange(60000, null, department, BRISTOL);
 
-        List<Long> ids = Arrays.asList(
-                v1.getId(),
-                v2.getId(),
-                v3.getId(),
-                v4.getId(),
-                v5.getId());
-
         Page<Vacancy> result = findVancancies(10000, null, "bristol");
         List<Vacancy> resultsList = result.getContent();
 
@@ -291,14 +272,12 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
             results.add(vacancy.getId());
         });
 
-        // who knows why this does not work :/
-//        Assert.assertThat(results, Matchers.containsInAnyOrder(ids));
-
-//        Assert.assertTrue(resultsList.contains(v1));
-//        Assert.assertTrue(resultsList.contains(v2));
-//        Assert.assertTrue(resultsList.contains(v3));
-//        Assert.assertTrue(resultsList.contains(v4));
-//        Assert.assertTrue(resultsList.contains(v5));
+        Assert.assertThat(results, Matchers.containsInAnyOrder(
+                v1.getId(),
+                v2.getId(),
+                v3.getId(),
+                v4.getId(),
+                v5.getId()));
     }
 
     @Test
@@ -314,13 +293,16 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         List<Vacancy> resultsList = result.getContent();
 
         Assert.assertTrue(resultsList.size() == 4);
-//        Assert.assertFalse(resultsList.contains(v1));
-//        Assert.assertTrue(resultsList.contains(v2));
-//        Assert.assertTrue(resultsList.contains(v3));
-//        Assert.assertTrue(resultsList.contains(v4));
-//        Assert.assertTrue(resultsList.contains(v5));
 
-        System.out.println("Success");
+        List<Long> results = new ArrayList<>();
+        resultsList.forEach((vacancy) -> {
+            results.add(vacancy.getId());
+        });
+
+        Assert.assertThat(results, Matchers.containsInAnyOrder(v2.getId(),
+                v3.getId(),
+                v4.getId(),
+                v5.getId()));
     }
 
     @Test
@@ -335,12 +317,16 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         Page<Vacancy> result = findVancancies(50000, null, "bristol");
         List<Vacancy> resultsList = result.getContent();
 
+        List<Long> results = new ArrayList<>();
+        resultsList.forEach((vacancy) -> {
+            results.add(vacancy.getId());
+        });
+
         Assert.assertTrue(resultsList.size() == 4);
-//        Assert.assertFalse(resultsList.contains(v1));
-//        Assert.assertTrue(resultsList.contains(v2));
-//        Assert.assertTrue(resultsList.contains(v3));
-//        Assert.assertTrue(resultsList.contains(v4));
-//        Assert.assertTrue(resultsList.contains(v5));
+        Assert.assertThat(results, Matchers.containsInAnyOrder(v2.getId(),
+                v3.getId(),
+                v4.getId(),
+                v5.getId()));
     }
 
     @Test
@@ -355,12 +341,15 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         Page<Vacancy> result = findVancancies(60000, null, "bristol");
         List<Vacancy> resultsList = result.getContent();
 
+        List<Long> results = new ArrayList<>();
+        resultsList.forEach((vacancy) -> {
+            results.add(vacancy.getId());
+        });
+
         Assert.assertTrue(resultsList.size() == 3);
-//        Assert.assertFalse(resultsList.contains(v1));
-//        Assert.assertFalse(resultsList.contains(v2));
-//        Assert.assertTrue(resultsList.contains(v3));
-//        Assert.assertTrue(resultsList.contains(v4));
-//        Assert.assertTrue(resultsList.contains(v5));
+        Assert.assertThat(results, Matchers.containsInAnyOrder(v3.getId(),
+                v4.getId(),
+                v5.getId()));
     }
 
     @Test
@@ -376,11 +365,6 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         List<Vacancy> resultsList = result.getContent();
 
         Assert.assertTrue(resultsList.isEmpty());
-        Assert.assertFalse(resultsList.contains(v1));
-        Assert.assertFalse(resultsList.contains(v2));
-        Assert.assertFalse(resultsList.contains(v3));
-        Assert.assertFalse(resultsList.contains(v4));
-        Assert.assertFalse(resultsList.contains(v5));
     }
 
     @Test
@@ -396,11 +380,7 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         List<Vacancy> resultsList = result.getContent();
 
         Assert.assertTrue(resultsList.size() == 1);
-//        Assert.assertTrue(resultsList.contains(v1));
-//        Assert.assertFalse(resultsList.contains(v2));
-//        Assert.assertFalse(resultsList.contains(v3));
-//        Assert.assertFalse(resultsList.contains(v4));
-//        Assert.assertFalse(resultsList.contains(v5));
+        Assert.assertTrue(resultsList.get(0).getId().equals(v1.getId()));
     }
 
     @Test
@@ -416,11 +396,7 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         List<Vacancy> resultsList = result.getContent();
 
         Assert.assertTrue(resultsList.size() == 1);
-//        Assert.assertTrue(resultsList.contains(v1));
-//        Assert.assertFalse(resultsList.contains(v2));
-//        Assert.assertFalse(resultsList.contains(v3));
-//        Assert.assertFalse(resultsList.contains(v4));
-//        Assert.assertFalse(resultsList.contains(v5));
+        Assert.assertTrue(resultsList.get(0).getId().equals(v1.getId()));
     }
 
     @Test
@@ -432,7 +408,6 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         Vacancy v4 = createVacancyWithSalaryRange(60000, 65000, department, BRISTOL);
         Vacancy v5 = createVacancyWithSalaryRange(60000, null, department, BRISTOL);
 
-
         Page<Vacancy> result = findVancancies(30000, 50000, "bristol");
         List<Vacancy> resultsList = result.getContent();
 
@@ -443,14 +418,14 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
             results.add(vacancy.getId());
         });
 
-        Assert.assertThat(results, not(contains(v4.getId(), v5.getId())));
+        Assert.assertThat(results, not(contains(
+                v4.getId(),
+                v5.getId())));
 
-
-//        Assert.assertTrue(resultsList.contains(v1));
-//        Assert.assertTrue(resultsList.contains(v2));
-//        Assert.assertTrue(resultsList.contains(v3));
-//        Assert.assertFalse(resultsList.contains(v4));
-//        Assert.assertFalse(resultsList.contains(v5));
+        Assert.assertThat(results, Matchers.containsInAnyOrder(
+                v1.getId(),
+                v2.getId(),
+                v3.getId()));
     }
 
     @Test
@@ -465,12 +440,21 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         Page<Vacancy> result = findVancancies(40000, 50000, "bristol");
         List<Vacancy> resultsList = result.getContent();
 
+        List<Long> results = new ArrayList<>();
+        resultsList.forEach((vacancy) -> {
+            results.add(vacancy.getId());
+        });
+
         Assert.assertTrue(resultsList.size() == 2);
-//        Assert.assertFalse(resultsList.contains(v1));
-//        Assert.assertTrue(resultsList.contains(v2));
-//        Assert.assertTrue(resultsList.contains(v3));
-//        Assert.assertFalse(resultsList.contains(v4));
-//        Assert.assertFalse(resultsList.contains(v5));
+
+        Assert.assertThat(results, not(contains(
+                v1.getId(),
+                v4.getId(),
+                v5.getId())));
+
+        Assert.assertThat(results, Matchers.containsInAnyOrder(
+                v2.getId(),
+                v3.getId()));
     }
 
     @Test
@@ -484,13 +468,21 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
 
         Page<Vacancy> result = findVancancies(50000, 60000, "bristol");
         List<Vacancy> resultsList = result.getContent();
+        List<Long> results = new ArrayList<>();
+        resultsList.forEach((vacancy) -> {
+            results.add(vacancy.getId());
+        });
 
         Assert.assertTrue(resultsList.size() == 4);
-//        Assert.assertFalse(resultsList.contains(v1));
-//        Assert.assertTrue(resultsList.contains(v2));
-//        Assert.assertTrue(resultsList.contains(v3));
-//        Assert.assertTrue(resultsList.contains(v4));
-//        Assert.assertTrue(resultsList.contains(v5));
+        
+        Assert.assertThat(results, not(contains(
+                v1.getId())));
+
+        Assert.assertThat(results, Matchers.containsInAnyOrder(
+                v2.getId(),
+                v3.getId(),
+                v4.getId(),
+                v5.getId()));
     }
 
     @Test
@@ -504,13 +496,21 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
 
         Page<Vacancy> result = findVancancies(60000, 60000, "bristol");
         List<Vacancy> resultsList = result.getContent();
+        List<Long> results = new ArrayList<>();
+        resultsList.forEach((vacancy) -> {
+            results.add(vacancy.getId());
+        });
 
         Assert.assertTrue(resultsList.size() == 3);
-//        Assert.assertFalse(resultsList.contains(v1));
-//        Assert.assertFalse(resultsList.contains(v2));
-//        Assert.assertTrue(resultsList.contains(v3));
-//        Assert.assertTrue(resultsList.contains(v4));
-//        Assert.assertTrue(resultsList.contains(v5));
+
+        Assert.assertThat(results, not(contains(
+                v1.getId(),
+                v2.getId())));
+
+        Assert.assertThat(results, Matchers.containsInAnyOrder(
+                v3.getId(),
+                v4.getId(),
+                v5.getId()));
     }
 
     @Test
@@ -526,11 +526,6 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         List<Vacancy> resultsList = result.getContent();
 
         Assert.assertTrue(resultsList.isEmpty());
-//        Assert.assertFalse(resultsList.contains(v1));
-//        Assert.assertFalse(resultsList.contains(v2));
-//        Assert.assertFalse(resultsList.contains(v3));
-//        Assert.assertFalse(resultsList.contains(v4));
-//        Assert.assertFalse(resultsList.contains(v5));
     }
 
     public Page<Vacancy> findVancancies(Integer minSalary, Integer maxSalary, String place) throws Exception {
@@ -604,7 +599,6 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         vacancy.setSalaryMin(salaryMin);
         vacancy.setSalaryMax(salaryMax != null ? salaryMax : salaryMin);
         vacancyRepository.save(vacancy);
-        createdVacancies.add(vacancy);
         return vacancy;
     }
 }
