@@ -206,13 +206,14 @@ public class Vacancy implements Serializable {
     @Column(name = "salaryoverridedescription")
     private String salaryOverrideDescription;
 
+    @ApiModelProperty(notes = "A comma separated list of contract types",
+                      example = "FULL_TIME, PART_TIME, CONTRACT, TEMPORARY, SEASONAL, INTERNSHIP")
+    @Field(store = Store.YES)
     @Column(name = "contracttype")
-    @Enumerated(EnumType.STRING)
-    private ContractType contractType;
+    private String contractTypes;
 
     @Column(name = "workingpattern")
-    @Enumerated(EnumType.STRING)
-    private WorkingPattern workingPattern;
+    private String workingPatterns;
 
     @Column(name = "whatweoffer")
     private String whatWeOffer;
@@ -220,3 +221,4 @@ public class Vacancy implements Serializable {
     @Column(name = "locationoverride")
     private String locationOverride;
 }
+

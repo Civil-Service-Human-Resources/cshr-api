@@ -31,6 +31,8 @@ public class VacancySearchParameters implements Serializable {
 
     private Boolean overseasJob;
 
+    private String[] contractTypes;
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);

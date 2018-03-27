@@ -67,13 +67,15 @@ public class HibernateSearchService {
         Query openClosed = getOpenClosedQuery(qb);
         Query departmentQuery = getDepartmentQuery(searchParameters, qb);
         Query locationQuery = getLocationQuery(searchParameters, qb);
+        Query contractTypeQuery = getContractTypeQuery(searchParameters, qb);
 
         BooleanJunction combinedQuery = qb.bool()
                 .must(locationQuery)
                 .must(salaryQuery)
                 .must(openClosed)
                 .must(departmentQuery)
-                .must(searchtermQuery);
+                .must(searchtermQuery)
+                .must(contractTypeQuery);
 
         log.debug("luceneQuery=" + combinedQuery.createQuery().toString());
 
@@ -314,6 +316,30 @@ public class HibernateSearchService {
             return departmentQuery;
         }
 
+        else {
+            return qb.all().createQuery();
+        }
+    }
+
+    private Query getContractTypeQuery(SearchParameters searchParameters, QueryBuilder qb) {
+
+        if ( searchParameters.getVacancySearchParameters().getContractTypes() != null
+                && searchParameters.getVacancySearchParameters().getContractTypes().length > 0) {
+
+            StringBuilder stringBuilder = new StringBuilder();
+
+            for (String string : searchParameters.getVacancySearchParameters().getContractTypes()) {
+                stringBuilder.append(string).append(" ");
+            }
+
+            Query query = qb.keyword()
+                    .onField("vacancy.contractTypes")
+                    .matching(stringBuilder.toString())
+                    .createQuery();
+
+            return query;
+
+        }
         else {
             return qb.all().createQuery();
         }
