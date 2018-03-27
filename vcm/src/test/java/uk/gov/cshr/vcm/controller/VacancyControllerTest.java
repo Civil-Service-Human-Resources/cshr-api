@@ -44,11 +44,13 @@ import uk.gov.cshr.vcm.VcmApplication;
 import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
 import static uk.gov.cshr.vcm.controller.search.VacancySearchTests.BRISTOL_LATITUDE;
 import static uk.gov.cshr.vcm.controller.search.VacancySearchTests.BRISTOL_LONGITUDE;
+import uk.gov.cshr.vcm.model.ContractType;
 import uk.gov.cshr.vcm.model.Coordinates;
 import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.model.NationalityStatement;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancyLocation;
+import uk.gov.cshr.vcm.model.WorkingPattern;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
 import uk.gov.cshr.vcm.service.LocationService;
@@ -126,6 +128,10 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             .displayCscContent(Boolean.TRUE)
             .selectionProcessDetails("selectionProcessDetails")
             .nationalityStatement(NationalityStatement.NON_RESERVED)
+            .contractType(ContractType.FULL_TIME)
+            .workingPattern(WorkingPattern.FLEXIBLE_WORKING)
+            .whatWeOffer("whatWeOffer")
+            .locationOverride("locationOverride")
             .build();
 
     {
@@ -314,7 +320,11 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.contactTelephone", is(this.vacancy1.getContactTelephone())))
                 .andExpect(jsonPath("$.eligibility", is(this.vacancy1.getEligibility())))
                 .andExpect(jsonPath("$.salaryMin", is(this.vacancy1.getSalaryMin())))
-                .andExpect(jsonPath("$.salaryMax", is(this.vacancy1.getSalaryMax())))
+                .andExpect(jsonPath("$.salaryMax", is(this.vacancy1.getSalaryMax())))                
+                .andExpect(jsonPath("$.workingPattern", is(this.vacancy1.getWorkingPattern().toString())))
+                .andExpect(jsonPath("$.whatWeOffer", is(this.vacancy1.getWhatWeOffer())))
+                .andExpect(jsonPath("$.locationOverride", is(this.vacancy1.getLocationOverride())))
+                .andExpect(jsonPath("$.contractType", is(this.vacancy1.getContractType().toString())))
                 .andExpect(jsonPath("$.numberVacancies", is(this.vacancy1.getNumberVacancies())));
     }
 
