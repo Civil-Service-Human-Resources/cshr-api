@@ -1,11 +1,10 @@
 package uk.gov.cshr.vcm.model;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Tests {@link VacancySearchParameters}
@@ -26,11 +25,6 @@ public class VacancySearchParametersTest {
     @After
     public void tearDown() {
         location = null;
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void build_noLocationSupplied() {
-        VacancySearchParameters.builder().keyword(KEYWORD).build();
     }
 
     @Test

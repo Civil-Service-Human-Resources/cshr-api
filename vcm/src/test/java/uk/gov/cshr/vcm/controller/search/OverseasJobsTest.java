@@ -1,18 +1,16 @@
-package uk.gov.cshr.vcm.controller;
+package uk.gov.cshr.vcm.controller.search;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.mockito.BDDMockito.given;
@@ -33,17 +31,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.cshr.vcm.VcmApplication;
+import uk.gov.cshr.vcm.controller.VacancyPage;
 import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
 import uk.gov.cshr.vcm.model.Coordinates;
 import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.model.Location;
 import uk.gov.cshr.vcm.model.Vacancy;
+import uk.gov.cshr.vcm.model.VacancyLocation;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
+import uk.gov.cshr.vcm.service.HibernateSearchService;
 import uk.gov.cshr.vcm.service.LocationService;
 
-@Ignore
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = VcmApplication.class)
 @ContextConfiguration
@@ -57,8 +57,22 @@ public class OverseasJobsTest extends AbstractTestNGSpringContextTests {
     public static final double NEWCASTLE_LATITUDE = 54.9806308;
     public static final double NEWCASTLE_LONGITUDE = -1.6167437;
 
-    public static final Coordinates BRISTOL = new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West");
-    public static final Coordinates NEWCASTLE = new Coordinates(NEWCASTLE_LONGITUDE, NEWCASTLE_LATITUDE, "North East");
+    public static final Coordinates BRISTOL_COORDINATES = new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West");
+    public static final Coordinates NEWCASTLE_COORDINATES = new Coordinates(NEWCASTLE_LONGITUDE, NEWCASTLE_LATITUDE, "North East");
+    private static final String BRISTOL_JOB_TITLE = "bristol job";
+    private static final String NEWCASTLE_JOB_TITLE = "newcastle job";
+
+    VacancyLocation bristolLocation = VacancyLocation.builder()
+            .latitude(BRISTOL_LATITUDE)
+            .longitude(BRISTOL_LONGITUDE)
+            .location("bristol")
+            .build();
+
+    VacancyLocation newcastleLocation = VacancyLocation.builder()
+            .latitude(NEWCASTLE_LATITUDE)
+            .longitude(NEWCASTLE_LONGITUDE)
+            .location("newcastle")
+            .build();
 
     final private MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(),
@@ -73,6 +87,9 @@ public class OverseasJobsTest extends AbstractTestNGSpringContextTests {
     @Inject
     private DepartmentRepository departmentRepository;
 
+    @Inject
+    private HibernateSearchService hibernateSearchService;
+
     private MockMvc mockMvc;
 
     @MockBean
@@ -81,18 +98,18 @@ public class OverseasJobsTest extends AbstractTestNGSpringContextTests {
     private static final Timestamp THIRTY_DAYS_FROM_NOW = getTime(30);
     private static final Timestamp ONE_DAY_AGO = getTime(-1);
 
-    private final List<Vacancy> createdVacancies = new ArrayList<>();
-    private final List<Department> createdDepartments = new ArrayList<>();
-
     private Department department;
 
     @Before
     public void before() throws LocationServiceException {
 
+        hibernateSearchService.purge();
+        vacancyRepository.deleteAll();
+        departmentRepository.deleteAll();
+
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
         department = departmentRepository.save(Department.builder().name("Department One").build());
-        createdDepartments.add(department);
 
         given(locationService.find("bristol"))
                 .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
@@ -103,14 +120,6 @@ public class OverseasJobsTest extends AbstractTestNGSpringContextTests {
 
     @After
     public void after() {
-
-        for (Vacancy createdVacancy : createdVacancies) {
-            vacancyRepository.delete(createdVacancy);
-        }
-
-        for (Department createdDepartment : createdDepartments) {
-            departmentRepository.delete(createdDepartment);
-        }
     }
 
     @Test
@@ -120,21 +129,20 @@ public class OverseasJobsTest extends AbstractTestNGSpringContextTests {
         boolean DONT_INCLUDE_OVERSEAS = false;
 
         // As we're searching Bristol, this should always come up
-        Vacancy localVacancy = getVacancyPrototype(BRISTOL);
+        Vacancy localVacancy = getVacancyPrototype(BRISTOL_JOB_TITLE, bristolLocation);
         localVacancy.setOverseasJob(Boolean.FALSE);
         vacancyRepository.save(localVacancy);
-        createdVacancies.add(localVacancy);
 
         // this should only come up when overseas is selected
-        Vacancy overseasVacancy = getVacancyPrototype(NEWCASTLE);
+        Vacancy overseasVacancy = getVacancyPrototype(NEWCASTLE_JOB_TITLE, newcastleLocation);
         overseasVacancy.setOverseasJob(Boolean.TRUE);
         vacancyRepository.save(overseasVacancy);
-        createdVacancies.add(overseasVacancy);
 
         Page<Vacancy> result = findVancancies("bristol", DONT_INCLUDE_OVERSEAS);
         List<Vacancy> resultsList = result.getContent();
 
         Assert.assertEquals(1, resultsList.size());
+        Assert.assertTrue("Expect Bristol Job", resultsList.get(0).getTitle().equals(BRISTOL_JOB_TITLE));
 
         result = findVancancies("bristol", INCLUDE_OVERSEAS);
         resultsList = result.getContent();
@@ -171,12 +179,11 @@ public class OverseasJobsTest extends AbstractTestNGSpringContextTests {
         return new Timestamp(date.getTime());
     }
 
-    private Vacancy getVacancyPrototype(Coordinates coordinates) {
+    private Vacancy getVacancyPrototype(String jobTitle, VacancyLocation vacancyLocation) {
 
         Vacancy vacancyPrototype = Vacancy.builder()
-                .title("testTile1 SearchQueryTitle")
+                .title(jobTitle)
                 .description("testDescription1 SearchQueryDescription")
-                .location("testLocation1 SearchQueryLocation")
                 .grade("testGrade1 SearchQueryGrade")
                 .responsibilities("testResponsibilities1")
                 .workingHours("testWorkingHours1")
@@ -188,24 +195,15 @@ public class OverseasJobsTest extends AbstractTestNGSpringContextTests {
                 .contactTelephone("testContactTelephone1")
                 .eligibility("testEligibility1")
                 .salaryMin(0)
+                .salaryMax(Integer.MAX_VALUE)
                 .identifier(1L)
                 .numberVacancies(1)
-                .latitude(coordinates.getLatitude())
-                .longitude(coordinates.getLongitude())
                 .identifier(System.currentTimeMillis())
                 .build();
 
+        vacancyPrototype.getVacancyLocations().add(vacancyLocation);
+        vacancyLocation.setVacancy(vacancyPrototype);
+
         return vacancyPrototype;
-    }
-
-    private Vacancy createVacancyWithSalaryRange(Integer salaryMin, Integer salaryMax, Department department, Coordinates coordinates) {
-
-        Vacancy vacancy = getVacancyPrototype(coordinates);
-        vacancy.setDepartment(department);
-        vacancy.setSalaryMin(salaryMin);
-        vacancy.setSalaryMax(salaryMax);
-        vacancyRepository.save(vacancy);
-        createdVacancies.add(vacancy);
-        return vacancy;
     }
 }

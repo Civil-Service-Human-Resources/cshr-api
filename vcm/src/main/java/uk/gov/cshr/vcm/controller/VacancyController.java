@@ -42,6 +42,12 @@ public class VacancyController {
     @ApiOperation(value = "Create a Vacancy", nickname = "create")
     public ResponseEntity<Vacancy> create(@RequestBody Vacancy vacancy) {
 
+        if (vacancy.getVacancyLocations() != null) {
+            vacancy.getVacancyLocations().forEach((vacancyLocation) -> {
+                vacancyLocation.setVacancy(vacancy);
+            });
+        }
+
         Vacancy savedVacancy = vacancyRepository.save(vacancy);
 
         URI location = ServletUriComponentsBuilder
@@ -57,13 +63,19 @@ public class VacancyController {
 
         Optional<Vacancy> foundVacancy = vacancyRepository.findById(vacancyId);
 
-        return foundVacancy.map((Vacancy vacancy) -> {
-            // Attention, mutable state on the argument
-            vacancyUpdate.setId(vacancy.getId());
-            vacancyRepository.save(vacancyUpdate);
+        if (foundVacancy.isPresent()) {
 
-            return ResponseEntity.ok().body(vacancy);
-        }).orElse(ResponseEntity.notFound().build());
+            vacancyUpdate.getVacancyLocations().forEach((vacancyLocation) -> {
+                vacancyLocation.setVacancy(vacancyUpdate);
+            });
+
+            vacancyUpdate.setId(foundVacancy.get().getId());
+            vacancyRepository.save(vacancyUpdate);
+            return ResponseEntity.ok().body(foundVacancy.get());
+        }
+        else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/{vacancyId}")

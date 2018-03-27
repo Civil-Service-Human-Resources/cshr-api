@@ -21,6 +21,6 @@ public class VacancyPage extends PageImpl<Vacancy> {
             @JsonProperty("number") int number,
             @JsonProperty("size") int size,
             @JsonProperty("totalElements") Long totalElements) {
-        super(content, new PageRequest(number, size), totalElements);
+        super(content, new PageRequest(number, size < 1 ? 1 : size), totalElements);
     }
 }

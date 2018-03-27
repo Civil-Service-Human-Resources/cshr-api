@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -80,7 +81,7 @@ public class VacancySearchController {
     public ResponseEntity<Page<Vacancy>> search(
 			@ApiParam(name = "searchParameters", value = "The values supplied to perform the search", required = true)
             @RequestBody VacancySearchParameters vacancySearchParameters, Pageable pageable)
-			throws LocationServiceException {
+            throws LocationServiceException, IOException {
 
 		Page<Vacancy> vacancies = searchService.search(vacancySearchParameters, pageable);
 		return ResponseEntity.ok().body(vacancies);

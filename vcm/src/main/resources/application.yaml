@@ -7,10 +7,17 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
     hibernate.ddl-auto: validate # validate schema on run.  Updates handled by Liquibase.
+    properties:
+        hibernate:
+            search:
+                default:
+                    directory_provider: filesystem
+                    indexBase: target/indexpath
   location:
     service:
       url: http://localhost:8989/findlocation/{searchTerm} # will be overridden by an env variable
 server:
   port: 8080
 liquibase:
+    enabled: true
     change-log: classpath:/changelog.xml

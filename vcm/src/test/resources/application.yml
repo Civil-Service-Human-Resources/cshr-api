@@ -6,8 +6,17 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     show-sql: true
-    hibernate.ddl-auto: create
+    hibernate.ddl-auto: drop # validate schema on run.  Updates handled by Liquibase.
+    properties:
+        hibernate:
+            search:
+                default:
+                    directory_provider: ram
+                    indexBase: target/testindexpath
+  location:
+    service:
+      url: http://location-service.dev.cshr-gov.uk/findlocation/{searchTerm} # will be overridden by an env variable
 server:
-  port: 9095
+  port: 8080
 liquibase:
-    enabled: false
+    change-log: classpath:/testchangelog.xml
