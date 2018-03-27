@@ -17,8 +17,8 @@
         <admin-user>postgres</admin-user>
         <admin-password>qwerty</admin-password>
 
-        <database>cshrtest</database>
-        <database-url>jdbc:postgresql://localhost:5432/cshrtest</database-url>
+        <database>cshr</database>
+        <database-url>jdbc:postgresql://localhost:5432/cshr</database-url>
         <database-user>postgres</database-user>
         <database-password>qwerty</database-password>
         <postgres.version>9.4-1206-jdbc42</postgres.version>
@@ -77,19 +77,6 @@
             <version>${testng.version}</version>
             <scope>test</scope>
         </dependency>
-
-<!--	 <dependency>
-	  <groupId>org.apache.lucene</groupId>
-	  <artifactId>lucene-analyzers-common</artifactId>
-	  <version>7.2.0</version>
-	  <type>jar</type>
-	 </dependency>
-	 <dependency>
-	  <groupId>org.apache.lucene</groupId>
-	  <artifactId>lucene-core</artifactId>
-	  <version>7.2.0</version>
-	  <type>jar</type>
-	 </dependency>-->
 	</dependencies>
 
     <build>

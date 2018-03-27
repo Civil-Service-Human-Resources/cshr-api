@@ -18,6 +18,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
@@ -75,7 +76,7 @@ public class VacancyLocation implements Serializable {
 
     @Override
     public String toString() {
-        return "VacancyLocation: " + id;
+        return ToStringBuilder.reflectionToString(this);
     }
 
 }

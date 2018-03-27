@@ -44,7 +44,6 @@ import uk.gov.cshr.vcm.repository.VacancyRepository;
 import uk.gov.cshr.vcm.service.HibernateSearchService;
 import uk.gov.cshr.vcm.service.LocationService;
 
-//@Ignore
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = VcmApplication.class)
 @ContextConfiguration
@@ -121,14 +120,6 @@ public class OverseasJobsTest extends AbstractTestNGSpringContextTests {
 
     @After
     public void after() {
-
-//        for (Vacancy createdVacancy : createdVacancies) {
-//            vacancyRepository.delete(createdVacancy);
-//        }
-//
-//        for (Department createdDepartment : createdDepartments) {
-//            departmentRepository.delete(createdDepartment);
-//        }
     }
 
     @Test
@@ -215,15 +206,4 @@ public class OverseasJobsTest extends AbstractTestNGSpringContextTests {
 
         return vacancyPrototype;
     }
-
-//    private Vacancy createVacancyWithSalaryRange(Integer salaryMin, Integer salaryMax, Department department, Coordinates coordinates) {
-//
-//        Vacancy vacancy = getVacancyPrototype(coordinates);
-//        vacancy.setDepartment(department);
-//        vacancy.setSalaryMin(salaryMin);
-//        vacancy.setSalaryMax(salaryMax);
-//        vacancyRepository.save(vacancy);
-//        createdVacancies.add(vacancy);
-//        return vacancy;
-//    }
 }
