@@ -28,6 +28,7 @@ import javax.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
@@ -71,6 +72,7 @@ import org.hibernate.search.annotations.TokenizerDef;
 @NoArgsConstructor
 @Table(name = "vacancies")
 @SequenceGenerator(name = "vacancies_id_seq", sequenceName = "vacancies_id_seq", allocationSize = 1)
+@EqualsAndHashCode
 public class Vacancy implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -112,7 +114,6 @@ public class Vacancy implements Serializable {
 
     @Field(store = Store.YES, analyze = Analyze.NO)
     @DateBridge(resolution = Resolution.MINUTE, encoding = EncodingType.STRING)
-//    @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT+0")
     @NonNull
     private Timestamp closingDate;
@@ -185,11 +186,6 @@ public class Vacancy implements Serializable {
     @ApiModelProperty(notes = "URL linking to external system")
     private String applyURL;
 
-    // @Field(index=Index.YES, analyze=Analyze.YES, store=Store.NO, bridge=@FieldBridge(impl=DHLCSKeywordFieldBridge.class))
-//    @Field(store = Store.YES)
-//    @Field(bridge = @FieldBridge(impl = RegionFieldBridge.class), store = Store.YES, analyze = Analyze.NO)
-//    @RegionFieldBridge
-//    @Analyzer(definition = "customanalyzer")
     @Field(store = Store.YES)
     @Column(name = "regions")
     private String regions;
@@ -202,19 +198,11 @@ public class Vacancy implements Serializable {
     @Enumerated(EnumType.STRING)
     private NationalityStatement nationalityStatement;
 
-//    @ContainedIn
-//    @JsonManagedReference
-//    @JsonIgnoreProperties("vacancy")
     @OneToMany(mappedBy = "vacancy", fetch = FetchType.EAGER, cascade = {
         CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE}, orphanRemoval = true)
     @Builder.Default
-//    @JsonIgnore
     private List<VacancyLocation> vacancyLocations = new ArrayList<>();
 
-//    @Override
-//    public String toString() {
-//        return "Vacancy: " + id;
-//    }
     @Column(name = "salaryoverridedescription")
     private String salaryOverrideDescription;
 }
