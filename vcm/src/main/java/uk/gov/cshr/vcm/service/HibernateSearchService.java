@@ -203,7 +203,7 @@ public class HibernateSearchService {
                     .ignoreAnalyzer()
                     .sentence(searchTerm)
                     .createQuery();
-            
+
             Query descriptiopnPhraseQuery = qb.phrase()
                     .onField("vacancy.description")
                     .ignoreAnalyzer()
@@ -329,19 +329,26 @@ public class HibernateSearchService {
             StringBuilder stringBuilder = new StringBuilder();
 
             for (String string : searchParameters.getVacancySearchParameters().getContractTypes()) {
-                stringBuilder.append(string).append(" ");
+				if ( ! string.isEmpty() ) {
+					stringBuilder.append(string).append(" ");
+				}
             }
 
-            Query query = qb.keyword()
-                    .onField("vacancy.contractTypes")
-                    .matching(stringBuilder.toString())
-                    .createQuery();
+			String queryString = stringBuilder.toString().trim();
 
-            return query;
+			if ( ! queryString.isEmpty() ) {
+
+				Query query = qb.keyword()
+						.onField("vacancy.contractTypes")
+						.matching(queryString)
+						.createQuery();
+
+				return query;
+			}
 
         }
-        else {
-            return qb.all().createQuery();
-        }
+
+		return qb.all().createQuery();
+
     }
 }
