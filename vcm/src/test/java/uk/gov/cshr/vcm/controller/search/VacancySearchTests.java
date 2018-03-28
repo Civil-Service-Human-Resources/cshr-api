@@ -52,6 +52,7 @@ import uk.gov.cshr.vcm.model.Location;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancyLocation;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
+import uk.gov.cshr.vcm.model.WorkingPattern;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
 import uk.gov.cshr.vcm.service.HibernateSearchService;
@@ -319,8 +320,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
 
         // return both departments
-        Page<Vacancy> result = findVancanciesByDpartmentInPlace("bristol", 
-                department1.getId().toString(), 
+        Page<Vacancy> result = findVancanciesByDpartmentInPlace("bristol",
+                department1.getId().toString(),
                 department2.getId().toString());
 
         List<Vacancy> resultsList = result.getContent();
@@ -416,7 +417,74 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
             Assert.assertTrue(vacancy.getContractTypes().contains(ContractType.FULL_TIME.toString())
             || vacancy.getContractTypes().contains(ContractType.PART_TIME.toString() ));
         }
+    }
 
+    @Test
+    public void testFilterByWorkingPAttern() throws Exception {
+
+        given(locationService.find("bristol"))
+                .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
+
+        Vacancy fulltimeVacancy = createVacancyPrototype(createBristolLocationPrototype("bristol1"));
+        fulltimeVacancy.setContractTypes(WorkingPattern.FLEXIBLE_WORKING.toString() + ", anythingelse1");
+        saveVacancy(fulltimeVacancy);
+
+        Vacancy parttimeVacancy = createVacancyPrototype(createBristolLocationPrototype("bristol1"));
+        parttimeVacancy.setContractTypes(WorkingPattern.FULL_TIME.toString() + ", anythingelse2");
+        saveVacancy(parttimeVacancy);
+
+        Vacancy internshipVacancy = createVacancyPrototype(createBristolLocationPrototype("bristol1"));
+        internshipVacancy.setContractTypes(WorkingPattern.HOME_WORKING.toString() + ", anythingelse3");
+        saveVacancy(internshipVacancy);
+
+        VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
+                .build();
+
+        // return all three
+        Page<Vacancy> result = findVancancies(vacancySearchParameters);
+        List<Vacancy> resultsList = result.getContent();
+        Assert.assertEquals("Expected number results", 3, resultsList.size());
+
+        vacancySearchParameters = VacancySearchParameters.builder()
+                .workingPatterns(new String[] {
+                    WorkingPattern.JOB_SHARE.toString(),
+                })
+                .build();
+
+        // no vacancies should exist matching seasonal
+        result = findVancancies(vacancySearchParameters);
+        resultsList = result.getContent();
+        Assert.assertEquals("Expected number results", 0, resultsList.size());
+
+        vacancySearchParameters = VacancySearchParameters.builder()
+                .workingPatterns(new String[] {
+                    WorkingPattern.FLEXIBLE_WORKING.toString(),
+                })
+                .build();
+
+        // no vacancies should exist matching seasonal
+        result = findVancancies(vacancySearchParameters);
+        resultsList = result.getContent();
+        Assert.assertEquals("Expected number results", 1, resultsList.size());
+        Assert.assertTrue("Expected result", resultsList.get(0).getContractTypes().contains(WorkingPattern.FLEXIBLE_WORKING.toString()));
+
+        vacancySearchParameters = VacancySearchParameters.builder()
+                .workingPatterns(new String[] {
+                    WorkingPattern.FLEXIBLE_WORKING.toString(),
+                    WorkingPattern.FULL_TIME.toString(),
+                })
+                .build();
+
+        // two vacancies should exist matching full/parttime
+        result = findVancancies(vacancySearchParameters);
+        resultsList = result.getContent();
+
+        Assert.assertEquals("Expected number results", 2, resultsList.size());
+
+        for (Vacancy vacancy : resultsList) {
+            Assert.assertTrue(vacancy.getWorkingPatterns().contains(WorkingPattern.FLEXIBLE_WORKING.toString())
+            || vacancy.getWorkingPatterns().contains(WorkingPattern.FULL_TIME.toString() ));
+        }
     }
 
     @Test

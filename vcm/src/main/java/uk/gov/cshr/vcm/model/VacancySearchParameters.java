@@ -33,6 +33,8 @@ public class VacancySearchParameters implements Serializable {
 
     private String[] contractTypes;
 
+	private String[] workingPatterns;
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
