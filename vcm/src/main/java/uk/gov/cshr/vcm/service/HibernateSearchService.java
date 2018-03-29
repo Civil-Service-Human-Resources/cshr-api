@@ -190,6 +190,8 @@ public class HibernateSearchService {
 
             searchTerm = searchTerm.toLowerCase();
 
+            searchTerm = searchTerm.toLowerCase();
+
             Query titleFuzzyQuery = qb.keyword().fuzzy()
                     .withEditDistanceUpTo(1)
                     .withPrefixLength(1)
