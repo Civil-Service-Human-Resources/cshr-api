@@ -394,7 +394,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 })
                 .build();
 
-        // no vacancies should exist matching seasonal
+        // One vacancy sholud match internship
         result = findVancancies(vacancySearchParameters);
         resultsList = result.getContent();
         Assert.assertEquals("Expected number results", 1, resultsList.size());
@@ -420,22 +420,22 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void testFilterByWorkingPAttern() throws Exception {
+    public void testFilterByWorkingPattern() throws Exception {
 
         given(locationService.find("bristol"))
                 .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
 
-        Vacancy fulltimeVacancy = createVacancyPrototype(createBristolLocationPrototype("bristol1"));
-        fulltimeVacancy.setContractTypes(WorkingPattern.FLEXIBLE_WORKING.toString() + ", anythingelse1");
-        saveVacancy(fulltimeVacancy);
+        Vacancy flexibleWorkingVacancy = createVacancyPrototype(createBristolLocationPrototype("bristol1"));
+        flexibleWorkingVacancy.setWorkingPatterns(WorkingPattern.FLEXIBLE_WORKING.toString() + ", anythingelse1");
+        saveVacancy(flexibleWorkingVacancy);
 
-        Vacancy parttimeVacancy = createVacancyPrototype(createBristolLocationPrototype("bristol1"));
-        parttimeVacancy.setContractTypes(WorkingPattern.FULL_TIME.toString() + ", anythingelse2");
-        saveVacancy(parttimeVacancy);
+        Vacancy fullTimeVacancy = createVacancyPrototype(createBristolLocationPrototype("bristol1"));
+        fullTimeVacancy.setWorkingPatterns(WorkingPattern.FULL_TIME.toString() + ", anythingelse2");
+        saveVacancy(fullTimeVacancy);
 
-        Vacancy internshipVacancy = createVacancyPrototype(createBristolLocationPrototype("bristol1"));
-        internshipVacancy.setContractTypes(WorkingPattern.HOME_WORKING.toString() + ", anythingelse3");
-        saveVacancy(internshipVacancy);
+        Vacancy homeWorkingVacancy = createVacancyPrototype(createBristolLocationPrototype("bristol1"));
+        homeWorkingVacancy.setWorkingPatterns(WorkingPattern.HOME_WORKING.toString() + ", anythingelse3");
+        saveVacancy(homeWorkingVacancy);
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
                 .build();
@@ -451,7 +451,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 })
                 .build();
 
-        // no vacancies should exist matching seasonal
+        // no vacancies should exist matching JOB_SHARE
         result = findVancancies(vacancySearchParameters);
         resultsList = result.getContent();
         Assert.assertEquals("Expected number results", 0, resultsList.size());
@@ -462,11 +462,11 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 })
                 .build();
 
-        // no vacancies should exist matching seasonal
+        // One vacancy should exist matching FLEXIBLE_WORKING
         result = findVancancies(vacancySearchParameters);
         resultsList = result.getContent();
         Assert.assertEquals("Expected number results", 1, resultsList.size());
-        Assert.assertTrue("Expected result", resultsList.get(0).getContractTypes().contains(WorkingPattern.FLEXIBLE_WORKING.toString()));
+        Assert.assertTrue("Expected result", resultsList.get(0).getWorkingPatterns().contains(WorkingPattern.FLEXIBLE_WORKING.toString()));
 
         vacancySearchParameters = VacancySearchParameters.builder()
                 .workingPatterns(new String[] {

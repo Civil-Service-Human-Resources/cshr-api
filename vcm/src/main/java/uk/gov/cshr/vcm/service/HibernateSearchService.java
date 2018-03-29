@@ -11,6 +11,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
@@ -67,8 +68,12 @@ public class HibernateSearchService {
         Query openClosed = getOpenClosedQuery(qb);
         Query departmentQuery = getDepartmentQuery(searchParameters, qb);
         Query locationQuery = getLocationQuery(searchParameters, qb);
-        Query contractTypeQuery = getFieldQuery(searchParameters, "vacancy.contractTypes", qb);
-		Query workingPatternsQuery = getFieldQuery(searchParameters, "vacancy.workingPatterns", qb);
+
+        Query contractTypeQuery = getFieldQuery(searchParameters, "vacancy.contractTypes",
+                getContractTypes(searchParameters), qb);
+        
+		Query workingPatternsQuery = getFieldQuery(searchParameters, "vacancy.workingPatterns",
+                getWorkingPatterns(searchParameters), qb);
 
         BooleanJunction combinedQuery = qb.bool()
                 .must(locationQuery)
@@ -325,31 +330,49 @@ public class HibernateSearchService {
 
     private Query getFieldQuery(SearchParameters searchParameters, String field, String searchTerm, QueryBuilder qb) {
 
-        if ( searchParameters.getVacancySearchParameters().getContractTypes() != null
-                && searchParameters.getVacancySearchParameters().getContractTypes().length > 0) {
+        if (StringUtils.isNotBlank(searchTerm)) {
 
-            StringBuilder stringBuilder = new StringBuilder();
+            Query query = qb.keyword()
+                    .onField(field)
+                    .matching(searchTerm)
+                    .createQuery();
 
-            for (String string : searchParameters.getVacancySearchParameters().getContractTypes()) {
-				if ( ! string.isEmpty() ) {
-					stringBuilder.append(string).append(" ");
-				}
-            }
-
-			String queryString = stringBuilder.toString().trim();
-
-			if ( ! queryString.isEmpty() ) {
-
-				Query query = qb.keyword()
-						.onField(field)
-						.matching(queryString)
-						.createQuery();
-
-				return query;
-			}
+            return query;
 
         }
 
-		return qb.all().createQuery();
+        return qb.all().createQuery();
+    }
+
+    private String getContractTypes(SearchParameters searchParameters) {
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        if ( searchParameters.getVacancySearchParameters().getContractTypes() != null ) {
+
+            for (String string : searchParameters.getVacancySearchParameters().getContractTypes()) {
+                if ( ! string.isEmpty() ) {
+                    stringBuilder.append(string).append(" ");
+                }
+            }
+        }
+
+        return stringBuilder.toString();
+    }
+
+    private String getWorkingPatterns(SearchParameters searchParameters) {
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        if ( searchParameters.getVacancySearchParameters().getWorkingPatterns() != null ) {
+
+            for (String string : searchParameters.getVacancySearchParameters().getWorkingPatterns()) {
+                if ( ! string.isEmpty() ) {
+                    stringBuilder.append(string).append(" ");
+                }
+            }
+        }
+
+        return stringBuilder.toString();
     }
 }
