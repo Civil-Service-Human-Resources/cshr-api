@@ -416,15 +416,10 @@ definitions:
         type: string
       contactTelephone:
         type: string
-      contractType:
+      contractTypes:
         type: string
-        enum:
-          - FULL_TIME
-          - PART_TIME
-          - CONTRACT
-          - TEMPORARY
-          - SEASONAL
-          - INTERNSHIP
+        example: 'FULL_TIME, PART_TIME, CONTRACT, TEMPORARY, SEASONAL, INTERNSHIP'
+        description: A comma separated list of contract types
       department:
         $ref: '#/definitions/Department'
       description:
@@ -491,14 +486,10 @@ definitions:
         type: string
       workingHours:
         type: string
-      workingPattern:
+      workingPatterns:
         type: string
-        enum:
-          - FLEXIBLE_WORKING
-          - FULL_TIME
-          - PART_TIME
-          - JOB_SHARE
-          - HOME_WORKING
+        example: 'FLEXIBLE_WORKING, FULL_TIME, PART_TIME, JOB_SHARE, HOME_WORKING'
+        description: A comma separated list of working patterns
   VacancyError:
     type: object
     properties:
@@ -594,6 +585,12 @@ definitions:
   VacancySearchParameters:
     type: object
     properties:
+      contractTypes:
+        type: array
+        example: FULL_TIME PART_TIME CONTRACT TEMPORARY SEASONAL INTERNSHIP
+        description: A string array of contract types
+        items:
+          type: string
       department:
         type: array
         description: id of one or more departments to search vacancies for
@@ -605,6 +602,12 @@ definitions:
       location:
         description: location of the vacancy
         $ref: '#/definitions/Location'
+      workingPatterns:
+        type: array
+        example: FLEXIBLE_WORKING FULL_TIME PART_TIME JOB_SHARE HOME_WORKING
+        description: A string array of working patterns
+        items:
+          type: string
       maxSalary:
         type: integer
         format: int32
