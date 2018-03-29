@@ -128,8 +128,8 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             .displayCscContent(Boolean.TRUE)
             .selectionProcessDetails("selectionProcessDetails")
             .nationalityStatement(NationalityStatement.NON_RESERVED)
-            .contractType(ContractType.FULL_TIME)
-            .workingPattern(WorkingPattern.FLEXIBLE_WORKING)
+            .contractType(ContractType.FULL_TIME.toString())
+            .workingPattern(WorkingPattern.FLEXIBLE_WORKING.toString())
             .whatWeOffer("whatWeOffer")
             .locationOverride("locationOverride")
             .build();

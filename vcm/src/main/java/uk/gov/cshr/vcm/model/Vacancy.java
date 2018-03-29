@@ -207,12 +207,12 @@ public class Vacancy implements Serializable {
     private String salaryOverrideDescription;
 
     @Column(name = "contracttype")
-    @Enumerated(EnumType.STRING)
-    private ContractType contractType;
+    @ApiModelProperty(name = "Contract Types", example = "FULL_TIME, PART_TIME, CONTRACT, TEMPORARY, SEASONAL, INTERNSHIP")
+    private String contractType;
 
+    @ApiModelProperty(name = "Working Patterns", example = "FLEXIBLE_WORKING, FULL_TIME, PART_TIME, JOB_SHARE, HOME_WORKING")
     @Column(name = "workingpattern")
-    @Enumerated(EnumType.STRING)
-    private WorkingPattern workingPattern;
+    private String workingPattern;
 
     @Column(name = "whatweoffer")
     private String whatWeOffer;
