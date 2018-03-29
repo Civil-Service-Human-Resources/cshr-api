@@ -206,13 +206,17 @@ public class Vacancy implements Serializable {
     @Column(name = "salaryoverridedescription")
     private String salaryOverrideDescription;
 
+    @ApiModelProperty(notes = "A comma separated list of contract types",
+                      example = "FULL_TIME, PART_TIME, CONTRACT, TEMPORARY, SEASONAL, INTERNSHIP")
+    @Field(store = Store.YES)
     @Column(name = "contracttype")
-    @ApiModelProperty(name = "Contract Types", example = "FULL_TIME, PART_TIME, CONTRACT, TEMPORARY, SEASONAL, INTERNSHIP")
-    private String contractType;
+    private String contractTypes;
 
-    @ApiModelProperty(name = "Working Patterns", example = "FLEXIBLE_WORKING, FULL_TIME, PART_TIME, JOB_SHARE, HOME_WORKING")
+    @ApiModelProperty(notes = "A comma separated list of working patterns",
+                      example = "FLEXIBLE_WORKING, FULL_TIME, PART_TIME, JOB_SHARE, HOME_WORKING")
+	@Field(store = Store.YES)
     @Column(name = "workingpattern")
-    private String workingPattern;
+    private String workingPatterns;
 
     @Column(name = "whatweoffer")
     private String whatWeOffer;
@@ -220,3 +224,4 @@ public class Vacancy implements Serializable {
     @Column(name = "locationoverride")
     private String locationOverride;
 }
+

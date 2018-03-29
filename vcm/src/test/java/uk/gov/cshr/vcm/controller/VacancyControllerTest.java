@@ -128,8 +128,8 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             .displayCscContent(Boolean.TRUE)
             .selectionProcessDetails("selectionProcessDetails")
             .nationalityStatement(NationalityStatement.NON_RESERVED)
-            .contractType(ContractType.FULL_TIME.toString())
-            .workingPattern(WorkingPattern.FLEXIBLE_WORKING.toString())
+            .contractTypes(ContractType.FULL_TIME.toString())
+            .workingPatterns(WorkingPattern.FLEXIBLE_WORKING.toString())
             .whatWeOffer("whatWeOffer")
             .locationOverride("locationOverride")
             .build();
@@ -321,10 +321,10 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.eligibility", is(this.vacancy1.getEligibility())))
                 .andExpect(jsonPath("$.salaryMin", is(this.vacancy1.getSalaryMin())))
                 .andExpect(jsonPath("$.salaryMax", is(this.vacancy1.getSalaryMax())))                
-                .andExpect(jsonPath("$.workingPattern", is(this.vacancy1.getWorkingPattern().toString())))
+                .andExpect(jsonPath("$.workingPatterns", is(this.vacancy1.getWorkingPatterns())))
                 .andExpect(jsonPath("$.whatWeOffer", is(this.vacancy1.getWhatWeOffer())))
                 .andExpect(jsonPath("$.locationOverride", is(this.vacancy1.getLocationOverride())))
-                .andExpect(jsonPath("$.contractType", is(this.vacancy1.getContractType().toString())))
+                .andExpect(jsonPath("$.contractTypes", is(this.vacancy1.getContractTypes())))
                 .andExpect(jsonPath("$.numberVacancies", is(this.vacancy1.getNumberVacancies())));
     }
 

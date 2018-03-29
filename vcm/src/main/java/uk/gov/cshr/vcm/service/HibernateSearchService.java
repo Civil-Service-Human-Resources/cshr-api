@@ -11,6 +11,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
@@ -68,12 +69,20 @@ public class HibernateSearchService {
         Query departmentQuery = getDepartmentQuery(searchParameters, qb);
         Query locationQuery = getLocationQuery(searchParameters, qb);
 
+        Query contractTypeQuery = getFieldQuery("vacancy.contractTypes",
+                getContractTypes(searchParameters), qb);
+        
+		Query workingPatternsQuery = getFieldQuery("vacancy.workingPatterns",
+                getWorkingPatterns(searchParameters), qb);
+
         BooleanJunction combinedQuery = qb.bool()
                 .must(locationQuery)
                 .must(salaryQuery)
                 .must(openClosed)
                 .must(departmentQuery)
-                .must(searchtermQuery);
+                .must(searchtermQuery)
+                .must(contractTypeQuery)
+				.must(workingPatternsQuery);
 
         log.debug("luceneQuery=" + combinedQuery.createQuery().toString());
 
@@ -181,6 +190,8 @@ public class HibernateSearchService {
 
             searchTerm = searchTerm.toLowerCase();
 
+            searchTerm = searchTerm.toLowerCase();
+
             Query titleFuzzyQuery = qb.keyword().fuzzy()
                     .withEditDistanceUpTo(1)
                     .withPrefixLength(1)
@@ -201,7 +212,7 @@ public class HibernateSearchService {
                     .ignoreAnalyzer()
                     .sentence(searchTerm)
                     .createQuery();
-            
+
             Query descriptiopnPhraseQuery = qb.phrase()
                     .onField("vacancy.description")
                     .ignoreAnalyzer()
@@ -316,6 +327,52 @@ public class HibernateSearchService {
 
         else {
             return qb.all().createQuery();
+        }
+    }
+
+    private Query getFieldQuery(String field, String searchTerm, QueryBuilder qb) {
+
+        if (StringUtils.isNotBlank(searchTerm)) {
+
+            Query query = qb.keyword()
+                    .onField(field)
+                    .matching(searchTerm)
+                    .createQuery();
+
+            return query;
+
+        }
+
+        return qb.all().createQuery();
+    }
+
+    private String getContractTypes(SearchParameters searchParameters) {
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        if ( searchParameters.getVacancySearchParameters().getContractTypes() != null ) {
+            concatenateStringArray(searchParameters.getVacancySearchParameters().getContractTypes(), stringBuilder);
+        }
+
+        return stringBuilder.toString();
+    }
+
+    private String getWorkingPatterns(SearchParameters searchParameters) {
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        if ( searchParameters.getVacancySearchParameters().getWorkingPatterns() != null ) {
+            concatenateStringArray(searchParameters.getVacancySearchParameters().getWorkingPatterns(), stringBuilder);
+        }
+
+        return stringBuilder.toString();
+    }
+
+    private void concatenateStringArray(String[] stringArray, StringBuilder stringBuilder) {
+        for (String string : stringArray) {
+            if ( ! string.isEmpty() ) {
+                stringBuilder.append(string).append(" ");
+            }
         }
     }
 }

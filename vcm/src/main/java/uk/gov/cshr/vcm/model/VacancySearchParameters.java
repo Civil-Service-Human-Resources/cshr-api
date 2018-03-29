@@ -31,6 +31,14 @@ public class VacancySearchParameters implements Serializable {
 
     private Boolean overseasJob;
 
+    @ApiModelProperty(notes = "A string array of contract types",
+                      example = "FULL_TIME PART_TIME CONTRACT TEMPORARY SEASONAL INTERNSHIP")
+    private String[] contractTypes;
+
+    @ApiModelProperty(notes = "A string array of working patterns",
+                      example = "FLEXIBLE_WORKING FULL_TIME PART_TIME JOB_SHARE HOME_WORKING")
+	private String[] workingPatterns;
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
