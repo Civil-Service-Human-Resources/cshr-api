@@ -351,7 +351,7 @@ public class HibernateSearchService {
         StringBuilder stringBuilder = new StringBuilder();
 
         if ( searchParameters.getVacancySearchParameters().getContractTypes() != null ) {
-            concatenateCSV(searchParameters.getVacancySearchParameters().getContractTypes(), stringBuilder);
+            concatenateStringArray(searchParameters.getVacancySearchParameters().getContractTypes(), stringBuilder);
         }
 
         return stringBuilder.toString();
@@ -362,13 +362,13 @@ public class HibernateSearchService {
         StringBuilder stringBuilder = new StringBuilder();
 
         if ( searchParameters.getVacancySearchParameters().getWorkingPatterns() != null ) {
-            concatenateCSV(searchParameters.getVacancySearchParameters().getWorkingPatterns(), stringBuilder);
+            concatenateStringArray(searchParameters.getVacancySearchParameters().getWorkingPatterns(), stringBuilder);
         }
 
         return stringBuilder.toString();
     }
 
-    private void concatenateCSV(String[] stringArray, StringBuilder stringBuilder) {
+    private void concatenateStringArray(String[] stringArray, StringBuilder stringBuilder) {
         for (String string : stringArray) {
             if ( ! string.isEmpty() ) {
                 stringBuilder.append(string).append(" ");
