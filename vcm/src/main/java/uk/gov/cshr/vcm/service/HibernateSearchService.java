@@ -69,10 +69,10 @@ public class HibernateSearchService {
         Query departmentQuery = getDepartmentQuery(searchParameters, qb);
         Query locationQuery = getLocationQuery(searchParameters, qb);
 
-        Query contractTypeQuery = getFieldQuery(searchParameters, "vacancy.contractTypes",
+        Query contractTypeQuery = getFieldQuery("vacancy.contractTypes",
                 getContractTypes(searchParameters), qb);
         
-		Query workingPatternsQuery = getFieldQuery(searchParameters, "vacancy.workingPatterns",
+		Query workingPatternsQuery = getFieldQuery("vacancy.workingPatterns",
                 getWorkingPatterns(searchParameters), qb);
 
         BooleanJunction combinedQuery = qb.bool()
@@ -330,7 +330,7 @@ public class HibernateSearchService {
         }
     }
 
-    private Query getFieldQuery(SearchParameters searchParameters, String field, String searchTerm, QueryBuilder qb) {
+    private Query getFieldQuery(String field, String searchTerm, QueryBuilder qb) {
 
         if (StringUtils.isNotBlank(searchTerm)) {
 
@@ -351,12 +351,7 @@ public class HibernateSearchService {
         StringBuilder stringBuilder = new StringBuilder();
 
         if ( searchParameters.getVacancySearchParameters().getContractTypes() != null ) {
-
-            for (String string : searchParameters.getVacancySearchParameters().getContractTypes()) {
-                if ( ! string.isEmpty() ) {
-                    stringBuilder.append(string).append(" ");
-                }
-            }
+            concatenateCSV(searchParameters.getVacancySearchParameters().getContractTypes(), stringBuilder);
         }
 
         return stringBuilder.toString();
@@ -367,14 +362,17 @@ public class HibernateSearchService {
         StringBuilder stringBuilder = new StringBuilder();
 
         if ( searchParameters.getVacancySearchParameters().getWorkingPatterns() != null ) {
-
-            for (String string : searchParameters.getVacancySearchParameters().getWorkingPatterns()) {
-                if ( ! string.isEmpty() ) {
-                    stringBuilder.append(string).append(" ");
-                }
-            }
+            concatenateCSV(searchParameters.getVacancySearchParameters().getWorkingPatterns(), stringBuilder);
         }
 
         return stringBuilder.toString();
+    }
+
+    private void concatenateCSV(String[] stringArray, StringBuilder stringBuilder) {
+        for (String string : stringArray) {
+            if ( ! string.isEmpty() ) {
+                stringBuilder.append(string).append(" ");
+            }
+        }
     }
 }
