@@ -253,4 +253,19 @@
 	<changeSet author="gordon" id="29">
 		<sql>update vacancies set active = true</sql>
     </changeSet>
+    <changeSet author="Seamus Singh" id="30" >
+        <createTable tableName="atsvendor">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="clientidentifier" type="TEXT"/>
+            <column name="name" type="TEXT"/>
+        </createTable>
+        <addPrimaryKey columnNames="id" constraintName="atsvendor_pkey" tableName="atsvendor"/>
+    </changeSet>
+    <changeSet author="Seamus Singh" id="31">
+        <addColumn tableName="vacancies">
+            <column name="atsvendoridentifier" type="TEXT" />
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
