@@ -22,10 +22,12 @@
 
 	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<File>logs/logFile.log</File>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<FileNamePattern>
-				logs/logFile.%d{yyyy-MM-dd_HH-mm}.log.zip
-			</FileNamePattern>
+
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>logFile.%d{yyyy-MM-dd_HH-mm}.%i.log.zip</fileNamePattern>
+			<maxFileSize>5MB</maxFileSize>
+			<maxHistory>30</maxHistory>
+			<totalSizeCap>200MB</totalSizeCap>
 		</rollingPolicy>
 
 		<layout class="ch.qos.logback.classic.PatternLayout">

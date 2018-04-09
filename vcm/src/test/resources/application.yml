@@ -19,4 +19,5 @@ spring:
 server:
   port: 8080
 liquibase:
-    change-log: classpath:/testchangelog.xml
+  change-log: classpath:/testchangelog.xml
+  enabled: true

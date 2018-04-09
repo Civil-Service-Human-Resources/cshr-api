@@ -248,4 +248,19 @@
             <column name="locationoverride" type="TEXT" />
         </addColumn>
     </changeSet>
+    <changeSet author="Seamus Singh" id="27" >
+        <createTable tableName="atsvendor">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="clientidentifier" type="TEXT"/>
+            <column name="name" type="TEXT"/>
+        </createTable>
+        <addPrimaryKey columnNames="id" constraintName="atsvendor_pkey" tableName="atsvendor"/>
+    </changeSet>
+    <changeSet author="Seamus Singh" id="28">
+        <addColumn tableName="vacancies">
+            <column name="atsvendoridentifier" type="TEXT" />
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

@@ -23,9 +23,10 @@
     </parent>
 
     <properties>
+        <cshr.common.version>0.0.4</cshr.common.version>
+        <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>1.8</java.version>
     </properties>
 
         <dependencies>
@@ -88,6 +89,12 @@
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>9.4-1206-jdbc42</version>
+            </dependency>
+
+            <dependency>
+                <groupId>uk.gov.cshr</groupId>
+                <artifactId>cshr-common</artifactId>
+                <version>${cshr.common.version}</version>
             </dependency>
 
             <dependency>
