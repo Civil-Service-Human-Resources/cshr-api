@@ -52,6 +52,8 @@ The cshr database can be built or updated by running:-
 
 mvn liquibase:update
 
+Setting/passing the LOG_DIR system value/param will specify where log files are written
+
 
 ## Todo
 * Pass DB configuration to docker container as env variables and/or docker secrets
