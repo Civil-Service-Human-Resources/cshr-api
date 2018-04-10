@@ -21,10 +21,10 @@
 	</appender>
 
 	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<File>${LOG_DIR:-logs}/logFile.log</File>
+		<File>${LOG_DIR:-logs}/vcmLogFile.log</File>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<FileNamePattern>
-				${LOG_DIR:-logs}/logFile.%d{yyyy-MM-dd_HH-mm}.log.zip
+				${LOG_DIR:-logs}/vcmLogFile.%d{yyyy-MM-dd_HH-mm}.log.zip
 			</FileNamePattern>
 		</rollingPolicy>
 
