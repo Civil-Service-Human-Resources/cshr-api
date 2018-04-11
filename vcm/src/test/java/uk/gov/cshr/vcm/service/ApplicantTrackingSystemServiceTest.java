@@ -21,7 +21,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 import org.springframework.test.context.junit4.SpringRunner;
-import uk.gov.cshr.error.CSHRServiceStatus;
+import uk.gov.cshr.status.CSHRServiceStatus;
 import uk.gov.cshr.vcm.VcmApplication;
 import uk.gov.cshr.vcm.controller.exception.InvalidApplicantTrackingSystemException;
 import uk.gov.cshr.vcm.model.ApplicantTrackingSystemVendor;
