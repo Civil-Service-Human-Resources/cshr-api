@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import uk.gov.cshr.error.CSHRServiceStatus;
+import uk.gov.cshr.status.CSHRServiceStatus;
 
 @ControllerAdvice
 public class VacancyRestResponseExceptionHandler extends ResponseEntityExceptionHandler {
