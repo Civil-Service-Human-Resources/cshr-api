@@ -1,8 +1,8 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/cshr
-    username: seamus
-    password: beast
+    username: postgres
+    password: qwerty
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
