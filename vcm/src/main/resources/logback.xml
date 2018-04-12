@@ -21,11 +21,14 @@
 	</appender>
 
 	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<File>${LOG_DIR:-logs}/vcmLogFile.log</File>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+		<File>${LOG_DIR:-logs}/cshr-api/vcmLogFile.log</File>
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
 			<FileNamePattern>
-				${LOG_DIR:-logs}/vcmLogFile.%d{yyyy-MM-dd_HH-mm}.log.zip
+				${LOG_DIR:-logs}/cshr-api/vcmLogFile.%d{yyyy-MM-dd_HH-mm}.%i.log.zip
 			</FileNamePattern>
+            <maxFileSize>5MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>200MB</totalSizeCap>
 		</rollingPolicy>
 
 		<layout class="ch.qos.logback.classic.PatternLayout">
