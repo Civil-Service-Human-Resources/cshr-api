@@ -5,6 +5,8 @@ import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.junit.MatcherAssert.assertThat;
 
+import java.util.Optional;
+
 import javax.inject.Inject;
 
 import org.junit.After;
@@ -34,7 +36,9 @@ public class ApplicantTrackingSystemVendorRepositoryTest {
 
     @Test
     public void testFindByClientIdentifier_doesNotExist() {
-        assertThat(repository.findByClientIdentifier("foo"), is(empty()));
+        Optional<ApplicantTrackingSystemVendor> vendor = repository.findByClientIdentifier("foo");
+
+        assertThat(vendor.isPresent(), is(false));
     }
 
     @Test
@@ -42,6 +46,8 @@ public class ApplicantTrackingSystemVendorRepositoryTest {
         ApplicantTrackingSystemVendor vendor = ApplicantTrackingSystemVendor.builder().id(1L).clientIdentifier("abc").name("ABC ATS").build();
         repository.save(vendor);
 
-        assertThat(repository.findByClientIdentifier("abc"), is(not(empty())));
+        Optional<ApplicantTrackingSystemVendor> actual = repository.findByClientIdentifier("abc");
+
+        assertThat(actual.isPresent(), is(true));
     }
 }

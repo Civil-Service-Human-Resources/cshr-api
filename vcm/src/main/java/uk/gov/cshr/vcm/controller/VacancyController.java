@@ -119,7 +119,7 @@ public class VacancyController {
      * @return Response include HttpStatus and instance of CSHRServiceStatus with information about whether the vacancye was created or updated.
      */
     @RequestMapping(method = RequestMethod.POST, value = "/save")
-    @ApiOperation(value = "Find all vacancies with support for pagination", nickname = "save")
+    @ApiOperation(value = "Creates a new or updates an existing vacancy", nickname = "save")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Request to save vacancy was successful.", response = CSHRServiceStatus.class),
             @ApiResponse(code = 422, message = "An unknown Applicant Tracking System Vendor was supplied.", response = CSHRServiceStatus.class)})

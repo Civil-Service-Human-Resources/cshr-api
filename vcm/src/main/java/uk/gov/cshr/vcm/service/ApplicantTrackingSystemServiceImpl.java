@@ -1,6 +1,7 @@
 package uk.gov.cshr.vcm.service;
 
-import java.util.List;
+import java.util.Collections;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import uk.gov.cshr.status.CSHRServiceStatus;
@@ -19,12 +20,13 @@ public class ApplicantTrackingSystemServiceImpl implements ApplicantTrackingSyst
 
     @Override
     public void validateClientIdentifier(final String clientIdentifier) {
-        List<ApplicantTrackingSystemVendor> vendor = applicantTrackingSystemVendorRepository.findByClientIdentifier(clientIdentifier);
+        Optional<ApplicantTrackingSystemVendor> vendor = applicantTrackingSystemVendorRepository.findByClientIdentifier(clientIdentifier);
 
-        if (vendor.isEmpty()) {
+        if (!vendor.isPresent()) {
             CSHRServiceStatus status = CSHRServiceStatus.builder()
                     .code(StatusCode.INTERNAL_SERVICE_ERROR.getCode())
-                    .summary(clientIdentifier + " is not a recognised identifier for an Applicant Tracking System")
+                    .summary(clientIdentifier + " is not a recognised identifier for an Applicant Tracking System vendor")
+                    .detail(Collections.EMPTY_LIST)
                     .build();
 
             throw new InvalidApplicantTrackingSystemException(status);

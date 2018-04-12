@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -46,7 +47,7 @@ public class ApplicantTrackingSystemServiceTest extends AbstractJUnit4SpringCont
         String identifier = "foo";
 
         try {
-            when(repository.findByClientIdentifier(identifier)).thenReturn(new ArrayList<>());
+            when(repository.findByClientIdentifier(identifier)).thenReturn(Optional.empty());
             service.validateClientIdentifier(identifier);
         } catch (RuntimeException re) {
             assertThat(re, instanceOf(InvalidApplicantTrackingSystemException.class));
@@ -60,11 +61,7 @@ public class ApplicantTrackingSystemServiceTest extends AbstractJUnit4SpringCont
         String identifier = "foo";
 
         try {
-            List<ApplicantTrackingSystemVendor> vendors = new ArrayList<>();
-            //Not interested in content code only expects one or more results to be valid
-            vendors.add(ApplicantTrackingSystemVendor.builder().build());
-
-            when(repository.findByClientIdentifier(identifier)).thenReturn(vendors);
+            when(repository.findByClientIdentifier(identifier)).thenReturn(Optional.of(ApplicantTrackingSystemVendor.builder().build()));
             service.validateClientIdentifier(identifier);
         } catch (RuntimeException re) {
             fail("No Exception should have been thrown");

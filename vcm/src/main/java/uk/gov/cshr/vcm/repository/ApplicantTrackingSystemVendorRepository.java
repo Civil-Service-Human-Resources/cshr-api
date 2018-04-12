@@ -15,13 +15,5 @@ import uk.gov.cshr.vcm.model.ApplicantTrackingSystemVendor;
  */
 @Repository
 @Transactional
-public interface ApplicantTrackingSystemVendorRepository extends CrudRepository<ApplicantTrackingSystemVendor, Long> {
-    /**
-     * Finds instances of ApplicantTrackingSystemVendor using clientIdentifier as the search criteria.
-     *
-     * @param clientIdentifier search criteria to find matching instances of ApplicantTrackingSystemVendor
-     * @return a list of ApplicantTrackingSystemVendor instances that match the given search criteria
-     */
-    @Query("select atsv from ApplicantTrackingSystemVendor atsv where atsv.clientIdentifier = :clientIdentifier")
-    List<ApplicantTrackingSystemVendor> findByClientIdentifier(@Param("clientIdentifier") String clientIdentifier);
+public interface ApplicantTrackingSystemVendorRepository extends CrudRepository<ApplicantTrackingSystemVendor, Long>, ApplicationTrackingSystemVendorRepositoryCustom {
 }

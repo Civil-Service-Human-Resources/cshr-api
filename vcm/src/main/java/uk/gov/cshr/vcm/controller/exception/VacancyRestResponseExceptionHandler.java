@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import uk.gov.cshr.status.CSHRServiceStatus;
@@ -23,6 +24,7 @@ public class VacancyRestResponseExceptionHandler extends ResponseEntityException
         return handleExceptionInternal(ex, ex.getVacancyError(), new HttpHeaders(), ex.getVacancyError().getStatus(), request);
     }
 
+    @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)
     @ExceptionHandler({InvalidApplicantTrackingSystemException.class})
     @ResponseBody
     public CSHRServiceStatus handleInvalidAtsException(InvalidApplicantTrackingSystemException ex, WebRequest request) {
