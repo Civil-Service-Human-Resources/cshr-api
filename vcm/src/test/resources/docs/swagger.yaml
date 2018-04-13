@@ -457,6 +457,8 @@ definitions:
         format: int32
       overseasJob:
         type: boolean
+      personalSpecification:
+        type: string
       publicOpeningDate:
         type: string
         example: 'yyyy-MM-dd''T''HH:mm:ss.SSSZ'

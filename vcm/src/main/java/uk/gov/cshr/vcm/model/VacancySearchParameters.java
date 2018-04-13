@@ -16,6 +16,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 @ApiModel(value = "VacancySearchParameters", description = "The parameters allowed for when searching for vacancies")
 public class VacancySearchParameters implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     @ApiModelProperty(value = "location of the vacancy")
     private Location location;
 
