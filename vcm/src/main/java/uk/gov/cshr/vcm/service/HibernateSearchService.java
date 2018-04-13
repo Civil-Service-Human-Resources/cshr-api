@@ -100,7 +100,6 @@ public class HibernateSearchService {
         });
 
         int pageSize = pageable.getPageSize();
-        int offSet = pageable.getOffset();
         int pageNumber = pageable.getPageNumber();
 
         List idList;

@@ -132,6 +132,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             .workingPatterns(WorkingPattern.FLEXIBLE_WORKING.toString())
             .whatWeOffer("whatWeOffer")
             .locationOverride("locationOverride")
+            .personalSpecification("personalSpecification")
             .build();
 
     {
@@ -325,6 +326,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.whatWeOffer", is(this.vacancy1.getWhatWeOffer())))
                 .andExpect(jsonPath("$.locationOverride", is(this.vacancy1.getLocationOverride())))
                 .andExpect(jsonPath("$.contractTypes", is(this.vacancy1.getContractTypes())))
+                .andExpect(jsonPath("$.personalSpecification", is(this.vacancy1.getPersonalSpecification())))
                 .andExpect(jsonPath("$.numberVacancies", is(this.vacancy1.getNumberVacancies())));
     }
 

@@ -223,5 +223,8 @@ public class Vacancy implements Serializable {
 
     @Column(name = "locationoverride")
     private String locationOverride;
+
+    @Column(name = "personalspecification")
+    private String personalSpecification;
 }
 

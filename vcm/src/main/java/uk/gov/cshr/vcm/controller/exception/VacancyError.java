@@ -1,5 +1,6 @@
 package uk.gov.cshr.vcm.controller.exception;
 
+import java.io.Serializable;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +12,9 @@ import org.springframework.http.HttpStatus;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class VacancyError {
+public class VacancyError implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private HttpStatus status;
     private String message;

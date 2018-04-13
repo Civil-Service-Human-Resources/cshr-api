@@ -239,4 +239,9 @@
             <column name="locationoverride" type="TEXT" />
         </addColumn>
     </changeSet>
+    <changeSet author="gordon" id="27">
+        <addColumn tableName="vacancies">
+            <column name="personalspecification" type="TEXT" />
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
