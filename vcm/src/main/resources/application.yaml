@@ -16,6 +16,11 @@ spring:
   location:
     service:
       url: http://localhost:8989/findlocation/{searchTerm} # will be overridden by an env variable
+  security:
+    search_username: searchusername
+    search_password: searchpassword
+    crud_username: crudusername
+    crud_password: crudpassword
 server:
   port: 8080
 liquibase:

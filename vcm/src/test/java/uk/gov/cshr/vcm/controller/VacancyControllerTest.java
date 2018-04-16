@@ -25,7 +25,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
@@ -58,7 +57,6 @@ import uk.gov.cshr.vcm.service.LocationService;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = VcmApplication.class)
 @ContextConfiguration
 @WebAppConfiguration
-@ActiveProfiles("dev")
 @TestExecutionListeners(MockitoTestExecutionListener.class)
 public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
