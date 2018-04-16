@@ -32,7 +32,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
-        System.out.println(new Date());
 		http.csrf().disable()
             .authorizeRequests().antMatchers("/vacancy/search/**").hasRole("SEARCH_ROLE")
             .and()
