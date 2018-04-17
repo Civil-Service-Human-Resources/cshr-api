@@ -5,8 +5,11 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
 import uk.gov.cshr.vcm.model.Coordinates;
@@ -21,6 +24,12 @@ public class LocationService {
     @Value("${spring.location.service.url}")
     private String locationServiceURL;
 
+	@Value("${spring.location.service.username}")
+    private String locationServiceUsername;
+
+	@Value("${spring.location.service.password}")
+    private String locationServicePassword;
+
     /**
      * This method calls an external service to map the given location to coordinates representing a single latitude and longitude.
      *
@@ -30,18 +39,24 @@ public class LocationService {
      * @return Coordinates the corresponding latitude and longitude of the given location
 	 * @throws uk.gov.cshr.vcm.controller.exception.LocationServiceException
      */
-    public Coordinates find(final String location) throws LocationServiceException {
-        Coordinates coordinates;
+    public Coordinates find(String location) throws LocationServiceException {
 
         Map<String, String> params = new HashMap<>();
         params.put("searchTerm", location);
 
         try {
-            coordinates = new RestTemplate().getForObject(locationServiceURL, Coordinates.class, params);
 
-            if (log.isDebugEnabled() && coordinates != null) {
-                log.debug(String.format("Coordinates returned from the external lookup service for %s are %s", location, coordinates.toString()));
+			RestTemplate restTemplate = new RestTemplateBuilder()
+					.basicAuthorization(locationServiceUsername, locationServicePassword)
+					.build();
+
+			Coordinates coordinates = restTemplate.getForObject(locationServiceURL, Coordinates.class, location);
+
+            if (log.isDebugEnabled()) {
+                log.debug(String.format("Coordinates returned from the external lookup service for %s are %s", location, coordinates));
             }
+
+			return coordinates;
         }
 		catch (RestClientException ex) {
             if (log.isErrorEnabled()) {
@@ -49,7 +64,12 @@ public class LocationService {
             }
             throw new LocationServiceException();
         }
-
-        return coordinates;
     }
+
+	@Bean
+	RestOperations rest(RestTemplateBuilder restTemplateBuilder) {
+	   return restTemplateBuilder
+			   .basicAuthorization(locationServiceUsername, locationServicePassword)
+			   .build();
+	}
 }

@@ -16,6 +16,8 @@ spring:
   location:
     service:
       url: http://localhost:8989/findlocation/{searchTerm} # will be overridden by an env variable
+      username: username
+      password: password
   security:
     search_username: searchusername
     search_password: searchpassword

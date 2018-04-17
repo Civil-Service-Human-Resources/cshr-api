@@ -1,6 +1,5 @@
 package uk.gov.cshr.vcm.security;
 
-import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -8,7 +7,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.web.AuthenticationEntryPoint;
 
 @Configuration
 @EnableWebSecurity
@@ -26,18 +24,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${spring.security.crud_password}")
     private String crudPassword;
 
-    @Autowired
-	private AuthenticationEntryPoint authEntryPoint;
-
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
 		http.csrf().disable()
-            .authorizeRequests().antMatchers("/vacancy/search/**").hasRole("SEARCH_ROLE")
-            .and()
-        	.authorizeRequests().antMatchers("/department/**", "/vacancy/**").hasRole("CRUD_ROLE")
-            .and()
-            .httpBasic().authenticationEntryPoint(authEntryPoint);
+			.authorizeRequests().anyRequest().authenticated()
+            .and().httpBasic();
 	}
 
 	@Autowired
