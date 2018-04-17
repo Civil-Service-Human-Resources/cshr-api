@@ -1,6 +1,5 @@
 package uk.gov.cshr.vcm.security;
 
-import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -33,7 +32,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 
 		http.csrf().disable()
-            .authorizeRequests().antMatchers("/vacancy/search/**").hasRole("SEARCH_ROLE")
+            .authorizeRequests().antMatchers("/vacancy/search/**", "/department/", "/department").hasRole("SEARCH_ROLE")
             .and()
         	.authorizeRequests().antMatchers("/department/**", "/vacancy/**").hasRole("CRUD_ROLE")
             .and()
