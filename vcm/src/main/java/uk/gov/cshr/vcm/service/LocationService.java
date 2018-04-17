@@ -1,10 +1,16 @@
 package uk.gov.cshr.vcm.service;
 
+import java.nio.charset.Charset;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -21,6 +27,12 @@ public class LocationService {
     @Value("${spring.location.service.url}")
     private String locationServiceURL;
 
+	@Value("${spring.location.service.username}")
+    private String locationServiceUsername;
+
+	@Value("${spring.location.service.password}")
+    private String locationServicePassword;
+
     /**
      * This method calls an external service to map the given location to coordinates representing a single latitude and longitude.
      *
@@ -30,18 +42,23 @@ public class LocationService {
      * @return Coordinates the corresponding latitude and longitude of the given location
 	 * @throws uk.gov.cshr.vcm.controller.exception.LocationServiceException
      */
-    public Coordinates find(final String location) throws LocationServiceException {
-        Coordinates coordinates;
+    public Coordinates find(String location) throws LocationServiceException {
 
         Map<String, String> params = new HashMap<>();
         params.put("searchTerm", location);
 
         try {
-            coordinates = new RestTemplate().getForObject(locationServiceURL, Coordinates.class, params);
+			RestTemplate restTemplate = new RestTemplate();
+			HttpHeaders httpHeaders = createHeaders(locationServiceUsername, locationServicePassword);
+			HttpEntity<String> httpEntity = new HttpEntity(httpHeaders);
 
-            if (log.isDebugEnabled() && coordinates != null) {
-                log.debug(String.format("Coordinates returned from the external lookup service for %s are %s", location, coordinates.toString()));
+			ResponseEntity<Coordinates> response = restTemplate.exchange(locationServiceURL, HttpMethod.GET, httpEntity, Coordinates.class, params);
+
+            if (log.isDebugEnabled()) {
+                log.debug(String.format("Coordinates returned from the external lookup service for %s are %s", location, response.getBody()));
             }
+
+			return response.getBody();
         }
 		catch (RestClientException ex) {
             if (log.isErrorEnabled()) {
@@ -49,7 +66,17 @@ public class LocationService {
             }
             throw new LocationServiceException();
         }
-
-        return coordinates;
     }
+
+	private HttpHeaders createHeaders(String username, String password) {
+		return new HttpHeaders() {
+			{
+				String auth = username + ":" + password;
+				byte[] encodedAuth = Base64.getEncoder().encode(
+						auth.getBytes(Charset.forName("US-ASCII")));
+				String authHeader = "Basic " + new String(encodedAuth);
+				set("Authorization", authHeader);
+			}
+		};
+	}
 }
