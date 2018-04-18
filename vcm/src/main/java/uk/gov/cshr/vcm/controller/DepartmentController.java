@@ -3,6 +3,7 @@ package uk.gov.cshr.vcm.controller;
 import io.swagger.annotations.ApiOperation;
 import java.net.URI;
 import java.util.Optional;
+import javax.annotation.security.RolesAllowed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import uk.gov.cshr.vcm.repository.DepartmentRepository;
 
 @RestController
 @RequestMapping(value = "/department", produces = MediaType.APPLICATION_JSON_VALUE)
+@RolesAllowed("CRUD_ROLE")
 public class DepartmentController {
 
     private static final Logger log = LoggerFactory.getLogger(DepartmentController.class);
@@ -36,6 +38,7 @@ public class DepartmentController {
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     @ApiOperation(value = "Find all departments", nickname = "findAll")
+	@RolesAllowed({"CRUD_ROLE", "SEARCH_ROLE"})
     public ResponseEntity<Page<Department>> findAll(Pageable pageable) {
         Page<Department> departments = departmentRepository.findAll(pageable);
         return ResponseEntity.ok().body(departments);

@@ -19,6 +19,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -107,7 +109,10 @@ public class OverseasJobsTest extends AbstractTestNGSpringContextTests {
         vacancyRepository.deleteAll();
         departmentRepository.deleteAll();
 
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        this.mockMvc = MockMvcBuilders
+                .webAppContextSetup(webApplicationContext)
+                .apply(SecurityMockMvcConfigurers.springSecurity())
+                .build();
 
         department = departmentRepository.save(Department.builder().name("Department One").build());
 
@@ -164,6 +169,7 @@ public class OverseasJobsTest extends AbstractTestNGSpringContextTests {
         String json = mapper.writeValueAsString(vacancySearchParameters);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/search")
+				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(json)
                 .accept(APPLICATION_JSON_UTF8))

@@ -28,6 +28,8 @@ import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
@@ -129,7 +131,10 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         vacancyRepository.deleteAll();
         departmentRepository.deleteAll();;
 
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        this.mockMvc = MockMvcBuilders
+                .webAppContextSetup(webApplicationContext)
+                .apply(SecurityMockMvcConfigurers.springSecurity())
+                .build();
 
         department1 = departmentRepository.save(
                 Department.builder()
@@ -511,6 +516,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         Vacancy closedVacancy = createVacancyWithClosingDate("yesterday", YESTERDAY, department1);
 
         MvcResult mvcResult = this.mockMvc.perform(get("/vacancy/" + closedVacancy.getId())
+				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .accept(APPLICATION_JSON_UTF8))
                 .andExpect(status().isGone())
@@ -538,6 +544,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         closedVacancy.setClosingDate(THIRTY_DAYS_FROM_NOW);
 
         MvcResult mvcUpdateResult = this.mockMvc.perform(put("/vacancy/" + closedVacancy.getId())
+				.with(user("searchusername").password("searchpassword").roles("CRUD_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(objectMapper.writeValueAsString(closedVacancy))
                 .accept(APPLICATION_JSON_UTF8))
@@ -545,6 +552,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .andReturn();
 
         MvcResult mvcFindResult = this.mockMvc.perform(get("/vacancy/" + closedVacancy.getId())
+				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .accept(APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
@@ -573,6 +581,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         String json = mapper.writeValueAsString(vacancySearchParameters);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/search")
+				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(json)
                 .accept(APPLICATION_JSON_UTF8))
@@ -607,6 +616,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         String json = mapper.writeValueAsString(vacancySearchParameters);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/search")
+				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(json)
                 .accept(APPLICATION_JSON_UTF8))
@@ -651,6 +661,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         String json = mapper.writeValueAsString(vacancySearchParameters);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/search")
+				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(json)
                 .accept(APPLICATION_JSON_UTF8))
@@ -676,6 +687,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         String json = mapper.writeValueAsString(vacancySearchParameters);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/search")
+				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(json)
                 .accept(APPLICATION_JSON_UTF8))
@@ -704,6 +716,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         String json = mapper.writeValueAsString(vacancySearchParameters);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/search")
+				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(json)
                 .accept(APPLICATION_JSON_UTF8))
@@ -727,10 +740,10 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .location(new Location(place, 30))
                 .build();
 
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(vacancySearchParameters);
+        String json = objectMapper.writeValueAsString(vacancySearchParameters);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/search")
+				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(json)
                 .accept(APPLICATION_JSON_UTF8))
