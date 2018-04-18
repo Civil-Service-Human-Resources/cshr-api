@@ -25,4 +25,4 @@ ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/vcm-0.0.1
 		"--spring.security.search_username=${SEARCH_USERNAME}", \
 		"--spring.security.search_password=${SEARCH_PASSWORD}", \
 		"--spring.security.crud_username=${CRUD_USERNAME}", \
-		"--spring.security.crud_password=${CRUD_PASSWORD}""	]
+		"--spring.security.crud_password=${CRUD_PASSWORD}" ]
