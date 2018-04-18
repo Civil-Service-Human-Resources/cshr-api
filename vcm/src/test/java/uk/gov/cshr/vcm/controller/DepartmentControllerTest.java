@@ -5,10 +5,11 @@ import java.nio.charset.Charset;
 import org.assertj.core.api.Assertions;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import org.junit.Ignore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -26,7 +27,6 @@ import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
 
-@Ignore
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = VcmApplication.class)
 @ContextConfiguration
 @WebAppConfiguration
@@ -71,7 +71,10 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
     @BeforeMethod
     void setup() {
 
-        this.mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        this.mvc = MockMvcBuilders
+                .webAppContextSetup(webApplicationContext)
+                .apply(SecurityMockMvcConfigurers.springSecurity())
+                .build();
 
         vacancyRepository.deleteAll();
         this.departmentRepository.deleteAll();
@@ -90,7 +93,8 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
         String path = "/department";
 
         // When
-        ResultActions sendRequest = mvc.perform(get(path));
+        ResultActions sendRequest = mvc.perform(get(path)
+			.with(user("crudusername").password("crudpassword").roles("CRUD_ROLE")));
 
         // Then
         sendRequest
@@ -111,7 +115,8 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
         String path = "/department/" + department1.getId();
 
         // When
-        ResultActions sendRequest = mvc.perform(get(path));
+        ResultActions sendRequest = mvc.perform(get(path)
+			.with(user("crudusername").password("crudpassword").roles("CRUD_ROLE")));
 
         MvcResult mvcResult = sendRequest.andReturn();
 
@@ -132,7 +137,8 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
         String path = "/department/-1";
 
         // When
-        ResultActions sendRequest = mvc.perform(get(path));
+        ResultActions sendRequest = mvc.perform(get(path)
+			.with(user("crudusername").password("crudpassword").roles("CRUD_ROLE")));
 
         // Then
         sendRequest.andExpect(status().isNotFound());
@@ -145,7 +151,9 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
         String path = "/department";
 
         // When
-        ResultActions sendRequest = mvc.perform(post(path).contentType(APPLICATION_JSON_UTF8).content(requestBody));
+        ResultActions sendRequest = mvc.perform(post(path)
+				.with(user("crudusername").password("crudpassword").roles("CRUD_ROLE"))
+				.contentType(APPLICATION_JSON_UTF8).content(requestBody));
 
         MvcResult sendRequestResult = sendRequest.andReturn();
 
@@ -170,7 +178,9 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
         String path = "/department/" + department1.getId();
 
         // When
-        ResultActions sendRequest = mvc.perform(put(path).contentType(APPLICATION_JSON_UTF8).content(requestBody));
+        ResultActions sendRequest = mvc.perform(put(path)
+				.with(user("crudusername").password("crudpassword").roles("CRUD_ROLE"))
+				.contentType(APPLICATION_JSON_UTF8).content(requestBody));
 
         // Then
         sendRequest
@@ -186,7 +196,9 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
         String path = "/department/-1";
 
         // When
-        ResultActions sendRequest = mvc.perform(put(path).contentType(APPLICATION_JSON_UTF8).content(requestBody));
+        ResultActions sendRequest = mvc.perform(put(path)
+				.with(user("crudusername").password("crudpassword").roles("CRUD_ROLE"))
+				.contentType(APPLICATION_JSON_UTF8).content(requestBody));
 
         // Then
         sendRequest.andExpect(status().isNotFound());
@@ -204,7 +216,8 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
         String path = "/department/" + department1.getId();
 
         // When
-        ResultActions sendRequest = mvc.perform(delete(path));
+        ResultActions sendRequest = mvc.perform(delete(path)
+			.with(user("crudusername").password("crudpassword").roles("CRUD_ROLE")));
 
         Iterable<Department> vacancies = departmentRepository.findAll();
 
@@ -222,7 +235,8 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
         String path = "/department/?page=0&size=1";
 
         // When
-        ResultActions sendRequest = mvc.perform(get(path));
+        ResultActions sendRequest = mvc.perform(get(path)
+			.with(user("crudusername").password("crudpassword").roles("CRUD_ROLE")));
 
         // Then
         sendRequest

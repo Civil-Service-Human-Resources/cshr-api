@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.net.URI;
 import java.util.Optional;
+import javax.annotation.security.RolesAllowed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import uk.gov.cshr.vcm.repository.VacancyRepository;
 @RequestMapping(value = "/vacancy", produces = MediaType.APPLICATION_JSON_VALUE)
 @ResponseBody
 @Api(value = "vacancyservice")
+@RolesAllowed("CRUD_ROLE")
 public class VacancyController {
 
     private static final Logger log = LoggerFactory.getLogger(VacancyController.class);

@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ import uk.gov.cshr.vcm.service.SearchService;
 @RequestMapping(value = "/vacancy", produces = MediaType.APPLICATION_JSON_VALUE)
 @ResponseBody
 @Api(value = "vacancySearchService")
+@RolesAllowed("SEARCH_ROLE")
 public class VacancySearchController {
 
     private static final Logger log = LoggerFactory.getLogger(VacancySearchController.class);
@@ -56,6 +58,7 @@ public class VacancySearchController {
 				message = VacancyClosedException.CLOSED_MESSAGE,
 				response = VacancyError.class)
 	})
+	@RolesAllowed({"SEARCH_ROLE", "CRUD_ROLE"})
     public ResponseEntity<Vacancy> findById(@PathVariable Long vacancyId)
 			throws VacancyClosedException {
 
