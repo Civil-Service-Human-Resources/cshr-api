@@ -7,7 +7,6 @@ import java.util.List;
 import org.assertj.core.api.Assertions;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -91,8 +90,6 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
     @Test
     public void testFindAll() throws Exception {
 
-        DepartmentRepository departmentRepositoryMock = Mockito.mock(DepartmentRepository.class);
-
         List<Department> departments = createDepartments(
                 "xx",
                 "zz",
@@ -119,11 +116,6 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
 
         sendRequest = mvc.perform(get(path)
 			.with(user("crudusername").password("crudpassword").roles("CRUD_ROLE")));
-
-//        departmentRepositorySpy.
-
-        Mockito.verify(departmentRepositoryMock).findAll();
-
     }
 
     @Test
