@@ -40,7 +40,7 @@ public class DepartmentController {
     @ApiOperation(value = "Find all departments", nickname = "findAll")
 	@RolesAllowed({"CRUD_ROLE", "SEARCH_ROLE"})
     public ResponseEntity<Page<Department>> findAll(Pageable pageable) {
-        Page<Department> departments = departmentRepository.findAll(pageable);
+        Page<Department> departments = departmentRepository.findAllByOrderByNameAsc(pageable);
         return ResponseEntity.ok().body(departments);
     }
 
