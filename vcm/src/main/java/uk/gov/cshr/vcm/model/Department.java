@@ -9,6 +9,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OrderBy;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -35,6 +36,7 @@ public class Department implements Serializable {
     @Column(name = "identifier")
     private String identifier;
 
+    @OrderBy
     private @NonNull
     String name;
 

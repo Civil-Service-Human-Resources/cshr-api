@@ -2,9 +2,12 @@ package uk.gov.cshr.vcm.controller;
 
 import static java.lang.Math.toIntExact;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 import org.assertj.core.api.Assertions;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -47,26 +50,19 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
             MediaType.APPLICATION_JSON.getSubtype(),
             Charset.forName("utf8"));
 
+    private final String departmentOneName = "testTitle1 dept";
+    private final String departmentTwoName = "testTitle2";
 
-    private Department requestBodyDepartment = Department.builder()
+
+    private final Department requestBodyDepartment = Department.builder()
             .name("department name")
             .build();
 
 
-    private String requestBody = "{" +
+    private final String requestBody = "{" +
             "\"name\":\"" + requestBodyDepartment.getName() + "\"" +
             "}";
 
-    private Department department1 = Department.builder()
-            .id(1L)
-            .name("testTile1 dept")
-            .disabilityLogo("disabilityLogo")
-            .build();
-
-    private Department department2 = Department.builder()
-            .id(2L)
-            .name("testTitle2")
-            .build();
 
     @BeforeMethod
     void setup() {
@@ -78,17 +74,32 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
 
         vacancyRepository.deleteAll();
         this.departmentRepository.deleteAll();
+    }
 
-        Department savedDepartment1 = this.departmentRepository.save(department1);
-        department1.setId(savedDepartment1.getId());
+    public List<Department> createDepartments(String... departmentNames) {
 
-        Department savedDepartment2 = this.departmentRepository.save(department2);
-        department2.setId(savedDepartment2.getId());
+        List<Department> departments = new ArrayList<>();
 
+        for (String departmentName : departmentNames) {
+             Department department = departmentRepository.save(
+                     Department.builder().name(departmentName).build());
+             departments.add(department);
+        }
+        return departments;
     }
 
     @Test
     public void testFindAll() throws Exception {
+
+        DepartmentRepository departmentRepositoryMock = Mockito.mock(DepartmentRepository.class);
+
+        List<Department> departments = createDepartments(
+                "xx",
+                "zz",
+                "yy",                
+                departmentTwoName,
+                departmentOneName);
+
         // Given
         String path = "/department";
 
@@ -100,19 +111,28 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
         sendRequest
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$.content", hasSize(2)))
-                .andExpect(jsonPath("$.totalElements", is(2)))
-                .andExpect(jsonPath("$.content[0].id", is(toIntExact(this.department1.getId()))))
-                .andExpect(jsonPath("$.content[0].disabilityLogo", is(this.department1.getDisabilityLogo())))
-                .andExpect(jsonPath("$.content[0].name", is(this.department1.getName())));
+                .andExpect(jsonPath("$.content", hasSize(5)))
+                .andExpect(jsonPath("$.totalElements", is(5)))
+                .andExpect(jsonPath("$.content[0].name", is(departments.get(4).getName())))
+                .andExpect(jsonPath("$.content[4].name", is(departments.get(1).getName())));
+
+
+        sendRequest = mvc.perform(get(path)
+			.with(user("crudusername").password("crudpassword").roles("CRUD_ROLE")));
+
+//        departmentRepositorySpy.
+
+        Mockito.verify(departmentRepositoryMock).findAll();
 
     }
 
     @Test
     public void testFindById() throws Exception {
 
+        List<Department> departments = createDepartments(departmentOneName, departmentTwoName);
+
         // Given
-        String path = "/department/" + department1.getId();
+        String path = "/department/" + departments.get(0).getId();
 
         // When
         ResultActions sendRequest = mvc.perform(get(path)
@@ -126,9 +146,9 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
         sendRequest
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$.id", is(toIntExact(this.department1.getId()))))
-                .andExpect(jsonPath("$.disabilityLogo", is(this.department1.getDisabilityLogo())))
-                .andExpect(jsonPath("$.name", is(this.department1.getName())));
+                .andExpect(jsonPath("$.id", is(toIntExact(departments.get(0).getId()))))
+                .andExpect(jsonPath("$.disabilityLogo", is(departments.get(0).getDisabilityLogo())))
+                .andExpect(jsonPath("$.name", is(departments.get(0).getName())));
     }
 
     @Test
@@ -174,8 +194,11 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
 
     @Test
     public void testUpdate() throws Exception {
+
+        List<Department> departments = createDepartments(departmentOneName, departmentTwoName);
+
         // Given
-        String path = "/department/" + department1.getId();
+        String path = "/department/" + departments.get(0).getId();
 
         // When
         ResultActions sendRequest = mvc.perform(put(path)
@@ -186,7 +209,7 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
         sendRequest
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$.id", is(toIntExact(this.department1.getId()))))
+                .andExpect(jsonPath("$.id", is(toIntExact(departments.get(0).getId()))))
                 .andExpect(jsonPath("$.name", is("department name")));
     }
 
@@ -212,8 +235,11 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
 
     @Test
     public void testDelete() throws Exception {
+
+        List<Department> departments = createDepartments(departmentOneName, departmentTwoName);
+
         // Given
-        String path = "/department/" + department1.getId();
+        String path = "/department/" + departments.get(0).getId();
 
         // When
         ResultActions sendRequest = mvc.perform(delete(path)
@@ -224,12 +250,14 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
         // Then
         sendRequest.andExpect(status().isNoContent());
         Assertions.assertThat(vacancies).hasSize(1);
-        Assertions.assertThat(vacancies.iterator().next()).isEqualToComparingFieldByField(department2);
+        Assertions.assertThat(vacancies.iterator().next()).isEqualToComparingFieldByField(departments.get(1));
 
     }
 
     @Test
     public void testFindAllPaginated() throws Exception {
+
+        List<Department> departments = createDepartments(departmentOneName, departmentTwoName);
 
         // Given
         String path = "/department/?page=0&size=1";
