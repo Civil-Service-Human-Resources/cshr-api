@@ -138,7 +138,7 @@ public class HibernateSearchService {
 
     private Query getLocationQuery(SearchParameters searchParameters, QueryBuilder qb) {
 
-        if (searchParameters.getVacancySearchParameters().getLocation() != null) {
+        if (searchParameters.getCoordinates() != null) {
 
             double kms = searchParameters.getVacancySearchParameters().getLocation().getRadius() * MILES_KM_MULTIPLIER;
 
