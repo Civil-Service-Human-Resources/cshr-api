@@ -226,5 +226,10 @@ public class Vacancy implements Serializable {
 
     @Column(name = "personalspecification")
     private String personalSpecification;
+
+	@Field(store = Store.YES, indexNullAs = "true")
+	@Column(name = "active")
+	@Builder.Default
+    private boolean active = true;
 }
 

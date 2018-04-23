@@ -244,4 +244,13 @@
             <column name="personalspecification" type="TEXT" />
         </addColumn>
     </changeSet>
+	<changeSet author="gordon" id="28">
+        <addColumn tableName="vacancies">
+            <column name="active" type="boolean" />
+        </addColumn>
+		<addDefaultValue tableName="vacancies" columnName="active" defaultValueBoolean="true" columnDataType="boolean" />
+    </changeSet>
+	<changeSet author="gordon" id="29">
+		<sql>update vacancies set active = true</sql>
+    </changeSet>
 </databaseChangeLog>

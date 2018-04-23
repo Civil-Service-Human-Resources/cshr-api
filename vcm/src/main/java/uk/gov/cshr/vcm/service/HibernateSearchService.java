@@ -71,9 +71,11 @@ public class HibernateSearchService {
 
         Query contractTypeQuery = getFieldQuery("vacancy.contractTypes",
                 getContractTypes(searchParameters), qb);
-        
+
 		Query workingPatternsQuery = getFieldQuery("vacancy.workingPatterns",
                 getWorkingPatterns(searchParameters), qb);
+
+		Query activeQuery = getActiveQuery(qb);
 
         BooleanJunction combinedQuery = qb.bool()
                 .must(locationQuery)
@@ -82,7 +84,8 @@ public class HibernateSearchService {
                 .must(departmentQuery)
                 .must(searchtermQuery)
                 .must(contractTypeQuery)
-				.must(workingPatternsQuery);
+				.must(workingPatternsQuery)
+				.must(activeQuery);
 
         log.debug("luceneQuery=" + combinedQuery.createQuery().toString());
 
@@ -343,6 +346,16 @@ public class HibernateSearchService {
         }
 
         return qb.all().createQuery();
+    }
+
+    private Query getActiveQuery(QueryBuilder qb) {
+
+            Query query = qb.keyword()
+                    .onField("vacancy.active")
+                    .matching("true")
+                    .createQuery();
+
+            return query;
     }
 
     private String getContractTypes(SearchParameters searchParameters) {

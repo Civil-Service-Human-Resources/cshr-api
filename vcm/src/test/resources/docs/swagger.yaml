@@ -402,6 +402,8 @@ definitions:
   Vacancy:
     type: object
     properties:
+      active:
+        type: boolean
       applyURL:
         type: string
         description: URL linking to external system
