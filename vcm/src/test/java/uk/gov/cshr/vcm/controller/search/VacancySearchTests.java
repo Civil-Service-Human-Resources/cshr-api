@@ -116,6 +116,12 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
             .location("Newcastle2")
             .build();
 
+    private final VacancyLocation newcastleLocation3 = VacancyLocation.builder()
+            .latitude(NEWCASTLE_LATITUDE)
+            .longitude(NEWCASTLE_LONGITUDE)
+            .location("Newcastle3")
+            .build();
+
     private VacancyLocation createBristolLocationPrototype(String locationName) {
         return VacancyLocation.builder()
             .latitude(BRISTOL_LATITUDE)
@@ -207,6 +213,34 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         Assert.assertEquals("Newcastle Job", resultsList.get(0).getTitle());
         Assert.assertEquals("1", 1, resultsList.size());
+    }
+
+    @Test
+    public void testFilterInactiveVacancies() throws Exception {
+
+        Vacancy vacancy1 = createVacancyPrototype(newcastleLocation);
+		vacancy1.setActive(false);
+        vacancy1.setTitle("Newcastle Job");
+        saveVacancy(vacancy1);
+
+        Vacancy vacancy2 = createVacancyPrototype(newcastleLocation2);
+		vacancy2.setActive(false);
+        vacancy2.setTitle("Second Newcastle Job");
+        saveVacancy(vacancy2);
+
+        Vacancy vacancy3 = createVacancyPrototype(newcastleLocation3);
+		vacancy3.setActive(true);
+        vacancy3.setTitle("third Newcastle Job");
+        saveVacancy(vacancy3);
+
+        Page<Vacancy> result = findVancanciesByKeyword("newcastle");
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertTrue("Results expected", resultsList.size() == 1);
+
+        for (Vacancy vacancy : resultsList) {
+			Assert.assertTrue("Returned vacancy is active", vacancy.isActive());
+		}
     }
 
     @Test
@@ -530,6 +564,25 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         assertThat(vacancyError.getStatus(), is(HttpStatus.GONE));
         assertThat(vacancyError.getMessage(),
                 containsString(VacancyClosedException.CLOSED_MESSAGE));
+    }
+
+    @Test
+    public void testGetInactiveVacancy() throws Exception {
+
+        given(locationService.find(any()))
+                .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
+
+        Vacancy inactiveVacancy = createVacancyPrototype(newcastleLocation);
+		inactiveVacancy.setActive(false);
+        inactiveVacancy.setTitle("Newcastle Job");
+        saveVacancy(inactiveVacancy);
+
+        MvcResult mvcResult = this.mockMvc.perform(get("/vacancy/" + inactiveVacancy.getId())
+				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
+                .contentType(APPLICATION_JSON_UTF8)
+                .accept(APPLICATION_JSON_UTF8))
+                .andExpect(status().isNotFound())
+                .andReturn();
     }
 
     @Test
