@@ -5,6 +5,8 @@ services:
     image: cshrrpg.azurecr.io/cshr-api:${DOCKER_SERVICE_TAG}
     build:
       context: .
+      args:
+        arg_maven_repo: https://nexus.dev.cshr-gov.uk/nexus/content/groups/public
     depends_on:
       - db
     environment:
