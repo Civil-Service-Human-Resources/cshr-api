@@ -581,7 +581,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .accept(APPLICATION_JSON_UTF8))
-                .andExpect(status().isNotFound())
+                .andExpect(status().isGone())
                 .andReturn();
     }
 

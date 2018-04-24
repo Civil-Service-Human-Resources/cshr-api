@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -68,14 +67,14 @@ public class VacancySearchController {
         if ( ! foundVacancy.isPresent() && log.isDebugEnabled()) {
             log.debug("No vacancy found for id " + vacancyId);
         }
-		else if ( foundVacancy.isPresent() && foundVacancy.get().isActive() == false ) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
-		else if (foundVacancy.isPresent() && foundVacancy.get().getClosingDate().before(new Date())) {
-            throw new VacancyClosedException(vacancyId);
-        }
 
-        return foundVacancy.map(ResponseEntity.ok()::body).orElse(ResponseEntity.notFound().build());
+		if ( foundVacancy.isPresent() && (foundVacancy.get().isActive() == false
+                || foundVacancy.get().getClosingDate().before(new Date()) ) ) {
+			throw new VacancyClosedException(vacancyId);
+		}
+        else {
+            return foundVacancy.map(ResponseEntity.ok()::body).orElse(ResponseEntity.notFound().build());
+        }
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/search")
