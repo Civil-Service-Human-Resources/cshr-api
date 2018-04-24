@@ -348,3 +348,4 @@ INSERT INTO departments ("name", disabilitylogo, identifier, departmentstatus, d
 	VALUES ('Wilton Park', NULL, '174-WP', NULL, NULL, '2018-02-02 00:00:00.0', NULL, '/174-WP.jpg', NULL);
 INSERT INTO departments ("name", disabilitylogo, identifier, departmentstatus, disabilityconfidencelevel, disabilityconfidencelevellastupdate, logoneeded, logopath, acceptedemailextensions) 
 	VALUES ('Youth Justice Board', NULL, '175-YJB', NULL, NULL, '2018-02-02 00:00:00.0', NULL, '/175-YJB.gif', NULL);
+update departments set disabilityconfidencelevel = upper(disabilityconfidencelevel) where disabilityconfidencelevel is not null

@@ -164,6 +164,9 @@ public class Vacancy implements Serializable {
     @JoinColumn(name = "dept_id")
     private Department department;
 
+    @Column(name = "atsvendoridentifier")
+    private String atsVendorIdentifier;
+
     @Transient
     @JsonIgnore
     @Field(store = Store.YES, name = "departmentID")

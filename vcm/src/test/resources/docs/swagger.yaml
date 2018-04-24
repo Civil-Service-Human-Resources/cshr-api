@@ -8,7 +8,7 @@ info:
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0'
-host: 'localhost:8080'
+host: 'localhost:9080'
 basePath: /
 tags:
   - name: vacancy-controller
@@ -162,6 +162,32 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/Vacancy'
+  /vacancy/save:
+    post:
+      tags:
+        - vacancy-controller
+      summary: Find all vacancies with support for pagination
+      operationId: save
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: vacancyToSave
+          description: vacancyToSave
+          required: true
+          schema:
+            $ref: '#/definitions/Vacancy'
+      responses:
+        '200':
+          description: Request to save vacancy was successful.
+          schema:
+            $ref: '#/definitions/CSHRServiceStatus'
+        '422':
+          description: An unknown Applicant Tracking System Vendor was supplied.
+          schema:
+            $ref: '#/definitions/CSHRServiceStatus'
   /vacancy/search:
     post:
       tags:
@@ -263,6 +289,17 @@ paths:
           schema:
             $ref: '#/definitions/Vacancy'
 definitions:
+  CSHRServiceStatus:
+    type: object
+    properties:
+      code:
+        type: string
+      detail:
+        type: array
+        items:
+          type: string
+      summary:
+        type: string
   Department:
     type: object
     properties:
@@ -407,6 +444,8 @@ definitions:
       applyURL:
         type: string
         description: URL linking to external system
+      atsVendorIdentifier:
+        type: string
       closingDate:
         type: string
         example: 'yyyy-MM-dd''T''HH:mm:ss.SSSZ'
@@ -604,7 +643,6 @@ definitions:
         type: string
         description: word found in title or description of vacancy
       location:
-        description: location of the vacancy
         $ref: '#/definitions/Location'
       workingPatterns:
         type: array
