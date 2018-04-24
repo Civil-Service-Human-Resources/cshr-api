@@ -1,15 +1,24 @@
 FROM maven:3.5-jdk-8 as dependencies
 
+ARG	    arg_maven_repo
+ENV 	MAVEN_REPO=$arg_maven_repo
+
 COPY pom.xml /usr/src/myapp/pom.xml
 COPY vcm/pom.xml /usr/src/myapp/vcm/pom.xml
+COPY 	.settings.xml /usr/share/maven/ref/settings.xml
 
-RUN mvn -f /usr/src/myapp/pom.xml clean verify --fail-never
+RUN mvn -f /usr/src/myapp/pom.xml -s /usr/share/maven/ref/settings.xml clean verify --fail-never
 
 FROM maven:3.5-jdk-8 as build
-COPY --from=dependencies /root/.m2 /root/.m2
+
+ARG	    arg_maven_repo
+ENV	    MAVEN_REPO=$arg_maven_repo
+
+COPY 	--from=dependencies /usr/share/maven/ref/ /usr/share/maven/ref/
+
 COPY vcm /usr/src/myapp/vcm
 COPY pom.xml /usr/src/myapp
-RUN mvn -f /usr/src/myapp/pom.xml clean package
+RUN mvn -f /usr/src/myapp/pom.xml -s /usr/share/maven/ref/settings.xml clean package
 
 FROM frolvlad/alpine-oraclejdk8:slim
 
