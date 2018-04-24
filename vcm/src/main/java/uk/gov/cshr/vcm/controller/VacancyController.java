@@ -4,10 +4,13 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
 import javax.annotation.security.RolesAllowed;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -55,9 +58,7 @@ public class VacancyController {
 
     private Vacancy createVacancy(Vacancy vacancy) {
         if (vacancy.getVacancyLocations() != null) {
-            vacancy.getVacancyLocations().forEach((vacancyLocation) -> {
-                vacancyLocation.setVacancy(vacancy);
-            });
+            vacancy.getVacancyLocations().forEach(vacancyLocation -> vacancyLocation.setVacancy(vacancy));
         }
 
         return vacancyRepository.save(vacancy);
@@ -79,9 +80,7 @@ public class VacancyController {
     }
 
     private Vacancy updateVacancy(@RequestBody Vacancy vacancyUpdate, Vacancy foundVacancy) {
-        vacancyUpdate.getVacancyLocations().forEach((vacancyLocation) -> {
-            vacancyLocation.setVacancy(vacancyUpdate);
-        });
+        vacancyUpdate.getVacancyLocations().forEach(vacancyLocation -> vacancyLocation.setVacancy(vacancyUpdate));
 
         vacancyUpdate.setId(foundVacancy.getId());
 
@@ -144,7 +143,7 @@ public class VacancyController {
             CSHRServiceStatus.builder()
                 .code(code)
                 .summary(message)
-                .detail(Collections.EMPTY_LIST)
+                .detail(Collections.emptyList())
                 .build());
     }
 }
