@@ -6,7 +6,7 @@ services:
     build:
       context: .
       args:
-        arg_maven_repo: https://nexus.dev.cshr-gov.uk/nexus/content/groups/public
+        arg_maven_repo: "${MAVEN_REPO}"
     depends_on:
       - db
     environment:
