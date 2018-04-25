@@ -5,6 +5,8 @@ services:
     image: cshrrpg.azurecr.io/cshr-api:${DOCKER_SERVICE_TAG}
     build:
       context: .
+      args:
+        arg_maven_repo: "${MAVEN_REPO}"
     depends_on:
       - db
     environment:
