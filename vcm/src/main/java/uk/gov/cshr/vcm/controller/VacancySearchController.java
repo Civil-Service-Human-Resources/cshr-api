@@ -68,7 +68,7 @@ public class VacancySearchController {
             log.debug("No vacancy found for id " + vacancyId);
         }
 
-		if ( foundVacancy.isPresent() && (foundVacancy.get().isActive() == false
+		if ( foundVacancy.isPresent() && (foundVacancy.get().getActive() == false
                 || foundVacancy.get().getClosingDate().before(new Date()) ) ) {
 			throw new VacancyClosedException(vacancyId);
 		}
