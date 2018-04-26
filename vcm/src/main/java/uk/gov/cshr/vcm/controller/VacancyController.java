@@ -1,16 +1,14 @@
 package uk.gov.cshr.vcm.controller;
 
-import java.net.URI;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import javax.annotation.security.RolesAllowed;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.net.URI;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import javax.annotation.security.RolesAllowed;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -46,6 +44,10 @@ public class VacancyController {
     @RequestMapping(method = RequestMethod.POST)
     @ApiOperation(value = "Create a Vacancy", nickname = "create")
     public ResponseEntity<Vacancy> create(@RequestBody Vacancy vacancy) {
+
+        if ( vacancy.getActive() == null ) {
+            vacancy.setActive(Boolean.TRUE);
+        }
 
         Vacancy savedVacancy = createVacancy(vacancy);
 
