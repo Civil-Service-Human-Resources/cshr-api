@@ -233,6 +233,6 @@ public class Vacancy implements Serializable {
 	@Field(store = Store.YES, indexNullAs = "true")
 	@Column(name = "active")
 	@Builder.Default
-    private boolean active = true;
+    private Boolean active = Boolean.TRUE;
 }
 

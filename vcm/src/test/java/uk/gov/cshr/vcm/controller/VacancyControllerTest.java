@@ -381,6 +381,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
         Assert.assertTrue(storedVacancy.getTitle().equals("testTile1 SearchQueryTitle"));
         Assertions.assertThat(storedVacancy).isEqualToIgnoringGivenFields(vacancy, "id", "vacancyLocations");
+        Assert.assertTrue(storedVacancy.getActive());
     }
 
 

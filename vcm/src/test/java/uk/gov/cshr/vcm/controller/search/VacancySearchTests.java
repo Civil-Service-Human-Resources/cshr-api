@@ -239,7 +239,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         Assert.assertTrue("Results expected", resultsList.size() == 1);
 
         for (Vacancy vacancy : resultsList) {
-			Assert.assertTrue("Returned vacancy is active", vacancy.isActive());
+			Assert.assertTrue("Returned vacancy is active", vacancy.getActive());
 		}
     }
 
