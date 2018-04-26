@@ -12,6 +12,8 @@ import javax.persistence.Id;
 import javax.persistence.OrderBy;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -52,6 +54,7 @@ public class Department implements Serializable {
     private DisabilityConfidenceLevel disabilityConfidenceLevel;
 
     @Column(name = "disabilityconfidencelevellastupdate")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT+0")
     private Timestamp disabilityConfidenceLevelLastUpdate;
 
     @Column(name = "logoneeded")
