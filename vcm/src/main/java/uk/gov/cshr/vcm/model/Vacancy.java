@@ -39,6 +39,7 @@ import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.AnalyzerDefs;
+import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.EncodingType;
 import org.hibernate.search.annotations.Field;
@@ -204,6 +205,7 @@ public class Vacancy implements Serializable {
     @OneToMany(mappedBy = "vacancy", fetch = FetchType.EAGER, cascade = {
         CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE}, orphanRemoval = true)
     @Builder.Default
+    @ContainedIn
     private List<VacancyLocation> vacancyLocations = new ArrayList<>();
 
     @Column(name = "salaryoverridedescription")
