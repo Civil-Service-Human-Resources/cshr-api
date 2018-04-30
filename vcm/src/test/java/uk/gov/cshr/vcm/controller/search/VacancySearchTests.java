@@ -38,6 +38,7 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -57,6 +58,7 @@ import uk.gov.cshr.vcm.model.VacancySearchParameters;
 import uk.gov.cshr.vcm.model.WorkingPattern;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
+import uk.gov.cshr.vcm.service.ApplicantTrackingSystemService;
 import uk.gov.cshr.vcm.service.HibernateSearchService;
 import uk.gov.cshr.vcm.service.LocationService;
 
@@ -88,6 +90,9 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     private DepartmentRepository departmentRepository;
 
     private MockMvc mockMvc;
+
+    @MockBean
+    private ApplicantTrackingSystemService applicantTrackingSystemService;
 
     @MockBean
     private LocationService locationService;
@@ -241,6 +246,48 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         for (Vacancy vacancy : resultsList) {
 			Assert.assertTrue("Returned vacancy is active", vacancy.getActive());
 		}
+    }
+
+    @Test
+    public void testIndexUpdated() throws Exception {
+
+        Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
+        newcastleVacancy.setTitle("Newcastle Job");
+        saveVacancy(newcastleVacancy);
+
+        Page<Vacancy> result = findVancanciesByKeyword("newcastle");
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertEquals("1", 1, resultsList.size());
+        Assert.assertEquals("Newcastle Job", resultsList.get(0).getTitle());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        newcastleVacancy.setTitle("findthis");
+        ResultActions sendRequest = this.mockMvc.perform(put("/vacancy/" + newcastleVacancy.getId())
+				.with(user("searchusername").password("searchpassword").roles("CRUD_ROLE"))
+				.contentType(APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(newcastleVacancy)));
+
+        sendRequest.andExpect(status().isOk());
+
+        result = findVancanciesByKeyword("findthis");
+        resultsList = result.getContent();
+
+        Assert.assertEquals("1", 1, resultsList.size());
+        Assert.assertEquals("findthis", resultsList.get(0).getTitle());
+
+        newcastleVacancy.setTitle("newtitle");
+        sendRequest = this.mockMvc.perform(post("/vacancy/save/")
+				.with(user("searchusername").password("searchpassword").roles("CRUD_ROLE"))
+				.contentType(APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(newcastleVacancy)));
+
+        sendRequest.andExpect(status().isOk());
+
+        result = findVancanciesByKeyword("newtitle");
+        resultsList = result.getContent();
+
+        Assert.assertEquals("1", 1, resultsList.size());
+        Assert.assertEquals("newtitle", resultsList.get(0).getTitle());
     }
 
     @Test
