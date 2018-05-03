@@ -25,4 +25,4 @@ server:
   port: 8080
 liquibase:
     enabled: true
-    change-log: classpath:/testchangelog.xml
+    change-log: classpath:/changelog.xml
