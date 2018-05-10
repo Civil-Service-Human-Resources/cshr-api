@@ -221,6 +221,25 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     }
 
     @Test
+    public void testHandleInvalidCharsInSearch() throws Exception {
+
+        VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
+                .keyword("£%^&*")
+                .build();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(vacancySearchParameters);
+
+        this.mockMvc.perform(post("/vacancy/search")
+				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(json)
+                .accept(APPLICATION_JSON_UTF8))
+                .andExpect(status().isNoContent())
+                .andReturn();
+    }
+
+    @Test
     public void testFilterInactiveVacancies() throws Exception {
 
         Vacancy vacancy1 = createVacancyPrototype(newcastleLocation);

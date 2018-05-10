@@ -58,7 +58,8 @@ public class HibernateSearchService {
     }
 
     @Transactional
-    public Page<Vacancy> search(SearchParameters searchParameters, Pageable pageable) throws LocationServiceException, IOException {
+    public Page<Vacancy> search(SearchParameters searchParameters, Pageable pageable)
+            throws LocationServiceException, IOException {
 
         FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
         QueryBuilder qb = fullTextEntityManager.getSearchFactory().buildQueryBuilder().forEntity(VacancyLocation.class).get();
