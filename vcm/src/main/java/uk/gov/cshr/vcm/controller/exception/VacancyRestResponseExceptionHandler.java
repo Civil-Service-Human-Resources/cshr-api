@@ -1,5 +1,6 @@
 package uk.gov.cshr.vcm.controller.exception;
 
+import org.hibernate.search.exception.EmptyQueryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -45,6 +46,13 @@ public class VacancyRestResponseExceptionHandler extends ResponseEntityException
     public ResponseEntity<Object> handleAccessDeniedExceptionException(AccessDeniedException ex, WebRequest request) {
         log.error(ex.getMessage(), ex);
         VacancyError vacancyError = new VacancyError(HttpStatus.FORBIDDEN, ex.getMessage(), null);
+        return handleExceptionInternal(ex, vacancyError, new HttpHeaders(), vacancyError.getStatus(), request);
+    }
+
+    @ExceptionHandler({EmptyQueryException.class})
+    public ResponseEntity<Object> handleEmptyQueryException(EmptyQueryException ex, WebRequest request) {
+        log.error(ex.getMessage(), ex);
+        VacancyError vacancyError = new VacancyError(HttpStatus.NO_CONTENT, ex.getMessage(), null);
         return handleExceptionInternal(ex, vacancyError, new HttpHeaders(), vacancyError.getStatus(), request);
     }
 }
