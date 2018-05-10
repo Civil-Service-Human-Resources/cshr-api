@@ -13,6 +13,7 @@ import javax.transaction.Transactional;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.Query;
+import org.hibernate.search.exception.EmptyQueryException;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.BooleanJunction;
@@ -63,30 +64,39 @@ public class HibernateSearchService {
 
         FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
         QueryBuilder qb = fullTextEntityManager.getSearchFactory().buildQueryBuilder().forEntity(VacancyLocation.class).get();
+        
+        BooleanJunction combinedQuery;
 
-        Query searchtermQuery = getSearchTermQuery(searchParameters, qb);
-        Query salaryQuery = getSalaryQuery(searchParameters, qb);
-        Query openClosed = getOpenClosedQuery(qb);
-        Query departmentQuery = getDepartmentQuery(searchParameters, qb);
-        Query locationQuery = getLocationQuery(searchParameters, qb);
+        try {
 
-        Query contractTypeQuery = getFieldQuery("vacancy.contractTypes",
-                getContractTypes(searchParameters), qb);
+            Query searchtermQuery = getSearchTermQuery(searchParameters, qb);
+            Query salaryQuery = getSalaryQuery(searchParameters, qb);
+            Query openClosed = getOpenClosedQuery(qb);
+            Query departmentQuery = getDepartmentQuery(searchParameters, qb);
+            Query locationQuery = getLocationQuery(searchParameters, qb);
 
-		Query workingPatternsQuery = getFieldQuery("vacancy.workingPatterns",
-                getWorkingPatterns(searchParameters), qb);
+            Query contractTypeQuery = getFieldQuery("vacancy.contractTypes",
+                    getContractTypes(searchParameters), qb);
 
-		Query activeQuery = getActiveQuery(qb);
+            Query workingPatternsQuery = getFieldQuery("vacancy.workingPatterns",
+                    getWorkingPatterns(searchParameters), qb);
 
-        BooleanJunction combinedQuery = qb.bool()
-                .must(locationQuery)
-                .must(salaryQuery)
-                .must(openClosed)
-                .must(departmentQuery)
-                .must(searchtermQuery)
-                .must(contractTypeQuery)
-				.must(workingPatternsQuery)
-				.must(activeQuery);
+            Query activeQuery = getActiveQuery(qb);
+
+            combinedQuery = qb.bool()
+                    .must(locationQuery)
+                    .must(salaryQuery)
+                    .must(openClosed)
+                    .must(departmentQuery)
+                    .must(searchtermQuery)
+                    .must(contractTypeQuery)
+                    .must(workingPatternsQuery)
+                    .must(activeQuery);
+        }
+        catch(EmptyQueryException e) {
+            log.error(e.getMessage(), e);
+            return new PageImpl<>(new ArrayList<>(), pageable, 0);
+        }
 
         log.debug("luceneQuery=" + combinedQuery.createQuery().toString());
 
