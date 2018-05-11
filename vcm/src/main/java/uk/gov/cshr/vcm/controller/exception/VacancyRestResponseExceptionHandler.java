@@ -1,5 +1,6 @@
 package uk.gov.cshr.vcm.controller.exception;
 
+import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -21,7 +22,9 @@ public class VacancyRestResponseExceptionHandler extends ResponseEntityException
 
     @ExceptionHandler({VacancyException.class})
     public ResponseEntity<Object> handleLocationServiceException(VacancyException ex, WebRequest request) {
-        log.error(ex.getMessage(), ex);
+        if (  ex.getMessage() != null ) {
+            log.error(ex.getMessage(), ex);
+        }
         return handleExceptionInternal(ex, ex.getVacancyError(), new HttpHeaders(), ex.getVacancyError().getStatus(), request);
     }
 
@@ -45,6 +48,13 @@ public class VacancyRestResponseExceptionHandler extends ResponseEntityException
     public ResponseEntity<Object> handleAccessDeniedExceptionException(AccessDeniedException ex, WebRequest request) {
         log.error(ex.getMessage(), ex);
         VacancyError vacancyError = new VacancyError(HttpStatus.FORBIDDEN, ex.getMessage(), null);
+        return handleExceptionInternal(ex, vacancyError, new HttpHeaders(), vacancyError.getStatus(), request);
+    }
+
+    @ExceptionHandler({IOException.class})
+    public ResponseEntity<Object> handleIOException(IOException ex, WebRequest request) {
+        log.error(ex.getMessage(), ex);
+        VacancyError vacancyError = new VacancyError(HttpStatus.BAD_REQUEST, ex.getMessage(), null);
         return handleExceptionInternal(ex, vacancyError, new HttpHeaders(), vacancyError.getStatus(), request);
     }
 }

@@ -33,18 +33,25 @@ public class SearchService {
                 .vacancySearchParameters(vacancySearchParameters)
                 .build();
 
-        if (vacancySearchParameters.getLocation() != null) {
+        boolean filterByLocation = vacancySearchParameters.getLocation() != null;
+        boolean locationFound = false;
+
+        if ( filterByLocation ) {
+
             Coordinates coordinates = locationService.find(vacancySearchParameters.getLocation().getPlace());
+
             if (coordinatesExist(coordinates)) {
+                locationFound = true;
                 searchParameters.setCoordinates(coordinates);
             }
             else {
-                debug("No Coordinates for %s with radius of %d exist", vacancySearchParameters.getLocation().getPlace(), vacancySearchParameters.getLocation().getRadius());
+                debug("No Coordinates for %s with radius of %d exist", 
+                        vacancySearchParameters.getLocation().getPlace(),
+                        vacancySearchParameters.getLocation().getRadius());
             }
         }
 
-        Page<Vacancy> vacancies = hibernateSearchService.search(searchParameters, pageable);
-        return vacancies;
+        return hibernateSearchService.search(searchParameters, pageable);
     }
 
     private boolean coordinatesExist(Coordinates coordinates) {
