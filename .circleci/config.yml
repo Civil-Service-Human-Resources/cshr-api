@@ -10,15 +10,15 @@ jobs:
       - checkout
 
       - run:
+          name: Login to Azure container repo
+          command: docker login -u ${ACR_ID} -p ${ACR_PASS} ${AZURE_URL}
+
+      - run:
           name: Build image
           command: |
             cp .env_dev .env
             export DOCKER_SERVICE_TAG="$CIRCLE_WORKFLOW_ID"
             docker-compose build api
-
-      - run:
-          name: Login to Azure container repo
-          command: docker login -u ${ACR_ID} -p ${ACR_PASS} ${AZURE_URL}
 
       - run:
           name: Push the images to Acr
