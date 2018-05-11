@@ -61,18 +61,12 @@
         <addForeignKeyConstraint baseColumnNames="dept_id"
                                  baseTableName="vacancies"
                                  constraintName="fk_vacancies_departments"
-                                 deferrable="true"
-                                 initiallyDeferred="true"
+
                                  onDelete="NO ACTION"
                                  onUpdate="NO ACTION"
                                  referencedColumnNames="id"
                                  referencedTableName="departments"/>
     </changeSet>
-    <changeSet author="gordon" id="6">
-        <sql>CREATE EXTENSION cube;</sql>
-        <sql>CREATE EXTENSION earthdistance;</sql>
-    </changeSet>
-
     <changeSet author="gordon" id="7">
         <dropNotNullConstraint
             columnDataType="int"
@@ -153,9 +147,7 @@
 		<sql>update vacancies set identifier = id</sql>
         <addUniqueConstraint columnNames="identifier"
                 constraintName="uk_identifier"
-                deferrable="true"
                 disabled="false"
-                initiallyDeferred="true"
                 tableName="vacancies"/>
     </changeSet>
 	<changeSet author="gordon" id="19">
@@ -221,8 +213,6 @@
             baseColumnNames="vacancyid"
             baseTableName="vacancylocations"
             constraintName="fk_vacancylocations_vacancies"
-            deferrable="true"
-            initiallyDeferred="true"
             onDelete="NO ACTION"
             onUpdate="NO ACTION"
             referencedColumnNames="id"
