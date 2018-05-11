@@ -90,7 +90,7 @@ public class VacancySearchController {
             @RequestBody VacancySearchParameters vacancySearchParameters, Pageable pageable)
             throws LocationServiceException, IOException {
 
-		ResponseEntity<Page<Vacancy>> response = searchService.search(vacancySearchParameters, pageable);
-		return response;
+		Page<Vacancy> vacancies = searchService.search(vacancySearchParameters, pageable);
+		return ResponseEntity.ok().body(vacancies);
     }
 }
