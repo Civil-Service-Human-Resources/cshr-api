@@ -242,7 +242,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(json)
                 .accept(APPLICATION_JSON_UTF8))
-                .andExpect(status().isPartialContent())
+                .andExpect(status().isOk())
                 .andReturn();
     }
 

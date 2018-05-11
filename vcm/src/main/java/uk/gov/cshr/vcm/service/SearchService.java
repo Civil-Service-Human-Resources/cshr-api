@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
@@ -54,13 +53,7 @@ public class SearchService {
         }
 
         Page<Vacancy> vacancies = hibernateSearchService.search(searchParameters, pageable);
-
-        if ( filterByLocation && ! locationFound ) {
-            return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(vacancies);
-        }
-        else {
-            return ResponseEntity.ok().body(vacancies);
-        }
+        return ResponseEntity.ok().body(vacancies);
     }
 
     private boolean coordinatesExist(Coordinates coordinates) {
