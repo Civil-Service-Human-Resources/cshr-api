@@ -1,5 +1,7 @@
 package uk.gov.cshr.vcm.service;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -41,6 +43,13 @@ public class LocationService {
      */
     public Coordinates find(String location) throws LocationServiceException {
 
+        try {
+            location = URLEncoder.encode(location, "UTF-8");
+        }
+        catch (UnsupportedEncodingException ex) {
+            throw new RuntimeException(ex);
+        }
+
         Map<String, String> params = new HashMap<>();
         params.put("searchTerm", location);
 
@@ -62,7 +71,7 @@ public class LocationService {
             if (log.isErrorEnabled()) {
                 log.error(String.format("An unexpected error occurred trying to find coordinates for %s", location), ex);
             }
-            throw new LocationServiceException();
+            throw new LocationServiceException(ex);
         }
     }
 

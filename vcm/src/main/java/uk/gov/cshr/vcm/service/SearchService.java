@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
 import uk.gov.cshr.vcm.model.Coordinates;
@@ -24,7 +26,7 @@ public class SearchService {
     @Inject
     private HibernateSearchService hibernateSearchService;
 
-    public Page<Vacancy> search(VacancySearchParameters vacancySearchParameters, Pageable pageable)
+    public ResponseEntity<Page<Vacancy>> search(VacancySearchParameters vacancySearchParameters, Pageable pageable)
             throws LocationServiceException, IOException {
 		
         debug("staring search()");
@@ -33,18 +35,32 @@ public class SearchService {
                 .vacancySearchParameters(vacancySearchParameters)
                 .build();
 
-        if (vacancySearchParameters.getLocation() != null) {
+        boolean filterByLocation = vacancySearchParameters.getLocation() != null;
+        boolean locationFound = false;
+
+        if ( filterByLocation ) {
+
             Coordinates coordinates = locationService.find(vacancySearchParameters.getLocation().getPlace());
+
             if (coordinatesExist(coordinates)) {
+                locationFound = true;
                 searchParameters.setCoordinates(coordinates);
             }
             else {
-                debug("No Coordinates for %s with radius of %d exist", vacancySearchParameters.getLocation().getPlace(), vacancySearchParameters.getLocation().getRadius());
+                debug("No Coordinates for %s with radius of %d exist", 
+                        vacancySearchParameters.getLocation().getPlace(),
+                        vacancySearchParameters.getLocation().getRadius());
             }
         }
 
         Page<Vacancy> vacancies = hibernateSearchService.search(searchParameters, pageable);
-        return vacancies;
+
+        if ( filterByLocation && ! locationFound ) {
+            return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(vacancies);
+        }
+        else {
+            return ResponseEntity.ok().body(vacancies);
+        }
     }
 
     private boolean coordinatesExist(Coordinates coordinates) {
