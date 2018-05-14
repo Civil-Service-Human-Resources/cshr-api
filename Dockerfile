@@ -22,11 +22,11 @@ RUN 	mvn -f /usr/src/myapp/pom.xml -s /usr/share/maven/ref/settings.xml clean pa
 
 FROM 	cshrrpg.azurecr.io/java-8-base
 
-COPY 	--from=build --chown=appuser:appuser /usr/src/myapp/vcm/target/vcm-0.0.1.jar /app/vcm-0.0.1.jar
+COPY 	--from=build --chown=appuser:appuser /usr/src/myapp/vcm/target/vcm-1.0.0.jar /app/vcm-1.0.01.jar
 
 USER 	appuser
 
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app/vcm-0.0.1.jar", \
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app/vcm-1.0.0.jar", \
 		"--spring.location.service.url=${LOCATION_SERVICE_URL}", \
 		"--spring.location.service.username=${LOCATION_SERVICE_USERNAME}", \
 		"--spring.location.service.password=${LOCATION_SERVICE_PASSWORD}", \
