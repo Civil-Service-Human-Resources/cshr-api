@@ -5,7 +5,7 @@
 
     <groupId>uk.gov.cshr</groupId>
     <artifactId>cshr</artifactId>
-    <version>0.0.1</version>
+    <version>1.0.0</version>
     <packaging>pom</packaging>
 
     <name>cshr</name>
