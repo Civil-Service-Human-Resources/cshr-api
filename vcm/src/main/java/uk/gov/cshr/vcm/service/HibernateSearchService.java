@@ -64,7 +64,7 @@ public class HibernateSearchService {
 
         FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
         QueryBuilder qb = fullTextEntityManager.getSearchFactory().buildQueryBuilder().forEntity(VacancyLocation.class).get();
-        
+
         BooleanJunction combinedQuery;
 
         try {
@@ -152,6 +152,9 @@ public class HibernateSearchService {
 
     private Query getLocationQuery(SearchParameters searchParameters, QueryBuilder qb) {
 
+		boolean includeOverseasJobs = BooleanUtils.isTrue(
+			searchParameters.getVacancySearchParameters().getOverseasJob());
+
         if (searchParameters.getCoordinates() != null) {
 
             double kms = searchParameters.getVacancySearchParameters().getLocation().getRadius() * MILES_KM_MULTIPLIER;
@@ -177,9 +180,6 @@ public class HibernateSearchService {
             Query overseasQuery = qb.keyword().onField("vacancy.overseasJob")
                     .matching("true").createQuery();
 
-            boolean includeOverseasJobs = BooleanUtils.isTrue(
-                    searchParameters.getVacancySearchParameters().getOverseasJob());
-
             if (!includeOverseasJobs) {
                 locationQuery.must(regionSpatialQuery);
             }
@@ -190,9 +190,14 @@ public class HibernateSearchService {
 
             return locationQuery.createQuery();
         }
-        else {
-            return qb.all().createQuery();
+		else if ( ! includeOverseasJobs )  {
+
+			return qb.keyword().onField("vacancy.overseasJob")
+                    .matching("false").createQuery();
         }
+		else {
+			return qb.all().createQuery();
+		}
     }
 
     private Query getSearchTermQuery(SearchParameters searchParameters, QueryBuilder qb) {

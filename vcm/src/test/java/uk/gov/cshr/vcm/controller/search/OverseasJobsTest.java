@@ -155,6 +155,28 @@ public class OverseasJobsTest extends AbstractTestNGSpringContextTests {
         Assert.assertEquals(2, resultsList.size());
     }
 
+    @Test
+    public void testfilteroutOverseasJobsWhenNoLocation() throws Exception {
+
+//        boolean INCLUDE_OVERSEAS = true;
+        boolean DONT_INCLUDE_OVERSEAS = false;
+
+        // As we're searching Bristol, this should always come up
+        Vacancy localVacancy = getVacancyPrototype(BRISTOL_JOB_TITLE, bristolLocation);
+        localVacancy.setOverseasJob(Boolean.FALSE);
+        vacancyRepository.save(localVacancy);
+
+        // this should only come up when overseas is selected
+        Vacancy overseasVacancy = getVacancyPrototype(NEWCASTLE_JOB_TITLE, newcastleLocation);
+        overseasVacancy.setOverseasJob(Boolean.TRUE);
+        vacancyRepository.save(overseasVacancy);
+
+        Page<Vacancy> result = findVancancies("bristolxx", DONT_INCLUDE_OVERSEAS);
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertEquals(1, resultsList.size());
+    }
+
     public Page<Vacancy> findVancancies(String place, Boolean includeOverseas) throws Exception {
 
         ObjectMapper objectMapper = new ObjectMapper();
