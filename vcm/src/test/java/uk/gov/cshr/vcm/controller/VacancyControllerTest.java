@@ -85,6 +85,10 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
     private MockMvc mvc;
 
+    private Department department1;
+    private Department department2;
+    private Department department3;
+
     final private MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(),
             Charset.forName("utf8"));
@@ -194,9 +198,9 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
 
-        Department department1 = departmentRepository.save(Department.builder().id(1L).name("Department One").build());
-        Department department2 = departmentRepository.save(Department.builder().id(2L).name("Department Two").build());
-        Department department3 = departmentRepository.save(Department.builder().id(3L).name("Department Three").build());
+        department1 = departmentRepository.save(Department.builder().id(1L).name("Department One").build());
+        department2 = departmentRepository.save(Department.builder().id(2L).name("Department Two").build());
+        department3 = departmentRepository.save(Department.builder().id(3L).name("Department Three").build());
 
         vacancy1.setDepartment(department1);
         Vacancy savedVacancy1 = this.vacancyRepository.save(vacancy1);
@@ -358,6 +362,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
         String path = "/vacancy";
 
         Vacancy vacancy = createVacancyPrototype();
+        vacancy.setDepartment(department1);
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -384,11 +389,33 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
         Assert.assertTrue(storedVacancy.getActive());
     }
 
+    @Test
+    public void testCreateVacancyWithoutDepartment() throws Exception {
+
+        // Given
+        String path = "/vacancy";
+
+        Vacancy vacancy = createVacancyPrototype();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // When
+        ResultActions sendRequest = mvc.perform(post(path)
+				.with(user("searchusername").password("searchpassword").roles("CRUD_ROLE"))
+				.contentType(APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(vacancy)));
+
+        MvcResult sendRequestResult = sendRequest.andReturn();
+
+        // Then
+        sendRequest.andExpect(status().isBadRequest());
+    }
+
 
     @Test
     public void testUpdate() throws Exception {
 
         Vacancy vacancy = createVacancyPrototype();
+        vacancy.setDepartment(department1);
         vacancy.setTitle("testUpdate");
 
         vacancy.getVacancyLocations().get(0).setLocation("My New Location Name");

@@ -1,6 +1,7 @@
 package uk.gov.cshr.vcm.controller.exception;
 
 import java.io.IOException;
+import javax.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -41,6 +42,14 @@ public class VacancyRestResponseExceptionHandler extends ResponseEntityException
     public ResponseEntity<Object> handleRuntimeException(RuntimeException ex, WebRequest request) {
         log.error(ex.getMessage(), ex);
         VacancyError vacancyError = new VacancyError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), null);
+        return handleExceptionInternal(ex, vacancyError, new HttpHeaders(), vacancyError.getStatus(), request);
+    }
+
+    @ExceptionHandler({ConstraintViolationException.class})
+    public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex, WebRequest request) {
+
+        log.error(ex.getMessage(), ex);
+        VacancyError vacancyError = new VacancyError(HttpStatus.BAD_REQUEST, ex.getMessage(), null);
         return handleExceptionInternal(ex, vacancyError, new HttpHeaders(), vacancyError.getStatus(), request);
     }
 

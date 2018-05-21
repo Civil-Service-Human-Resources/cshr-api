@@ -267,4 +267,11 @@
             <column name="atsvendoridentifier" type="TEXT" />
         </addColumn>
     </changeSet>
+    <changeSet author="Gordon" id="32">
+        <sql>delete from vacancies where dept_id is null</sql>
+        <addNotNullConstraint
+            columnDataType="int"
+            columnName="dept_id"
+            tableName="vacancies"/>
+    </changeSet>
 </databaseChangeLog>
