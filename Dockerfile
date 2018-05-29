@@ -20,20 +20,14 @@ COPY 	vcm /usr/src/myapp/vcm
 COPY 	pom.xml /usr/src/myapp
 RUN 	mvn -f /usr/src/myapp/pom.xml -s /usr/share/maven/ref/settings.xml clean package
 
-FROM 	cshrrpg.azurecr.io/java-8-base
+FROM 	cshrrpg.azurecr.io/java-8-base-filebeat
 
-COPY 	--from=build --chown=appuser:appuser /usr/src/myapp/vcm/target/vcm-1.0.0.jar /app/vcm-1.0.01.jar
+COPY 	--from=build --chown=appuser:appuser /usr/src/myapp/vcm/target/vcm-0.0.1.jar /app/vcm-0.0.1.jar
+
+COPY    --chown=appuser:appuser entrypoint.sh /usr/local/bin/entrypoint.sh
+
+RUN     chmod 755 /usr/local/bin/entrypoint.sh
 
 USER 	appuser
 
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app/vcm-1.0.0.jar", \
-		"--spring.location.service.url=${LOCATION_SERVICE_URL}", \
-		"--spring.location.service.username=${LOCATION_SERVICE_USERNAME}", \
-		"--spring.location.service.password=${LOCATION_SERVICE_PASSWORD}", \
-		"--spring.datasource.url=${DATASOURCE_URL}", \
-		"--spring.datasource.username=${DATASOURCE_USERNAME}", \
-		"--spring.datasource.password=${DATASOURCE_PASSWORD}", \
-		"--spring.security.search_username=${SEARCH_USERNAME}", \
-		"--spring.security.search_password=${SEARCH_PASSWORD}", \
-		"--spring.security.crud_username=${CRUD_USERNAME}", \
-		"--spring.security.crud_password=${CRUD_PASSWORD}" ]
+ENTRYPOINT [  "/usr/local/bin/entrypoint.sh" ]
