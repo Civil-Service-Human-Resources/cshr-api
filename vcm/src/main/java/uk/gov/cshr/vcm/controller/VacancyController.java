@@ -153,8 +153,15 @@ public class VacancyController {
 
     private void alterApplyURLToHTTPS(Vacancy vacancy) {
 
-        if ( vacancy.getApplyURL() != null &&  (! vacancy.getApplyURL().startsWith("https")) ) {
+        if ( vacancy.getApplyURL() != null &&  (! vacancy.getApplyURL().startsWith("http")) ) {
             vacancy.setApplyURL(vacancy.getApplyURL().replaceFirst("http", "https"));
+        }
+        
+        String url = vacancy.getApplyURL();
+        
+        if (  url != null &&  !url.toLowerCase().matches("^\\w+://.*")) {
+            url = "https://" + url;
+            vacancy.setApplyURL(url);
         }
     }
 }

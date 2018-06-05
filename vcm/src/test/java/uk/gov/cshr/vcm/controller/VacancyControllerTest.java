@@ -362,7 +362,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
         String path = "/vacancy";
 
         Vacancy vacancy = createVacancyPrototype();
-        vacancy.setApplyURL("http://www.google.com");
+        vacancy.setApplyURL("www.google.com");
         vacancy.setDepartment(department1);
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -398,7 +398,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
         Vacancy vacancy = createVacancyPrototype();
         vacancy.setDepartment(department1);
         vacancy.setTitle("testUpdate");
-        vacancy.setApplyURL("http://www.google.com");
+        vacancy.setApplyURL("www.google.com");
 
         vacancy.getVacancyLocations().get(0).setLocation("My New Location Name");
 
