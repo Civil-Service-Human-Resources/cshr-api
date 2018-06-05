@@ -362,6 +362,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
         String path = "/vacancy";
 
         Vacancy vacancy = createVacancyPrototype();
+        vacancy.setApplyURL("http://www.google.com");
         vacancy.setDepartment(department1);
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -385,8 +386,9 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
         Vacancy storedVacancy = vacancyRepository.findOne(createdVacancyId);
 
         Assert.assertTrue(storedVacancy.getTitle().equals("testTile1 SearchQueryTitle"));
-        Assertions.assertThat(storedVacancy).isEqualToIgnoringGivenFields(vacancy, "id", "vacancyLocations");
+        Assertions.assertThat(storedVacancy).isEqualToIgnoringGivenFields(vacancy, "id", "vacancyLocations", "applyURL");
         Assert.assertTrue(storedVacancy.getActive());
+        Assert.assertEquals("https://www.google.com", storedVacancy.getApplyURL());
     }
 
 
@@ -396,6 +398,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
         Vacancy vacancy = createVacancyPrototype();
         vacancy.setDepartment(department1);
         vacancy.setTitle("testUpdate");
+        vacancy.setApplyURL("http://www.google.com");
 
         vacancy.getVacancyLocations().get(0).setLocation("My New Location Name");
 
@@ -417,6 +420,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
         Assert.assertEquals("title", "testUpdate", optionalVacancy.get().getTitle());
         Assert.assertEquals("location name", "My New Location Name", optionalVacancy.get().getVacancyLocations().get(0).getLocation());
+        Assert.assertEquals("https://www.google.com", optionalVacancy.get().getApplyURL());
     }
 
     @Test

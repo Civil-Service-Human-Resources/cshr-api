@@ -59,10 +59,12 @@ public class VacancyController {
     }
 
     private Vacancy createVacancy(Vacancy vacancy) {
+
         if (vacancy.getVacancyLocations() != null) {
             vacancy.getVacancyLocations().forEach(vacancyLocation -> vacancyLocation.setVacancy(vacancy));
         }
 
+        alterApplyURLToHTTPS(vacancy);
         return vacancyRepository.save(vacancy);
     }
 
@@ -82,10 +84,10 @@ public class VacancyController {
     }
 
     private Vacancy updateVacancy(@RequestBody Vacancy vacancyUpdate, Vacancy foundVacancy) {
+
         vacancyUpdate.getVacancyLocations().forEach(vacancyLocation -> vacancyLocation.setVacancy(vacancyUpdate));
-
         vacancyUpdate.setId(foundVacancy.getId());
-
+        alterApplyURLToHTTPS(vacancyUpdate);
         return vacancyRepository.save(vacancyUpdate);
     }
 
@@ -147,5 +149,12 @@ public class VacancyController {
                 .summary(message)
                 .detail(Collections.emptyList())
                 .build());
+    }
+
+    private void alterApplyURLToHTTPS(Vacancy vacancy) {
+
+        if ( vacancy.getApplyURL() != null &&  (! vacancy.getApplyURL().startsWith("https")) ) {
+            vacancy.setApplyURL(vacancy.getApplyURL().replaceFirst("http", "https"));
+        }
     }
 }
