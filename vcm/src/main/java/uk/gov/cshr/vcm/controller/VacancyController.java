@@ -9,6 +9,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.security.RolesAllowed;
+import org.apache.commons.validator.UrlValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -32,6 +35,9 @@ import uk.gov.cshr.vcm.service.ApplicantTrackingSystemService;
 @Api(value = "vacancyservice")
 @RolesAllowed("CRUD_ROLE")
 public class VacancyController {
+    
+    private static final Logger log = LoggerFactory.getLogger(VacancyController.class);
+
     private final ApplicantTrackingSystemService applicantTrackingSystemService;
     private final VacancyRepository vacancyRepository;
 
@@ -153,6 +159,8 @@ public class VacancyController {
 
     private void alterApplyURLToHTTPS(Vacancy vacancy) {
 
+        String originalURL = vacancy.getApplyURL();
+
         if ( vacancy.getApplyURL() != null &&  (! vacancy.getApplyURL().startsWith("http")) ) {
             vacancy.setApplyURL(vacancy.getApplyURL().replaceFirst("http", "https"));
         }
@@ -160,8 +168,16 @@ public class VacancyController {
         String url = vacancy.getApplyURL();
         
         if (  url != null &&  !url.toLowerCase().matches("^\\w+://.*")) {
-            url = "https://" + url;
-            vacancy.setApplyURL(url);
+            url = "https://" + url;            
         }
+        
+        String[] schemes = {"http","https"};
+        UrlValidator urlValidator = new UrlValidator(schemes);
+        if (! urlValidator.isValid(url)) {
+            url = null;
+        }
+
+        log.debug("setting applyurl '" + originalURL + "' to: " + url);
+        vacancy.setApplyURL(url);
     }
 }

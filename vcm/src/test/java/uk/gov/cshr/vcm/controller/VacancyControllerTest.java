@@ -398,7 +398,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
         Vacancy vacancy = createVacancyPrototype();
         vacancy.setDepartment(department1);
         vacancy.setTitle("testUpdate");
-        vacancy.setApplyURL("www.google.com");
+        vacancy.setApplyURL("1234@me.com");
 
         vacancy.getVacancyLocations().get(0).setLocation("My New Location Name");
 
@@ -420,7 +420,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
         Assert.assertEquals("title", "testUpdate", optionalVacancy.get().getTitle());
         Assert.assertEquals("location name", "My New Location Name", optionalVacancy.get().getVacancyLocations().get(0).getLocation());
-        Assert.assertEquals("https://www.google.com", optionalVacancy.get().getApplyURL());
+        Assert.assertEquals(null, optionalVacancy.get().getApplyURL());
     }
 
     @Test
