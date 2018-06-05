@@ -70,7 +70,7 @@ public class VacancyController {
             vacancy.getVacancyLocations().forEach(vacancyLocation -> vacancyLocation.setVacancy(vacancy));
         }
 
-        alterApplyURLToHTTPS(vacancy);
+        sanitiseApplyURL(vacancy);
         return vacancyRepository.save(vacancy);
     }
 
@@ -93,7 +93,7 @@ public class VacancyController {
 
         vacancyUpdate.getVacancyLocations().forEach(vacancyLocation -> vacancyLocation.setVacancy(vacancyUpdate));
         vacancyUpdate.setId(foundVacancy.getId());
-        alterApplyURLToHTTPS(vacancyUpdate);
+        sanitiseApplyURL(vacancyUpdate);
         return vacancyRepository.save(vacancyUpdate);
     }
 
@@ -157,13 +157,9 @@ public class VacancyController {
                 .build());
     }
 
-    private void alterApplyURLToHTTPS(Vacancy vacancy) {
+    private void sanitiseApplyURL(Vacancy vacancy) {
 
         String originalURL = vacancy.getApplyURL();
-
-        if ( vacancy.getApplyURL() != null &&  (! vacancy.getApplyURL().startsWith("http")) ) {
-            vacancy.setApplyURL(vacancy.getApplyURL().replaceFirst("http", "https"));
-        }
         
         String url = vacancy.getApplyURL();
         
