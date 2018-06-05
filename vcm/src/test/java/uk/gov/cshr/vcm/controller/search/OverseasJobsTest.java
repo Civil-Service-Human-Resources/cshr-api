@@ -135,11 +135,13 @@ public class OverseasJobsTest extends AbstractTestNGSpringContextTests {
 
         // As we're searching Bristol, this should always come up
         Vacancy localVacancy = getVacancyPrototype(BRISTOL_JOB_TITLE, bristolLocation);
+        localVacancy.setDepartment(department);
         localVacancy.setOverseasJob(Boolean.FALSE);
         vacancyRepository.save(localVacancy);
 
         // this should only come up when overseas is selected
         Vacancy overseasVacancy = getVacancyPrototype(NEWCASTLE_JOB_TITLE, newcastleLocation);
+        overseasVacancy.setDepartment(department);
         overseasVacancy.setOverseasJob(Boolean.TRUE);
         vacancyRepository.save(overseasVacancy);
 
@@ -163,11 +165,13 @@ public class OverseasJobsTest extends AbstractTestNGSpringContextTests {
 
         // As we're searching Bristol, this should always come up
         Vacancy localVacancy = getVacancyPrototype(BRISTOL_JOB_TITLE, bristolLocation);
+        localVacancy.setDepartment(department);
         localVacancy.setOverseasJob(Boolean.FALSE);
         vacancyRepository.save(localVacancy);
 
         // this should only come up when overseas is selected
         Vacancy overseasVacancy = getVacancyPrototype(NEWCASTLE_JOB_TITLE, newcastleLocation);
+        overseasVacancy.setDepartment(department);
         overseasVacancy.setOverseasJob(Boolean.TRUE);
         vacancyRepository.save(overseasVacancy);
 
