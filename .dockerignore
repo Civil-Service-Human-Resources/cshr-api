@@ -1,0 +1,6 @@
+.env*
+docker-compose.*
+Makefile
+mvnw*
+.mvn
+.circleci

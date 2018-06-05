@@ -22,3 +22,11 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
+/vcm/nbactions.xml
+
+### Docker ###
+.env
+docker-stack.yml
+
+### Logging ###
+/vcm/logs/*

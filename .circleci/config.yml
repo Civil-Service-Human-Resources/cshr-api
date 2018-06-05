@@ -1,0 +1,96 @@
+version: 2
+jobs:
+  build:
+    environment:
+      - COMPOSE_FILE: "docker-compose.yml"
+      - AZURE_URL: "cshrrpg.azurecr.io"
+
+    machine: true
+    steps:
+      - checkout
+
+      - run:
+          name: Login to Azure container repo
+          command: docker login -u ${ACR_ID} -p ${ACR_PASS} ${AZURE_URL}
+
+      - run:
+          name: Build image
+          command: |
+            cp .env_dev .env
+            export DOCKER_SERVICE_TAG="$CIRCLE_WORKFLOW_ID"
+            docker-compose build api
+
+      - run:
+          name: Push the images to Acr
+          command: docker push ${AZURE_URL}/cshr-api:${CIRCLE_WORKFLOW_ID}
+
+      - run:
+          name: tag images based on branch - temp - ship not working
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              docker_tag="latest"
+            else
+              docker_tag="${CIRCLE_BRANCH}"
+            fi
+            docker tag "${AZURE_URL}"/cshr-api:"${CIRCLE_WORKFLOW_ID}" "${AZURE_URL}"/cshr-api:"${docker_tag}"
+            docker push "${AZURE_URL}"/cshr-api:"${docker_tag}"
+
+  ship:
+    environment:
+      - COMPOSE_FILE: "docker-compose.yml"
+      - AZURE_URL: "cshrrpg.azurecr.io"
+
+    machine: true
+    steps:
+      - checkout
+
+      - run:
+          name: Login to Azure container repo
+          command: docker login -u ${ACR_ID} -p ${ACR_PASS} ${AZURE_URL}
+
+      - run:
+          name: Pull Current workflow images
+          command: |
+            set -x
+            cp .env_dev .env
+            export DOCKER_SERVICE_TAG="$CIRCLE_WORKFLOW_ID"
+            docker-compose pull api
+            images=$(docker images | grep "$DOCKER_SERVICE_TAG" | cut -d " " -f1)
+            if [ "$CIRCLE_BRANCH" == "master" ]; then
+              docker_tag="latest"
+            else
+              docker_tag="$CIRCLE_BRANCH"
+            fi
+            for image in $images
+            do
+              docker tag "${image}":"${DOCKER_SERVICE_TAG}" "${image}":"${docker_tag}"
+              docker push "${image}":"${docker_tag}"
+            done
+
+  notify_pipeline:
+    machine: true
+    steps:
+      - run:
+          name: Notify Jenkins pipeline to deploy change
+          command: curl -X POST --user "circleci:${JENKINS_API_KEY}"  "https://${JENKINS_HOST}/job/deploy-cshr-api/buildWithParameters?dockerTag=${CIRCLE_WORKFLOW_ID}&environment=dev"
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
+      - ship:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - master
+                - develop
+      - notify_pipeline:
+          requires:
+            - ship
+          filters:
+            branches:
+              only:
+                - develop

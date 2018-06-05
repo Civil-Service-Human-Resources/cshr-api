@@ -1,0 +1,21 @@
+version: "2"
+
+services:
+  api:
+    image: cshrrpg.azurecr.io/cshr-api:${DOCKER_SERVICE_TAG}
+    build:
+      context: .
+      args:
+        arg_maven_repo: "${MAVEN_REPO}"
+    depends_on:
+      - db
+    environment:
+      SPRING_PROFILES_ACTIVE: "${SPRING_PROFILES_ACTIVE}"
+      LOCATION_SERVICE_URL: "${LOCATION_SERVICE_URL}"
+
+  db:
+    image: postgres:10
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: "${POSTGRES_DB}"

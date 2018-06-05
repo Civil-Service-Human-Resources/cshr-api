@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:USERS;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true
+    hibernate.ddl-auto: drop # validate schema on run.  Updates handled by Liquibase.
+    properties:
+        hibernate:
+            search:
+                default:
+                    directory_provider: ram
+                    indexBase: target/testindexpath
+  location:
+    service:
+      url: http://location-service.dev.cshr-gov.uk/findlocation/{searchTerm} # will be overridden by an env variable
+  security:
+    search_username: searchusername
+    search_password: searchpassword
+    crud_username: crudusername
+    crud_password: crudpassword
+server:
+  port: 8080
+liquibase:
+    enabled: true
+    change-log: classpath:/changelog.xml
