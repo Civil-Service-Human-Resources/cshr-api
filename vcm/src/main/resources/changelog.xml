@@ -267,4 +267,10 @@
             <column name="atsvendoridentifier" type="TEXT" />
         </addColumn>
     </changeSet>
+    <changeSet author="Gordon" id="32">
+        <addNotNullConstraint
+            columnDataType="int"
+            columnName="dept_id"
+            tableName="vacancies"/>
+    </changeSet>
 </databaseChangeLog>
