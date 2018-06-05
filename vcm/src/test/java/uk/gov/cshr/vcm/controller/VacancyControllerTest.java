@@ -389,6 +389,29 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
         Assert.assertTrue(storedVacancy.getActive());
     }
 
+    @Test
+    public void testCreateWithoutVacancy() throws Exception {
+
+        // Given
+        String path = "/vacancy";
+
+        Vacancy vacancy = createVacancyPrototype();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // When
+        ResultActions sendRequest = mvc.perform(post(path)
+				.with(user("searchusername").password("searchpassword").roles("CRUD_ROLE"))
+				.contentType(APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(vacancy)));
+
+        MvcResult sendRequestResult = sendRequest.andReturn();
+
+        String returnedLocation = sendRequestResult.getResponse().getRedirectedUrl();
+
+        // Then
+        sendRequest.andExpect(status().isBadRequest());
+    }
+
 
     @Test
     public void testUpdate() throws Exception {

@@ -25,6 +25,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -161,6 +162,7 @@ public class Vacancy implements Serializable {
 
     private Integer numberVacancies;
 
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "dept_id")
     private Department department;
