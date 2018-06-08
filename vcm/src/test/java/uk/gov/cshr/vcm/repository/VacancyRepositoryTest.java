@@ -2,6 +2,7 @@ package uk.gov.cshr.vcm.repository;
 
 import java.util.List;
 import javax.inject.Inject;
+import javax.validation.ConstraintViolationException;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
@@ -13,7 +14,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.cshr.vcm.VcmApplication;
@@ -83,12 +83,12 @@ public class VacancyRepositoryTest {
     }
 
     @Test
-    public void testCreatVacancy_nullDepartment() {
+    public void testCreateVacancy_nullDepartment() {
 
         Vacancy vacancy = createVacancy(JOB_REF_1234, ATS_OO1);
         vacancy.setDepartment(null);
 
-        expectedException.expect(DataIntegrityViolationException.class);
+        expectedException.expect(ConstraintViolationException.class);
         vacancyRepository.save(vacancy);
     }
 
