@@ -390,7 +390,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void testCreateWithoutVacancy() throws Exception {
+    public void testCreateVacancyWithoutDepartment() throws Exception {
 
         // Given
         String path = "/vacancy";
@@ -405,8 +405,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 				.contentType(APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(vacancy)));
 
         MvcResult sendRequestResult = sendRequest.andReturn();
-
-        String returnedLocation = sendRequestResult.getResponse().getRedirectedUrl();
 
         // Then
         sendRequest.andExpect(status().isBadRequest());
