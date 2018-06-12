@@ -277,4 +277,3 @@
             tableName="vacancies"/>
     </changeSet>
 </databaseChangeLog>
-fred
