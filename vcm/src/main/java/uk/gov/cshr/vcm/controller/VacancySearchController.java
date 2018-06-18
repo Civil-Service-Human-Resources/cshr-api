@@ -15,10 +15,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -27,9 +29,13 @@ import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
 import uk.gov.cshr.vcm.controller.exception.VacancyClosedException;
 import uk.gov.cshr.vcm.controller.exception.VacancyError;
 import uk.gov.cshr.vcm.model.Vacancy;
+import uk.gov.cshr.vcm.model.VacancyEligibility;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
+import uk.gov.cshr.vcm.service.CshrAuthenticationService;
+import uk.gov.cshr.vcm.service.NotifyService;
 import uk.gov.cshr.vcm.service.SearchService;
+import uk.gov.service.notify.NotificationClientException;
 
 @RestController
 @RequestMapping(value = "/vacancy", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -42,6 +48,12 @@ public class VacancySearchController {
 
     @Inject
     private SearchService searchService;
+
+	@Inject
+	private NotifyService notifyService;
+
+	@Inject
+	private CshrAuthenticationService cshrAuthenticationService;
 
     private final VacancyRepository vacancyRepository;
 
@@ -87,10 +99,31 @@ public class VacancySearchController {
 	})
     public ResponseEntity<Page<Vacancy>> search(
 			@ApiParam(name = "searchParameters", value = "The values supplied to perform the search", required = true)
-            @RequestBody VacancySearchParameters vacancySearchParameters, Pageable pageable)
+            @RequestBody VacancySearchParameters vacancySearchParameters,
+			@RequestHeader(value = "cshr-authentication", required = false) String jwt,
+			Pageable pageable)
             throws LocationServiceException, IOException {
+
+		VacancyEligibility vacancyEligibility = cshrAuthenticationService.parseVacancyEligibility(jwt);
+		vacancySearchParameters.setVacancyEligibility(vacancyEligibility);
 
 		Page<Vacancy> vacancies = searchService.search(vacancySearchParameters, pageable);
 		return ResponseEntity.ok().body(vacancies);
+    }
+
+   @RequestMapping(method = RequestMethod.POST, value = "/verifyemail")
+    @ApiOperation(value = "Generate a JWT to enable access to internal vacancies", nickname = "verifyEmailJWT")
+    public ResponseEntity<String> verifyEmailJWT(@RequestBody String emailAddress) throws NotificationClientException {
+
+		String jwt = cshrAuthenticationService.createInternalJWT(emailAddress);
+
+		if ( jwt != null ) {
+			notifyService.emailInternalJWT(emailAddress, jwt, "name");
+			return ResponseEntity.ok().build();
+		}
+		else {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.build();
+		}
     }
 }
