@@ -10,11 +10,11 @@ import uk.gov.service.notify.NotificationClientException;
 @Service
 public class NotifyService {
 
-//    @Value("${spring.notifyservice.templateid}")
-    private String templateId = "";
+    @Value("${spring.notifyservice.templateid}")
+    private String templateId;
 
-//    @Value("${spring.notifyservice.notifyApiKey}")
-    private String notifyApiKey = "";
+    @Value("${spring.notifyservice.notifyApiKey}")
+    private String notifyApiKey ;
 
     @Value("${spring.notifyservice.accountEnableURL}")
     private String accountEnableURL;
