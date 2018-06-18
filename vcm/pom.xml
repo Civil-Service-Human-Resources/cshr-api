@@ -104,7 +104,7 @@
 		<dependency>
 			<groupId>uk.gov.service.notify</groupId>
 			<artifactId>notifications-java-client</artifactId>
-			<version>3.9.1-RELEASE</version>
+			<version>3.9.2-RELEASE</version>
 			<type>jar</type>
 		</dependency>
 	</dependencies>
@@ -133,4 +133,14 @@
             </plugin>
         </plugins>
     </build>
+	<repositories>
+		<repository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>bintray-gov-uk-notify-maven</id>
+			<name>bintray</name>
+			<url>https://dl.bintray.com/gov-uk-notify/maven</url>
+		</repository>
+	</repositories>
 </project>
