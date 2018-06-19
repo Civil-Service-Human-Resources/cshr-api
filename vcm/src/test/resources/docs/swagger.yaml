@@ -34,7 +34,7 @@ paths:
         '200':
           description: OK
           schema:
-            $ref: '#/definitions/Page«Department»'
+            $ref: '#/definitions/Department'
     post:
       tags:
         - department-controller
@@ -140,7 +140,7 @@ paths:
         '200':
           description: OK
           schema:
-            $ref: '#/definitions/Page«Vacancy»'
+            $ref: '#/definitions/Vacancy'
     post:
       tags:
         - vacancy-controller
@@ -166,7 +166,7 @@ paths:
     post:
       tags:
         - vacancy-controller
-      summary: Saves a vacancy which means create if it does not exist or update if it does
+      summary: Creates a new or updates an existing vacancy
       operationId: save
       consumes:
         - application/json
@@ -205,15 +205,42 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/VacancySearchParameters'
+        - name: cshr-authorisation
+          in: header
+          description: JWT for cshr-authorisation
+          required: false
+          type: string
       responses:
         '200':
           description: OK
           schema:
-            $ref: '#/definitions/Page«Vacancy»'
+            $ref: '#/definitions/Vacancy'
         '503':
           description: The location service is unavailable.
           schema:
             $ref: '#/definitions/VacancyError'
+  /vacancy/verifyemail:
+    post:
+      tags:
+        - vacancy-search-controller
+      summary: Generate a JWT to enable access to internal vacancies
+      operationId: verifyEmailJWT
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: emailAddress
+          description: emailAddress
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: string
   '/vacancy/{vacancyId}':
     get:
       tags:
@@ -317,7 +344,8 @@ definitions:
           - LEADER
           - COMMITTED
       disabilityConfidenceLevelLastUpdate:
-        $ref: '#/definitions/Timestamp'
+        type: string
+        example: 'yyyy-MM-dd''T''HH:mm:ss.SSSZ'
       disabilityLogo:
         type: string
       id:
@@ -403,39 +431,6 @@ definitions:
         format: int32
   Sort:
     type: object
-  Timestamp:
-    type: object
-    properties:
-      date:
-        type: integer
-        format: int32
-      day:
-        type: integer
-        format: int32
-      hours:
-        type: integer
-        format: int32
-      minutes:
-        type: integer
-        format: int32
-      month:
-        type: integer
-        format: int32
-      nanos:
-        type: integer
-        format: int32
-      seconds:
-        type: integer
-        format: int32
-      time:
-        type: integer
-        format: int64
-      timezoneOffset:
-        type: integer
-        format: int32
-      year:
-        type: integer
-        format: int32
   Vacancy:
     type: object
     properties:
@@ -639,10 +634,15 @@ definitions:
         description: id of one or more departments to search vacancies for
         items:
           type: string
+      internal:
+        type: boolean
+        example: false
+        description: Whether to include internal vacancies
       keyword:
         type: string
         description: word found in title or description of vacancy
       location:
+        description: location of the vacancy
         $ref: '#/definitions/Location'
       workingPatterns:
         type: array

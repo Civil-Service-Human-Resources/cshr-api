@@ -1,5 +1,6 @@
 package uk.gov.cshr.vcm.controller.exception;
 
+import io.jsonwebtoken.JwtException;
 import java.io.IOException;
 import javax.validation.ConstraintViolationException;
 import org.slf4j.Logger;
@@ -64,6 +65,13 @@ public class VacancyRestResponseExceptionHandler extends ResponseEntityException
     public ResponseEntity<Object> handleIOException(IOException ex, WebRequest request) {
         log.error(ex.getMessage(), ex);
         VacancyError vacancyError = new VacancyError(HttpStatus.BAD_REQUEST, ex.getMessage(), null);
+        return handleExceptionInternal(ex, vacancyError, new HttpHeaders(), vacancyError.getStatus(), request);
+    }
+
+    @ExceptionHandler({JwtException.class})
+    public ResponseEntity<Object> handleExpiredJwtException(JwtException ex, WebRequest request) {
+        log.error(ex.getMessage(), ex);
+        VacancyError vacancyError = new VacancyError(HttpStatus.UNAUTHORIZED, ex.getMessage(), null);
         return handleExceptionInternal(ex, vacancyError, new HttpHeaders(), vacancyError.getStatus(), request);
     }
 }

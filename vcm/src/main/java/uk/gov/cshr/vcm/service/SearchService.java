@@ -26,11 +26,12 @@ public class SearchService {
 
     public Page<Vacancy> search(VacancySearchParameters vacancySearchParameters, Pageable pageable)
             throws LocationServiceException, IOException {
-		
+
         debug("staring search()");
 
         SearchParameters searchParameters = SearchParameters.builder()
                 .vacancySearchParameters(vacancySearchParameters)
+				.vacancyEligibility(vacancySearchParameters.getVacancyEligibility())
                 .build();
 
         boolean filterByLocation = vacancySearchParameters.getLocation() != null;
@@ -45,7 +46,7 @@ public class SearchService {
                 searchParameters.setCoordinates(coordinates);
             }
             else {
-                debug("No Coordinates for %s with radius of %d exist", 
+                debug("No Coordinates for %s with radius of %d exist",
                         vacancySearchParameters.getLocation().getPlace(),
                         vacancySearchParameters.getLocation().getRadius());
             }

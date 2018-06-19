@@ -59,8 +59,10 @@ import uk.gov.cshr.vcm.model.WorkingPattern;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
 import uk.gov.cshr.vcm.service.ApplicantTrackingSystemService;
+import uk.gov.cshr.vcm.service.CshrAuthenticationService;
 import uk.gov.cshr.vcm.service.HibernateSearchService;
 import uk.gov.cshr.vcm.service.LocationService;
+import uk.gov.cshr.vcm.service.SearchService;
 
 @ActiveProfiles("dev")
 @RunWith(SpringRunner.class)
@@ -89,6 +91,12 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     @Inject
     private DepartmentRepository departmentRepository;
 
+	@Inject
+	private SearchService searchService;
+
+	@Inject
+	private CshrAuthenticationService cshrAuthenticationService;
+
     private MockMvc mockMvc;
 
     @MockBean
@@ -96,6 +104,9 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
     @MockBean
     private LocationService locationService;
+
+//	@MockBean
+//    private SearchService searchService;
 
     @Inject
     private HibernateSearchService hibernateSearchService;
@@ -218,6 +229,57 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         Assert.assertEquals("Newcastle Job", resultsList.get(0).getTitle());
         Assert.assertEquals("1", 1, resultsList.size());
+    }
+
+    @Test
+    public void testExcludeInternalVacancy() throws Exception {
+
+        Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
+		newcastleVacancy.setInternalOpeningDate(YESTERDAY);
+		newcastleVacancy.setPublicOpeningDate(YESTERDAY);
+        newcastleVacancy.setTitle("Newcastle Job");
+        saveVacancy(newcastleVacancy);
+
+        Vacancy newcastleVacancy2 = createVacancyPrototype(newcastleLocation2);
+		newcastleVacancy2.setInternalOpeningDate(YESTERDAY);
+		newcastleVacancy2.setPublicOpeningDate(TOMORROW);
+        newcastleVacancy2.setTitle("Newcastle Job 2");
+        saveVacancy(newcastleVacancy2);
+
+        Page<Vacancy> result = findVancanciesByKeyword("newcastle");
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertEquals("internal vacancy excluded", 1, resultsList.size());
+        Assert.assertEquals("Newcastle Job", resultsList.get(0).getTitle());
+    }
+
+    @Test
+    public void testIncludeInternalVacancy() throws Exception {
+
+        Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
+		newcastleVacancy.setInternalOpeningDate(YESTERDAY);
+		newcastleVacancy.setPublicOpeningDate(YESTERDAY);
+        newcastleVacancy.setTitle("Newcastle Job");
+        saveVacancy(newcastleVacancy);
+
+        Vacancy newcastleVacancy2 = createVacancyPrototype(newcastleLocation2);
+		newcastleVacancy2.setInternalOpeningDate(YESTERDAY);
+		newcastleVacancy2.setPublicOpeningDate(TOMORROW);
+        newcastleVacancy2.setTitle("Newcastle Job 2");
+        saveVacancy(newcastleVacancy2);
+
+		String jwt = cshrAuthenticationService.createInternalJWT("cabinetoffice.gov.uk");
+		System.out.println("JWT=" + jwt);
+
+        VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
+                .keyword("newcastle")
+                .build();
+
+        Page<Vacancy> result = findVancanciesByKeyword(vacancySearchParameters, jwt);
+        List<Vacancy> resultsList = result.getContent();
+
+        Assert.assertEquals("internal vacancy included", 2, resultsList.size());
+        Assert.assertEquals("Newcastle Job", resultsList.get(0).getTitle());
     }
 
     @Test
@@ -809,6 +871,28 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(json)
+                .accept(APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String searchResponse = mvcResult.getResponse().getContentAsString();
+
+        System.out.println("searchRespons=" + searchResponse);
+
+        return objectMapper.readValue(searchResponse, VacancyPage.class);
+    }
+
+    private Page<Vacancy> findVancanciesByKeyword(VacancySearchParameters vacancySearchParameters, String jwt)
+			throws Exception {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(vacancySearchParameters);
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/search")
+				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(json)
+				.header("cshr-authentication", jwt)
                 .accept(APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andReturn();

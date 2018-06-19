@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.security.RolesAllowed;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -25,6 +26,7 @@ import uk.gov.cshr.status.StatusCode;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
 import uk.gov.cshr.vcm.service.ApplicantTrackingSystemService;
+import uk.gov.cshr.vcm.service.SearchService;
 
 @RestController
 @RequestMapping(value = "/vacancy", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -32,8 +34,12 @@ import uk.gov.cshr.vcm.service.ApplicantTrackingSystemService;
 @Api(value = "vacancyservice")
 @RolesAllowed("CRUD_ROLE")
 public class VacancyController {
+
     private final ApplicantTrackingSystemService applicantTrackingSystemService;
     private final VacancyRepository vacancyRepository;
+
+	@Autowired
+	private SearchService searchService;
 
     VacancyController(ApplicantTrackingSystemService applicantTrackingSystemService,
                       VacancyRepository vacancyRepository) {
