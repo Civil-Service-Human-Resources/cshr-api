@@ -25,7 +25,6 @@ import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -44,7 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.cshr.vcm.VcmApplication;
-import uk.gov.cshr.vcm.controller.VacancyPage;
+import uk.gov.cshr.vcm.controller.SearchResponsePage;
 import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
 import uk.gov.cshr.vcm.controller.exception.VacancyClosedException;
 import uk.gov.cshr.vcm.controller.exception.VacancyError;
@@ -190,8 +189,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         createVacancyWithClosingDate("tomorrow", TOMORROW, department1);
         createVacancyWithClosingDate("thirty days time", THIRTY_DAYS_FROM_NOW, department1);
 
-        Page<Vacancy> result = findVancanciesInPlace("bristol");
-        List<Vacancy> resultsList = result.getContent();
+        SearchResponsePage result = findVancanciesInPlace("bristol");
+        List<Vacancy> resultsList = result.getVacancies().getContent();
 
         Assert.assertTrue("Expected results", !resultsList.isEmpty());
 
@@ -215,8 +214,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         newcastleVacancy.setTitle("Newcastle Job");
         saveVacancy(newcastleVacancy);
 
-        Page<Vacancy> result = findVancanciesByKeyword("newcastle");
-        List<Vacancy> resultsList = result.getContent();
+        SearchResponsePage result = findVancanciesByKeyword("newcastle");
+        List<Vacancy> resultsList = result.getVacancies().getContent();
 
         Assert.assertEquals("Newcastle Job", resultsList.get(0).getTitle());
 
@@ -225,7 +224,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         saveVacancy(bristolVacancy);
 
         result = findVancanciesByKeyword("newcastle");
-        resultsList = result.getContent();
+        resultsList = result.getVacancies().getContent();
 
         Assert.assertEquals("Newcastle Job", resultsList.get(0).getTitle());
         Assert.assertEquals("1", 1, resultsList.size());
@@ -246,8 +245,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         newcastleVacancy2.setTitle("Newcastle Job 2");
         saveVacancy(newcastleVacancy2);
 
-        Page<Vacancy> result = findVancanciesByKeyword("newcastle");
-        List<Vacancy> resultsList = result.getContent();
+        SearchResponsePage result = findVancanciesByKeyword("newcastle");
+        List<Vacancy> resultsList = result.getVacancies().getContent();
 
         Assert.assertEquals("internal vacancy excluded", 1, resultsList.size());
         Assert.assertEquals("Newcastle Job", resultsList.get(0).getTitle());
@@ -275,8 +274,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .keyword("newcastle")
                 .build();
 
-        Page<Vacancy> result = findVancanciesByKeyword(vacancySearchParameters, jwt);
-        List<Vacancy> resultsList = result.getContent();
+        SearchResponsePage result = findVancanciesByKeyword(vacancySearchParameters, jwt);
+        List<Vacancy> resultsList = result.getVacancies().getContent();
 
         Assert.assertEquals("internal vacancy included", 2, resultsList.size());
         Assert.assertEquals("Newcastle Job", resultsList.get(0).getTitle());
@@ -345,8 +344,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         vacancy3.setTitle("third Newcastle Job");
         saveVacancy(vacancy3);
 
-        Page<Vacancy> result = findVancanciesByKeyword("newcastle");
-        List<Vacancy> resultsList = result.getContent();
+        SearchResponsePage result = findVancanciesByKeyword("newcastle");
+        List<Vacancy> resultsList = result.getVacancies().getContent();
 
         Assert.assertTrue("Results expected", resultsList.size() == 1);
 
@@ -362,8 +361,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         newcastleVacancy.setTitle("Newcastle Job");
         saveVacancy(newcastleVacancy);
 
-        Page<Vacancy> result = findVancanciesByKeyword("newcastle");
-        List<Vacancy> resultsList = result.getContent();
+        SearchResponsePage result = findVancanciesByKeyword("newcastle");
+        List<Vacancy> resultsList = result.getVacancies().getContent();
 
         Assert.assertEquals("1", 1, resultsList.size());
         Assert.assertEquals("Newcastle Job", resultsList.get(0).getTitle());
@@ -378,7 +377,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         sendRequest.andExpect(status().isOk());
 
         result = findVancanciesByKeyword("findthis");
-        resultsList = result.getContent();
+        resultsList = result.getVacancies().getContent();
 
         Assert.assertEquals("1", 1, resultsList.size());
         Assert.assertEquals("findthis", resultsList.get(0).getTitle());
@@ -391,7 +390,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         sendRequest.andExpect(status().isOk());
 
         result = findVancanciesByKeyword("newtitle");
-        resultsList = result.getContent();
+        resultsList = result.getVacancies().getContent();
 
         Assert.assertEquals("1", 1, resultsList.size());
         Assert.assertEquals("newtitle", resultsList.get(0).getTitle());
@@ -404,8 +403,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         newcastleVacancy.setTitle("Newcastle Job");
         saveVacancy(newcastleVacancy);
 
-        Page<Vacancy> result = findVancanciesByKeyword("zxcvbnm");
-        List<Vacancy> resultsList = result.getContent();
+        SearchResponsePage result = findVancanciesByKeyword("zxcvbnm");
+        List<Vacancy> resultsList = result.getVacancies().getContent();
 
         Assert.assertEquals("Expect no results", 0, resultsList.size());
     }
@@ -417,8 +416,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         newcastleVacancy.setTitle("GDS Engineer");
         saveVacancy(newcastleVacancy);
 
-        Page<Vacancy> result = findVancanciesByKeyword("Government Digital Services");
-        List<Vacancy> resultsList = result.getContent();
+        SearchResponsePage result = findVancanciesByKeyword("Government Digital Services");
+        List<Vacancy> resultsList = result.getVacancies().getContent();
 
         Assert.assertEquals("Expect one result", 1, resultsList.size());
         Assert.assertEquals("Find GDS Engineer", "GDS Engineer", resultsList.get(0).getTitle());
@@ -431,8 +430,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         newcastleVacancy.setTitle("International Business Machines");
         saveVacancy(newcastleVacancy);
 
-        Page<Vacancy> result = findVancanciesByKeyword("IBM Manager");
-        List<Vacancy> resultsList = result.getContent();
+        SearchResponsePage result = findVancanciesByKeyword("IBM Manager");
+        List<Vacancy> resultsList = result.getVacancies().getContent();
 
         Assert.assertEquals("Expect one result", 1, resultsList.size());
         Assert.assertEquals("Find International Business Machines", "International Business Machines",
@@ -452,8 +451,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         newcastleVacancy2.setDescription("jobs in are great");
         saveVacancy(newcastleVacancy2);
 
-        Page<Vacancy> result = findVancanciesByKeyword("newcastle");
-        List<Vacancy> resultsList = result.getContent();
+        SearchResponsePage result = findVancanciesByKeyword("newcastle");
+        List<Vacancy> resultsList = result.getVacancies().getContent();
 
         Assert.assertEquals("Expect two results", 2, resultsList.size());
         Assert.assertEquals("title match is first", newcastleVacancy2.getId(),
@@ -469,8 +468,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
         saveVacancy(newcastleVacancy);
 
-        Page<Vacancy> result = findVancanciesInPlace("bristol");
-        List<Vacancy> resultsList = result.getContent();
+        SearchResponsePage result = findVancanciesInPlace("bristol");
+        List<Vacancy> resultsList = result.getVacancies().getContent();
 
         Assert.assertTrue("Expected no results", resultsList.isEmpty());
 
@@ -480,7 +479,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         vacancyRepository.save(newcastleVacancy);
 
         result = findVancanciesInPlace("bristol");
-        resultsList = result.getContent();
+        resultsList = result.getVacancies().getContent();
 
         Assert.assertTrue("Expected results", !resultsList.isEmpty());
     }
@@ -495,8 +494,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         createVacancyWithRegions(department1, "North East, Scotland", newcastleLocation);
 
 
-        Page<Vacancy> result = findVancanciesInPlace("bristol");
-        List<Vacancy> resultsList = result.getContent();
+        SearchResponsePage result = findVancanciesInPlace("bristol");
+        List<Vacancy> resultsList = result.getVacancies().getContent();
 
         Assert.assertTrue("Expected results", !resultsList.isEmpty());
         Assert.assertEquals("Expected number results", 1, resultsList.size());
@@ -513,34 +512,34 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
 
         // return both departments
-        Page<Vacancy> result = findVancanciesByDpartmentInPlace("bristol",
+        SearchResponsePage result = findVancanciesByDpartmentInPlace("bristol",
                 department1.getId().toString(),
                 department2.getId().toString());
 
-        List<Vacancy> resultsList = result.getContent();
+        List<Vacancy> resultsList = result.getVacancies().getContent();
 
         Assert.assertEquals("Expected number results", 2, resultsList.size());
 
         // dont filter by any departments
         result = findVancanciesByDpartmentInPlace("bristol");
-        resultsList = result.getContent();
+        resultsList = result.getVacancies().getContent();
         Assert.assertEquals("Expected number results", 2, resultsList.size());
 
         // filter by  department 1
         result = findVancanciesByDpartmentInPlace("bristol", department1.getId().toString());
-        resultsList = result.getContent();
+        resultsList = result.getVacancies().getContent();
         Assert.assertEquals("Expected number results", 1, resultsList.size());
         Assert.assertEquals("Department1.id", resultsList.get(0).getDepartment().getId(), department1.getId());
 
         // filter by  department 2
         result = findVancanciesByDpartmentInPlace("bristol", department2.getId().toString());
-        resultsList = result.getContent();
+        resultsList = result.getVacancies().getContent();
         Assert.assertEquals("Expected number results", 1, resultsList.size());
         Assert.assertEquals("Department1.id", resultsList.get(0).getDepartment().getId(), department2.getId());
 
         // filter by  unknown departent
         result = findVancanciesByDpartmentInPlace("bristol", "-1");
-        resultsList = result.getContent();
+        resultsList = result.getVacancies().getContent();
         Assert.assertEquals("Expected number results", 0, resultsList.size());
     }
 
@@ -566,8 +565,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .build();
 
         // return all three
-        Page<Vacancy> result = findVancancies(vacancySearchParameters);
-        List<Vacancy> resultsList = result.getContent();
+        SearchResponsePage result = findVancancies(vacancySearchParameters);
+        List<Vacancy> resultsList = result.getVacancies().getContent();
         Assert.assertEquals("Expected number results", 3, resultsList.size());
 
         vacancySearchParameters = VacancySearchParameters.builder()
@@ -578,7 +577,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         // no vacancies should exist matching seasonal
         result = findVancancies(vacancySearchParameters);
-        resultsList = result.getContent();
+        resultsList = result.getVacancies().getContent();
         Assert.assertEquals("Expected number results", 0, resultsList.size());
 
         vacancySearchParameters = VacancySearchParameters.builder()
@@ -589,7 +588,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         // One vacancy sholud match internship
         result = findVancancies(vacancySearchParameters);
-        resultsList = result.getContent();
+        resultsList = result.getVacancies().getContent();
         Assert.assertEquals("Expected number results", 1, resultsList.size());
         Assert.assertTrue("Expected result", resultsList.get(0).getContractTypes().contains(ContractType.INTERNSHIP.toString()));
 
@@ -602,7 +601,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         // two vacancies should exist matching full/parttime
         result = findVancancies(vacancySearchParameters);
-        resultsList = result.getContent();
+        resultsList = result.getVacancies().getContent();
 
         Assert.assertEquals("Expected number results", 2, resultsList.size());
 
@@ -634,8 +633,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .build();
 
         // return all three
-        Page<Vacancy> result = findVancancies(vacancySearchParameters);
-        List<Vacancy> resultsList = result.getContent();
+        SearchResponsePage result = findVancancies(vacancySearchParameters);
+        List<Vacancy> resultsList = result.getVacancies().getContent();
         Assert.assertEquals("Expected number results", 3, resultsList.size());
 
         vacancySearchParameters = VacancySearchParameters.builder()
@@ -646,7 +645,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         // no vacancies should exist matching JOB_SHARE
         result = findVancancies(vacancySearchParameters);
-        resultsList = result.getContent();
+        resultsList = result.getVacancies().getContent();
         Assert.assertEquals("Expected number results", 0, resultsList.size());
 
         vacancySearchParameters = VacancySearchParameters.builder()
@@ -657,7 +656,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         // One vacancy should exist matching FLEXIBLE_WORKING
         result = findVancancies(vacancySearchParameters);
-        resultsList = result.getContent();
+        resultsList = result.getVacancies().getContent();
         Assert.assertEquals("Expected number results", 1, resultsList.size());
         Assert.assertTrue("Expected result", resultsList.get(0).getWorkingPatterns().contains(WorkingPattern.FLEXIBLE_WORKING.toString()));
 
@@ -670,7 +669,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         // two vacancies should exist matching full/parttime
         result = findVancancies(vacancySearchParameters);
-        resultsList = result.getContent();
+        resultsList = result.getVacancies().getContent();
 
         Assert.assertEquals("Expected number results", 2, resultsList.size());
 
@@ -689,8 +688,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         createVacancyWithRegions(department1, "North East, Scotland", newcastleLocation);
         createVacancyWithRegions(department1, "South West, Scotland, North East", createBristolLocationPrototype("bristol1"));
 
-        Page<Vacancy> result = findVancanciesInPlace("newcastle");
-        List<Vacancy> resultsList = result.getContent();
+        SearchResponsePage result = findVancanciesInPlace("newcastle");
+        List<Vacancy> resultsList = result.getVacancies().getContent();
 
         Assert.assertEquals("Expected results 2", 2, resultsList.size());
     }
@@ -851,8 +850,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         given(locationService.find("testLocation1"))
                 .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
 
-        Page<Vacancy> result = findVancanciesInPlace("testLocation1");
-        List<Vacancy> resultsList = result.getContent();
+        SearchResponsePage result = findVancanciesInPlace("testLocation1");
+        List<Vacancy> resultsList = result.getVacancies().getContent();
 
         Assert.assertTrue("Expected results", resultsList.size() == 1);
         Vacancy actual = resultsList.get(0);
@@ -860,7 +859,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         assertThat(actual.getSalaryOverrideDescription(), equalTo("This is the salary override description"));
     }
 
-    private Page<Vacancy> findVancancies(VacancySearchParameters vacancySearchParameters) throws Exception {
+    private SearchResponsePage findVancancies(VacancySearchParameters vacancySearchParameters) throws Exception {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -879,10 +878,10 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         System.out.println("searchRespons=" + searchResponse);
 
-        return objectMapper.readValue(searchResponse, VacancyPage.class);
+        return objectMapper.readValue(searchResponse, SearchResponsePage.class);
     }
 
-    private Page<Vacancy> findVancanciesByKeyword(VacancySearchParameters vacancySearchParameters, String jwt)
+    private SearchResponsePage findVancanciesByKeyword(VacancySearchParameters vacancySearchParameters, String jwt)
 			throws Exception {
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -901,10 +900,10 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         System.out.println("searchRespons=" + searchResponse);
 
-        return objectMapper.readValue(searchResponse, VacancyPage.class);
+        return objectMapper.readValue(searchResponse, SearchResponsePage.class);
     }
 
-    private Page<Vacancy> findVancanciesByKeyword(String keyword) throws Exception {
+    private SearchResponsePage findVancanciesByKeyword(String keyword) throws Exception {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -927,10 +926,10 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         System.out.println("searchRespons=" + searchResponse);
 
-        return objectMapper.readValue(searchResponse, VacancyPage.class);
+        return objectMapper.readValue(searchResponse, SearchResponsePage.class);
     }
 
-    private Page<Vacancy> findVancanciesByDpartmentInPlace(String place, String... departmentIDs) throws Exception {
+    private SearchResponsePage findVancanciesByDpartmentInPlace(String place, String... departmentIDs) throws Exception {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -956,10 +955,10 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         System.out.println("searchRespons=" + searchResponse);
 
-        return objectMapper.readValue(searchResponse, VacancyPage.class);
+        return objectMapper.readValue(searchResponse, SearchResponsePage.class);
     }
 
-    private Page<Vacancy> findVancanciesInPlace(String place) throws Exception {
+    private SearchResponsePage findVancanciesInPlace(String place) throws Exception {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -983,7 +982,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         System.out.println("searchRespons=" + searchResponse);
 
-        return objectMapper.readValue(searchResponse, VacancyPage.class);
+        return objectMapper.readValue(searchResponse, SearchResponsePage.class);
     }
 
     private static Timestamp getTime(int numberOfDaysFromNow) {

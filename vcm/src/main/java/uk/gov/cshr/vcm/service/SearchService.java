@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
 import uk.gov.cshr.vcm.model.Coordinates;
 import uk.gov.cshr.vcm.model.SearchParameters;
+import uk.gov.cshr.vcm.model.SearchResponse;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
 
@@ -24,7 +25,7 @@ public class SearchService {
     @Inject
     private HibernateSearchService hibernateSearchService;
 
-    public Page<Vacancy> search(VacancySearchParameters vacancySearchParameters, Pageable pageable)
+    public SearchResponse search(VacancySearchParameters vacancySearchParameters, Pageable pageable)
             throws LocationServiceException, IOException {
 
         debug("staring search()");
@@ -52,7 +53,10 @@ public class SearchService {
             }
         }
 
-        return hibernateSearchService.search(searchParameters, pageable);
+        Page<Vacancy> vacancies = hibernateSearchService.search(searchParameters, pageable);
+        return SearchResponse.builder()
+                .vacancies(vacancies)
+                .build();
     }
 
     private boolean coordinatesExist(Coordinates coordinates) {

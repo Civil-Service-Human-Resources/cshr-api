@@ -13,7 +13,6 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
 import uk.gov.cshr.vcm.controller.exception.VacancyClosedException;
 import uk.gov.cshr.vcm.controller.exception.VacancyError;
+import uk.gov.cshr.vcm.model.SearchResponse;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancyEligibility;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
@@ -97,7 +97,7 @@ public class VacancySearchController {
 				message = LocationServiceException.SERVICE_UNAVAILABLE_MESSAGE,
 				response = VacancyError.class)
 	})
-    public ResponseEntity<Page<Vacancy>> search(
+    public ResponseEntity<SearchResponse> search(
 			@ApiParam(name = "searchParameters", value = "The values supplied to perform the search", required = true)
             @RequestBody VacancySearchParameters vacancySearchParameters,
 			@RequestHeader(value = "cshr-authentication", required = false) String jwt,
@@ -107,8 +107,8 @@ public class VacancySearchController {
 		VacancyEligibility vacancyEligibility = cshrAuthenticationService.parseVacancyEligibility(jwt);
 		vacancySearchParameters.setVacancyEligibility(vacancyEligibility);
 
-		Page<Vacancy> vacancies = searchService.search(vacancySearchParameters, pageable);
-		return ResponseEntity.ok().body(vacancies);
+		SearchResponse searchResponse = searchService.search(vacancySearchParameters, pageable);
+		return ResponseEntity.ok().body(searchResponse);
     }
 
    @RequestMapping(method = RequestMethod.POST, value = "/verifyemail")
