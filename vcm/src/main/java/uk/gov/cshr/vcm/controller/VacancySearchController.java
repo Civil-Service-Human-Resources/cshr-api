@@ -1,5 +1,6 @@
 package uk.gov.cshr.vcm.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -113,17 +114,26 @@ public class VacancySearchController {
 
    @RequestMapping(method = RequestMethod.POST, value = "/verifyemail")
     @ApiOperation(value = "Generate a JWT to enable access to internal vacancies", nickname = "verifyEmailJWT")
-    public ResponseEntity<String> verifyEmailJWT(@RequestBody String emailAddress) throws NotificationClientException {
+    public ResponseEntity<String> verifyEmailJWT(String emailAddressJSON) throws NotificationClientException {
 
-		String jwt = cshrAuthenticationService.createInternalJWT(emailAddress);
+        try {
+            String emailAddress = new ObjectMapper().readTree(emailAddressJSON).findValue("emailAddress").asText();
 
-		if ( jwt != null ) {
-			notifyService.emailInternalJWT(emailAddress, jwt, "name");
-			return ResponseEntity.ok().build();
-		}
-		else {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-					.build();
-		}
+            String jwt = cshrAuthenticationService.createInternalJWT(emailAddress);
+
+            if ( jwt != null ) {
+                notifyService.emailInternalJWT(emailAddress, jwt, "name");
+                return ResponseEntity.ok().build();
+            }
+            else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .build();
+            }
+        }
+        catch (IOException ex) {
+            log.error(ex.getMessage(), ex);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .build();
+        }
     }
 }
