@@ -34,7 +34,7 @@ paths:
         '200':
           description: OK
           schema:
-            $ref: '#/definitions/Department'
+            $ref: '#/definitions/Page«Department»'
     post:
       tags:
         - department-controller
@@ -140,7 +140,7 @@ paths:
         '200':
           description: OK
           schema:
-            $ref: '#/definitions/Vacancy'
+            $ref: '#/definitions/Page«Vacancy»'
     post:
       tags:
         - vacancy-controller
@@ -205,16 +205,16 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/VacancySearchParameters'
-        - name: cshr-authorisation
+        - name: cshr-authentication
           in: header
-          description: JWT for cshr-authorisation
+          description: cshr-authentication
           required: false
           type: string
       responses:
         '200':
           description: OK
           schema:
-            $ref: '#/definitions/Vacancy'
+            $ref: '#/definitions/SearchResponse'
         '503':
           description: The location service is unavailable.
           schema:
@@ -429,6 +429,15 @@ definitions:
       totalPages:
         type: integer
         format: int32
+  SearchResponse:
+    type: object
+    properties:
+      cshrServiceStatus:
+        $ref: '#/definitions/CSHRServiceStatus'
+      vacancies:
+        $ref: '#/definitions/Page«Vacancy»'
+      vacancyError:
+        $ref: '#/definitions/VacancyError'
   Sort:
     type: object
   Vacancy:
@@ -634,16 +643,18 @@ definitions:
         description: id of one or more departments to search vacancies for
         items:
           type: string
-      internal:
-        type: boolean
-        example: false
-        description: Whether to include internal vacancies
       keyword:
         type: string
         description: word found in title or description of vacancy
       location:
         description: location of the vacancy
         $ref: '#/definitions/Location'
+      vacancyEligibility:
+        type: string
+        enum:
+          - PUBLIC
+          - ACROSS_GOVERNMENT
+          - INTERNAL
       workingPatterns:
         type: array
         example: FLEXIBLE_WORKING FULL_TIME PART_TIME JOB_SHARE HOME_WORKING
