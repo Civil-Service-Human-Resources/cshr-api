@@ -3,6 +3,8 @@ package uk.gov.cshr.vcm.controller;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import uk.gov.cshr.status.CSHRServiceStatus;
+import uk.gov.cshr.vcm.controller.exception.VacancyError;
 import uk.gov.cshr.vcm.model.SearchResponse;
 
 /**
@@ -14,8 +16,11 @@ import uk.gov.cshr.vcm.model.SearchResponse;
 public class SearchResponsePage extends SearchResponse {
 
     @JsonCreator
-    public SearchResponsePage(@JsonProperty("vacancies") VacancyPage vacancyPage) {
+    public SearchResponsePage(
+            @JsonProperty("vacancies") VacancyPage vacancyPage,
+            @JsonProperty("vacanyError") VacancyError vacanyError,
+            @JsonProperty("cshrServiceStatus") CSHRServiceStatus cshrServiceStatus) {
 
-        super(vacancyPage, null, null);
+        super(vacancyPage, vacanyError, cshrServiceStatus);
     }
 }

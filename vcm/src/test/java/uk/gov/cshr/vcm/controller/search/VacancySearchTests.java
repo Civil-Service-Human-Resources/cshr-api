@@ -17,6 +17,7 @@ import org.junit.After;
 import org.junit.Assert;
 import static org.junit.Assert.fail;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.mockito.BDDMockito.given;
@@ -275,6 +276,40 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .build();
 
         SearchResponsePage result = findVancanciesByKeyword(vacancySearchParameters, jwt);
+        List<Vacancy> resultsList = result.getVacancies().getContent();
+
+        Assert.assertEquals("internal vacancy included", 2, resultsList.size());
+        Assert.assertEquals("Newcastle Job", resultsList.get(0).getTitle());
+    }
+
+    @Ignore
+    @Test
+    public void testHandleInvalidJWTOnInternalVacancySearch() throws Exception {
+
+        Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
+		newcastleVacancy.setInternalOpeningDate(YESTERDAY);
+		newcastleVacancy.setPublicOpeningDate(YESTERDAY);
+        newcastleVacancy.setTitle("Newcastle Job");
+        saveVacancy(newcastleVacancy);
+
+        Vacancy newcastleVacancy2 = createVacancyPrototype(newcastleLocation2);
+		newcastleVacancy2.setInternalOpeningDate(YESTERDAY);
+		newcastleVacancy2.setPublicOpeningDate(TOMORROW);
+        newcastleVacancy2.setTitle("Newcastle Job 2");
+        saveVacancy(newcastleVacancy2);
+
+//		String jwt = cshrAuthenticationService.createInternalJWT("cabinetoffice.gov.uk");
+//		System.out.println("JWT=" + jwt);
+
+        VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
+                .keyword("newcastle")
+                .build();
+
+        SearchResponsePage result = findVancanciesByKeyword(vacancySearchParameters, "jwt");
+
+//        VacancyError vacancyError = result.getVacancyError();]
+//        assertT
+
         List<Vacancy> resultsList = result.getVacancies().getContent();
 
         Assert.assertEquals("internal vacancy included", 2, resultsList.size());

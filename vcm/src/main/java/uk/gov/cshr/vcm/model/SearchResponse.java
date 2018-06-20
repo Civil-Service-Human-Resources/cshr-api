@@ -16,7 +16,7 @@ public class SearchResponse {
 
     private Page<Vacancy> vacancies;
 
-    private VacancyError vacanyError;
+    private VacancyError vacancyError;
 
     private CSHRServiceStatus cshrServiceStatus;
 }

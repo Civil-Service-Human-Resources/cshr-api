@@ -83,6 +83,7 @@ public class CshrAuthenticationService {
 	private boolean verifyEmailAddress(String emailAddress) {
 
 		return emailAddress.endsWith(".gov.uk")
-				|| emailAddress.endsWith("valtech.co.uk");
+				|| emailAddress.endsWith("valtech.co.uk")
+                || emailAddress.endsWith("cabinetoffice.gov.uk");
 	}
 }
