@@ -123,7 +123,7 @@ public class VacancySearchController {
 
             if ( jwt != null ) {
                 notifyService.emailInternalJWT(emailAddress, jwt, "name");
-                return ResponseEntity.ok().build();
+                return ResponseEntity.noContent().build();
             }
             else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
