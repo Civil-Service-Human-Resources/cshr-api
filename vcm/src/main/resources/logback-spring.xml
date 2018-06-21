@@ -29,6 +29,10 @@
             </Pattern>
         </layout>
     </appender>
+    <root level="DEBUG">
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="STDOUT"/>
+    </root>
     <springProfile name="dev">
         <root level="DEBUG">
             <appender-ref ref="FILE"/>
@@ -40,5 +44,6 @@
             <appender-ref ref="FILE"/>
         </root>
     </springProfile>
+
 
 </configuration>
