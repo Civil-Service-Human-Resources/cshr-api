@@ -231,8 +231,8 @@ paths:
         - application/json
       parameters:
         - in: body
-          name: emailAddress
-          description: emailAddress
+          name: emailAddressJSON
+          description: emailAddressJSON
           required: true
           schema:
             type: string
@@ -240,7 +240,7 @@ paths:
         '200':
           description: OK
           schema:
-            type: string
+            $ref: '#/definitions/VacancyError'
   '/vacancy/{vacancyId}':
     get:
       tags:
@@ -432,12 +432,18 @@ definitions:
   SearchResponse:
     type: object
     properties:
-      cshrServiceStatus:
-        $ref: '#/definitions/CSHRServiceStatus'
+      authenticatedEmail:
+        type: string
+      cshrServiceStatuses:
+        type: array
+        items:
+          $ref: '#/definitions/CSHRServiceStatus'
       vacancies:
         $ref: '#/definitions/Page«Vacancy»'
-      vacancyError:
-        $ref: '#/definitions/VacancyError'
+      vacancyErrors:
+        type: array
+        items:
+          $ref: '#/definitions/VacancyError'
   Sort:
     type: object
   Vacancy:
@@ -546,6 +552,14 @@ definitions:
           type: string
       message:
         type: string
+      searchStatusCode:
+        type: string
+        enum:
+          - INVALID_JWT
+          - NULL_JWT
+          - EXPIRED_JWT
+          - JWT_NO_ELIGIBILITY_CLAIM
+          - EXCEPTION
       status:
         type: string
         enum:
