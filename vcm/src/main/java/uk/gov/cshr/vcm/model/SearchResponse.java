@@ -23,4 +23,6 @@ public class SearchResponse {
 
     @Builder.Default
     private List<CSHRServiceStatus> cshrServiceStatuses = new ArrayList<>();
+
+    private String authenticatedEmail;
 }

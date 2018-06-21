@@ -39,6 +39,7 @@ public class CshrAuthenticationService {
 			String compactJws = Jwts.builder()
 					.setSubject("internal candidate")
 					.claim("Vacancy Eligibility", VacancyEligibility.ACROSS_GOVERNMENT.toString())
+                    .claim("Email Address", emailAddress)
 					.signWith(SignatureAlgorithm.HS512, SECRET)
 					.setExpiration(date)
 					.compact();
@@ -72,6 +73,9 @@ public class CshrAuthenticationService {
 			Claims claims = Jwts.parser()
 				.setSigningKey(DatatypeConverter.parseBase64Binary(SECRET))
 				.parseClaimsJws(jwt).getBody();
+
+            String emailAddress = claims.get("Email Address", String.class);
+            searchResponse.setAuthenticatedEmail(emailAddress);
 
 			Object eligibilityClaim = claims.get("Vacancy Eligibility");
 
