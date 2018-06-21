@@ -3,7 +3,6 @@ package uk.gov.cshr.vcm.repository;
 import java.util.List;
 import java.util.Optional;
 import javax.transaction.Transactional;
-
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -13,6 +12,7 @@ import uk.gov.cshr.vcm.model.Vacancy;
 @Repository
 @Transactional
 public interface VacancyRepository extends PagingAndSortingRepository<Vacancy, Long> {
+    
     default Optional<Vacancy> findById(Long id) {
         return Optional.ofNullable(this.findOne(id));
     }
@@ -28,4 +28,7 @@ public interface VacancyRepository extends PagingAndSortingRepository<Vacancy, L
      */
     @Query("select v from Vacancy v where v.identifier = :jobRef and v.atsVendorIdentifier = :vendorIdentifier")
     List<Vacancy> findVacancy(@Param("jobRef") Long jobRef, @Param("vendorIdentifier") String vendorIdentifier);
+
+    @Override
+    public <S extends Vacancy> S save(S entity);
 }
