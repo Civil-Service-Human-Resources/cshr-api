@@ -34,7 +34,7 @@ paths:
         '200':
           description: OK
           schema:
-            $ref: '#/definitions/Page«Department»'
+            $ref: '#/definitions/Page%C2%ABDepartment%C2%BB'
     post:
       tags:
         - department-controller
@@ -140,7 +140,7 @@ paths:
         '200':
           description: OK
           schema:
-            $ref: '#/definitions/Page«Vacancy»'
+            $ref: '#/definitions/Page%C2%ABVacancy%C2%BB'
     post:
       tags:
         - vacancy-controller
@@ -439,7 +439,7 @@ definitions:
         items:
           $ref: '#/definitions/CSHRServiceStatus'
       vacancies:
-        $ref: '#/definitions/Page«Vacancy»'
+        $ref: '#/definitions/Page%C2%ABVacancy%C2%BB'
       vacancyErrors:
         type: array
         items:
