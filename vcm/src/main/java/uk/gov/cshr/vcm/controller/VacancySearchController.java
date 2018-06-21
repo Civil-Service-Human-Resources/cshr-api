@@ -114,7 +114,7 @@ public class VacancySearchController {
 
    @RequestMapping(method = RequestMethod.POST, value = "/verifyemail")
     @ApiOperation(value = "Generate a JWT to enable access to internal vacancies", nickname = "verifyEmailJWT")
-    public ResponseEntity<String> verifyEmailJWT(String emailAddressJSON) throws NotificationClientException {
+    public ResponseEntity<String> verifyEmailJWT(@RequestBody String emailAddressJSON) throws NotificationClientException {
 
         try {
             String emailAddress = new ObjectMapper().readTree(emailAddressJSON).findValue("emailAddress").asText();
