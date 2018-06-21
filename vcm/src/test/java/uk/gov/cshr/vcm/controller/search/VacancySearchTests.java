@@ -316,6 +316,25 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     }
 
     @Test
+    public void testHandleUnauthorisedEmailOnVerifyEmail() throws Exception {
+        
+        String requestBody = "{ \"emailAddress\": \"anyone@yahoo.co.uk\" }";
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/verifyemail")
+				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(requestBody)
+                .accept(APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String response = mvcResult.getResponse().getContentAsString();
+
+        VacancyError vacancyError = new ObjectMapper().readValue(response, VacancyError.class);
+        Assert.assertEquals("Expect UNAUTHORIZED error status", HttpStatus.UNAUTHORIZED, vacancyError.getStatus());
+    }
+
+    @Test
     public void testInvalidLocation() throws Exception {
 
         given(locationService.find(any()))
