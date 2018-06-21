@@ -28,5 +28,3 @@ server:
 liquibase:
     enabled: false
     change-log: classpath:/changelog.xml
-profile:
-    active: dev
