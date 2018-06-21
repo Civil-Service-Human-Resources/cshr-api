@@ -17,7 +17,6 @@ import org.junit.After;
 import org.junit.Assert;
 import static org.junit.Assert.fail;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.mockito.BDDMockito.given;
@@ -282,7 +281,6 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         Assert.assertEquals("Newcastle Job", resultsList.get(0).getTitle());
     }
 
-    @Ignore
     @Test
     public void testHandleInvalidJWTOnInternalVacancySearch() throws Exception {
 
@@ -298,8 +296,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         newcastleVacancy2.setTitle("Newcastle Job 2");
         saveVacancy(newcastleVacancy2);
 
-//		String jwt = cshrAuthenticationService.createInternalJWT("cabinetoffice.gov.uk");
-//		System.out.println("JWT=" + jwt);
+		String jwt = cshrAuthenticationService.createInternalJWT("cabinetoffice.gov.uk");
+		System.out.println("JWT=" + jwt);
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
                 .keyword("newcastle")
@@ -307,7 +305,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         SearchResponsePage result = findVancanciesByKeyword(vacancySearchParameters, "jwt");
 
-//        VacancyError vacancyError = result.getVacancyError();]
+        List<VacancyError> vacancyError = result.getVacancyErrors();
 //        assertT
 
         List<Vacancy> resultsList = result.getVacancies().getContent();

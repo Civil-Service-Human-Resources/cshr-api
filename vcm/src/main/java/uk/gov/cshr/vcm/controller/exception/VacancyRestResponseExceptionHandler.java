@@ -42,7 +42,7 @@ public class VacancyRestResponseExceptionHandler extends ResponseEntityException
     @ExceptionHandler({RuntimeException.class})
     public ResponseEntity<Object> handleRuntimeException(RuntimeException ex, WebRequest request) {
         log.error(ex.getMessage(), ex);
-        VacancyError vacancyError = new VacancyError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), null);
+        VacancyError vacancyError = new VacancyError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), null, SearchStatusCode.EXCEPTION);
         return handleExceptionInternal(ex, vacancyError, new HttpHeaders(), vacancyError.getStatus(), request);
     }
 
@@ -50,28 +50,28 @@ public class VacancyRestResponseExceptionHandler extends ResponseEntityException
     public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex, WebRequest request) {
 
         log.error(ex.getMessage(), ex);
-        VacancyError vacancyError = new VacancyError(HttpStatus.BAD_REQUEST, ex.getMessage(), null);
+        VacancyError vacancyError = new VacancyError(HttpStatus.BAD_REQUEST, ex.getMessage(), null, SearchStatusCode.EXCEPTION);
         return handleExceptionInternal(ex, vacancyError, new HttpHeaders(), vacancyError.getStatus(), request);
     }
 
     @ExceptionHandler({AccessDeniedException.class})
     public ResponseEntity<Object> handleAccessDeniedExceptionException(AccessDeniedException ex, WebRequest request) {
         log.error(ex.getMessage(), ex);
-        VacancyError vacancyError = new VacancyError(HttpStatus.FORBIDDEN, ex.getMessage(), null);
+        VacancyError vacancyError = new VacancyError(HttpStatus.FORBIDDEN, ex.getMessage(), null, SearchStatusCode.EXCEPTION);
         return handleExceptionInternal(ex, vacancyError, new HttpHeaders(), vacancyError.getStatus(), request);
     }
 
     @ExceptionHandler({IOException.class})
     public ResponseEntity<Object> handleIOException(IOException ex, WebRequest request) {
         log.error(ex.getMessage(), ex);
-        VacancyError vacancyError = new VacancyError(HttpStatus.BAD_REQUEST, ex.getMessage(), null);
+        VacancyError vacancyError = new VacancyError(HttpStatus.BAD_REQUEST, ex.getMessage(), null, SearchStatusCode.EXCEPTION);
         return handleExceptionInternal(ex, vacancyError, new HttpHeaders(), vacancyError.getStatus(), request);
     }
 
     @ExceptionHandler({JwtException.class})
     public ResponseEntity<Object> handleExpiredJwtException(JwtException ex, WebRequest request) {
         log.error(ex.getMessage(), ex);
-        VacancyError vacancyError = new VacancyError(HttpStatus.UNAUTHORIZED, ex.getMessage(), null);
+        VacancyError vacancyError = new VacancyError(HttpStatus.UNAUTHORIZED, ex.getMessage(), null, SearchStatusCode.EXCEPTION);
         return handleExceptionInternal(ex, vacancyError, new HttpHeaders(), vacancyError.getStatus(), request);
     }
 }

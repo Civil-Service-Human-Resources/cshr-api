@@ -25,7 +25,8 @@ public class SearchService {
     @Inject
     private HibernateSearchService hibernateSearchService;
 
-    public SearchResponse search(VacancySearchParameters vacancySearchParameters, Pageable pageable)
+    public void search(VacancySearchParameters vacancySearchParameters,
+            SearchResponse searchResponse, Pageable pageable)
             throws LocationServiceException, IOException {
 
         debug("staring search()");
@@ -36,14 +37,12 @@ public class SearchService {
                 .build();
 
         boolean filterByLocation = vacancySearchParameters.getLocation() != null;
-        boolean locationFound = false;
 
         if ( filterByLocation ) {
 
             Coordinates coordinates = locationService.find(vacancySearchParameters.getLocation().getPlace());
 
             if (coordinatesExist(coordinates)) {
-                locationFound = true;
                 searchParameters.setCoordinates(coordinates);
             }
             else {
@@ -54,9 +53,7 @@ public class SearchService {
         }
 
         Page<Vacancy> vacancies = hibernateSearchService.search(searchParameters, pageable);
-        return SearchResponse.builder()
-                .vacancies(vacancies)
-                .build();
+        searchResponse.setVacancies(vacancies);
     }
 
     private boolean coordinatesExist(Coordinates coordinates) {

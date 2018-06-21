@@ -1,5 +1,7 @@
 package uk.gov.cshr.vcm.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +18,9 @@ public class SearchResponse {
 
     private Page<Vacancy> vacancies;
 
-    private VacancyError vacancyError;
+    @Builder.Default
+    private List<VacancyError> vacancyErrors = new ArrayList<>();
 
-    private CSHRServiceStatus cshrServiceStatus;
+    @Builder.Default
+    private List<CSHRServiceStatus> cshrServiceStatuses = new ArrayList<>();
 }

@@ -105,16 +105,18 @@ public class VacancySearchController {
 			Pageable pageable)
             throws LocationServiceException, IOException {
 
-		VacancyEligibility vacancyEligibility = cshrAuthenticationService.parseVacancyEligibility(jwt);
+        SearchResponse searchResponse = SearchResponse.builder().build();
+
+		VacancyEligibility vacancyEligibility = cshrAuthenticationService.parseVacancyEligibility(jwt, searchResponse);
 		vacancySearchParameters.setVacancyEligibility(vacancyEligibility);
 
-		SearchResponse searchResponse = searchService.search(vacancySearchParameters, pageable);
+		searchService.search(vacancySearchParameters, searchResponse, pageable);
 		return ResponseEntity.ok().body(searchResponse);
     }
 
    @RequestMapping(method = RequestMethod.POST, value = "/verifyemail")
     @ApiOperation(value = "Generate a JWT to enable access to internal vacancies", nickname = "verifyEmailJWT")
-    public ResponseEntity<String> verifyEmailJWT(String emailAddressJSON) throws NotificationClientException {
+    public ResponseEntity<String> verifyEmailJWT(@RequestBody String emailAddressJSON) throws NotificationClientException {
         
         try {
             String emailAddress = new ObjectMapper().readTree(emailAddressJSON).findValue("emailAddress").asText();
