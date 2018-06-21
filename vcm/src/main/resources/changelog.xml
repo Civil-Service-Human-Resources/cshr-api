@@ -269,6 +269,8 @@
     </changeSet>
     <changeSet author="Gordon" id="32">
         <sql>delete from vacancies where dept_id is null</sql>
+    </changeSet>
+    <changeSet author="Gordon" id="33">
         <addNotNullConstraint
             columnDataType="int"
             columnName="dept_id"
