@@ -45,6 +45,7 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.cshr.vcm.VcmApplication;
 import uk.gov.cshr.vcm.controller.SearchResponsePage;
 import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
+import uk.gov.cshr.vcm.controller.exception.SearchStatusCode;
 import uk.gov.cshr.vcm.controller.exception.VacancyClosedException;
 import uk.gov.cshr.vcm.controller.exception.VacancyError;
 import uk.gov.cshr.vcm.model.ContractType;
@@ -306,11 +307,11 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         SearchResponsePage result = findVancanciesByKeyword(vacancySearchParameters, "jwt");
 
         List<VacancyError> vacancyError = result.getVacancyErrors();
-//        assertT
+        Assert.assertEquals("", vacancyError.get(0).getSearchStatusCode(), SearchStatusCode.INVALID_JWT);
 
         List<Vacancy> resultsList = result.getVacancies().getContent();
 
-        Assert.assertEquals("internal vacancy included", 2, resultsList.size());
+        Assert.assertEquals("internal vacancy included", 1, resultsList.size());
         Assert.assertEquals("Newcastle Job", resultsList.get(0).getTitle());
     }
 

@@ -128,13 +128,13 @@ public class VacancySearchController {
                 return ResponseEntity.ok().build();
             }
             else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                return ResponseEntity.status(HttpStatus.OK)
                         .build();
             }
         }
         catch (IOException ex) {
             log.error(ex.getMessage(), ex);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            return ResponseEntity.status(HttpStatus.OK)
                 .build();
         }
     }
