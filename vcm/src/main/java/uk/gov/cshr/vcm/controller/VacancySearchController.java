@@ -114,28 +114,30 @@ public class VacancySearchController {
 		return ResponseEntity.ok().body(searchResponse);
     }
 
-   @RequestMapping(method = RequestMethod.POST, value = "/verifyemail")
+    @RequestMapping(method = RequestMethod.POST, value = "/verifyemail")
     @ApiOperation(value = "Generate a JWT to enable access to internal vacancies", nickname = "verifyEmailJWT")
-    public ResponseEntity<String> verifyEmailJWT(@RequestBody String emailAddressJSON) throws NotificationClientException {
-        
+    public ResponseEntity<VacancyError> verifyEmailJWT(@RequestBody String emailAddressJSON) throws NotificationClientException {
+
         try {
             String emailAddress = new ObjectMapper().readTree(emailAddressJSON).findValue("emailAddress").asText();
-            
             String jwt = cshrAuthenticationService.createInternalJWT(emailAddress);
 
             if ( jwt != null ) {
                 notifyService.emailInternalJWT(emailAddress, jwt, "name");
-                return ResponseEntity.ok().build();
+                return ResponseEntity.noContent().build();
             }
             else {
-                return ResponseEntity.status(HttpStatus.OK)
+                VacancyError vacancyError = VacancyError.builder()
+                        .status(HttpStatus.UNAUTHORIZED)
                         .build();
+                return ResponseEntity.ok().body(vacancyError);
             }
         }
         catch (IOException ex) {
             log.error(ex.getMessage(), ex);
-            return ResponseEntity.status(HttpStatus.OK)
-                .build();
+            return ResponseEntity.noContent().build();
         }
+
+
     }
 }
