@@ -1,12 +1,20 @@
 package uk.gov.cshr.vcm.controller;
 
 import io.swagger.annotations.ApiOperation;
+import java.io.IOException;
+import java.io.Reader;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
 import javax.annotation.security.RolesAllowed;
+import liquibase.util.csv.CSVReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -97,6 +105,39 @@ public class DepartmentController {
     public ResponseEntity<Department> deleteById(@PathVariable Long departmentId) {
 
         departmentRepository.delete(departmentId);
+        return ResponseEntity.noContent().build();
+    }
+
+	@CacheEvict(value = "emailAddresses", allEntries = true)
+    @RequestMapping(method = RequestMethod.PUT, value = "/load")
+    @ApiOperation(value = "load departments", nickname = "load")
+    public ResponseEntity<Department> load() throws IOException {
+
+        Reader reader = Files.newBufferedReader(Paths.get("/Users/gordon/Desktop/RPGDepartmentDataMaster.csv"));
+        CSVReader csvReader = new CSVReader(reader);
+
+		// skip first line
+		csvReader.readNext();
+
+        String[] nextRecord;
+
+        while ((nextRecord = csvReader.readNext()) != null) {
+            System.out.println("id : " + nextRecord[0]);
+            String name = nextRecord[1];
+            System.out.println("Phone : " + nextRecord[2]);
+            String emails = nextRecord[8];
+            System.out.println("==========================");
+
+			Department department = new Department();
+			department.setName(name);
+
+			HashSet<String> emailSet = new HashSet<>();
+			emailSet.addAll(Arrays.asList(emails.split("\n")));
+
+			department.setAcceptedEmailExtensions(emailSet);
+
+			departmentRepository.save(department);
+        }
         return ResponseEntity.noContent().build();
     }
 }

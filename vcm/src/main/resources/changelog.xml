@@ -274,4 +274,12 @@
             columnName="dept_id"
             tableName="vacancies"/>
     </changeSet>
+    <changeSet author="Gordon" id="33">
+        <createTable tableName="department_acceptedemailextensions">
+            <column name="department_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="acceptedemailextensions" type="TEXT"/>
+        </createTable>
+    </changeSet>
 </databaseChangeLog>
