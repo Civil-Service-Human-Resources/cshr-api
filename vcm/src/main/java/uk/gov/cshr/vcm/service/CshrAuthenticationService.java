@@ -1,9 +1,12 @@
 package uk.gov.cshr.vcm.service;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -60,7 +63,7 @@ public class CshrAuthenticationService {
 	 */
 	public VacancyEligibility parseVacancyEligibility(String jwt, SearchResponse searchResponse) {
 
-		if (jwt == null) {			
+		if (jwt == null) {
             VacancyError vacancyError = VacancyError.builder()
                     .searchStatusCode(SearchStatusCode.NULL_JWT)
                     .build();
@@ -90,7 +93,8 @@ public class CshrAuthenticationService {
 				return VacancyEligibility.PUBLIC;
 			}
 		}
-		catch(IllegalArgumentException | MalformedJwtException e) {
+		// Who knows what exceptions Jwts.parser may throw
+		catch(ExpiredJwtException | MalformedJwtException | SignatureException | UnsupportedJwtException | IllegalArgumentException e) {
 			log.error(e.getMessage(), e);
             VacancyError vacancyError = VacancyError.builder()
                     .message(e.getMessage())
