@@ -7,6 +7,8 @@ COPY 	pom.xml /usr/src/myapp/pom.xml
 COPY 	vcm/pom.xml /usr/src/myapp/vcm/pom.xml
 COPY 	.settings.xml /usr/share/maven/ref/settings.xml
 
+RUN	curl www.google.com
+
 RUN 	mvn -f /usr/src/myapp/pom.xml -s /usr/share/maven/ref/settings.xml clean verify --fail-never
 
 FROM 	cshrrpg.azurecr.io/maven-3-base as build

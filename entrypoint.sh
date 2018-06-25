@@ -23,7 +23,9 @@ if [[ ${#} -eq 0 ]]; then
             --spring.security.search_username=${SEARCH_USERNAME} \
             --spring.security.search_password=${SEARCH_PASSWORD} \
             --spring.security.crud_username=${CRUD_USERNAME} \
-            --spring.security.crud_password=${CRUD_PASSWORD}
+            --spring.security.crud_password=${CRUD_PASSWORD} \
+            --spring.profiles.active=${SPRING_PROFILES_ACTIVE} \
+            
 else
     echo "Running command:"
     exec "$@"

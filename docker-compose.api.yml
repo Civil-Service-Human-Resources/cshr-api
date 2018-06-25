@@ -1,0 +1,34 @@
+version: "2"
+
+services:
+  api:
+    image: cshrrpg.azurecr.io/cshr-api:${DOCKER_SERVICE_TAG}
+    build:
+      context: .
+      args:
+        arg_maven_repo: "${MAVEN_REPO}"
+    ports:
+      - "8080:8080"
+    networks:
+      - docker-elk_elk
+    environment:
+      SPRING_PROFILES_ACTIVE: "${SPRING_PROFILES_ACTIVE}"
+      LOCATION_SERVICE_URL: "${LOCATION_SERVICE_URL}"
+      LOCATION_SERVICE_USERNAME: "${LOCATION_SERVICE_USERNAME}"
+      LOCATION_SERVICE_PASSWORD: "${LOCATION_SERVICE_PASSWORD}"
+      DATASOURCE_URL: "${DATASOURCE_URL}"
+      DATASOURCE_USERNAME: "${DATASOURCE_USERNAME}"
+      DATASOURCE_PASSWORD: "${DATASOURCE_PASSWORD}"
+      SEARCH_USERNAME: "${SEARCH_USERNAME}"
+      SEARCH_PASSWORD: "${SEARCH_PASSWORD}"
+      CRUD_USERNAME: "${CRUD_USERNAME}"
+      CRUD_PASSWORD: "${CRUD_PASSWORD}"
+      FILEBEAT_COMPONENT: cshr-api
+      FILEBEAT_ENVIRONMENT: local
+      FILEBEAT_HOSTS: 0ef17232-6155-4411-b532-3390280be20d-ls.logit.io:18281
+      #FILEBEAT_HOSTS: logstash:5000
+      FILEBEAT_PLATFORM: mac
+
+networks:
+  docker-elk_elk:
+    external: true
