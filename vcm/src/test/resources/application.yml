@@ -21,6 +21,8 @@ spring:
     search_password: searchpassword
     crud_username: crudusername
     crud_password: crudpassword
+    notify_username: notifyusername
+    notify_password: notifypassword
 server:
   port: 8080
 liquibase:

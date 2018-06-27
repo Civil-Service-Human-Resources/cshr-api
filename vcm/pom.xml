@@ -82,7 +82,11 @@
 			<version>4.5.3</version>
 			<type>jar</type>
 		</dependency>
-
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>0.9.0</version>
+		</dependency>
         <!-- Testing -->
         <dependency>
             <groupId>org.testng</groupId>
@@ -95,6 +99,12 @@
 			<artifactId>spring-security-test</artifactId>
 			<version>4.2.3.RELEASE</version>
 			<scope>test</scope>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>uk.gov.service.notify</groupId>
+			<artifactId>notifications-java-client</artifactId>
+			<version>3.9.1-RELEASE</version>
 			<type>jar</type>
 		</dependency>
         <dependency>
@@ -134,4 +144,14 @@
             </plugin>
         </plugins>
     </build>
+	<repositories>
+		<repository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>bintray-gov-uk-notify-maven</id>
+			<name>bintray</name>
+			<url>https://dl.bintray.com/gov-uk-notify/maven</url>
+		</repository>
+	</repositories>
 </project>

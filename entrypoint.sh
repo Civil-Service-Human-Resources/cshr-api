@@ -1,6 +1,6 @@
 #! /bin/bash
 ##
-# Due to some restrictions with the Azure platform we need to 
+# Due to some restrictions with the Azure platform we need to
 # run filebeat alongside the application in the same container.
 # In order to achieve this we need an entrypoint file
 
@@ -23,10 +23,10 @@ if [[ ${#} -eq 0 ]]; then
             --spring.security.search_username=${SEARCH_USERNAME} \
             --spring.security.search_password=${SEARCH_PASSWORD} \
             --spring.security.crud_username=${CRUD_USERNAME} \
-            --spring.security.crud_password=${CRUD_PASSWORD}
+            --spring.security.crud_password=${CRUD_PASSWORD} \
+            --spring.notifyService.templateid=${NOTIFY_SERVICE_TEMPLATE_ID} \
+            --spring.notifyservice.notifyApiKey=${NOTIFY_SERVICE_NOTIFY_API_KEY}
 else
     echo "Running command:"
     exec "$@"
 fi
-
-

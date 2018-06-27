@@ -34,7 +34,7 @@ paths:
         '200':
           description: OK
           schema:
-            $ref: '#/definitions/Page«Department»'
+            $ref: '#/definitions/Page%C2%ABDepartment%C2%BB'
     post:
       tags:
         - department-controller
@@ -140,7 +140,7 @@ paths:
         '200':
           description: OK
           schema:
-            $ref: '#/definitions/Page«Vacancy»'
+            $ref: '#/definitions/Page%C2%ABVacancy%C2%BB'
     post:
       tags:
         - vacancy-controller
@@ -166,7 +166,7 @@ paths:
     post:
       tags:
         - vacancy-controller
-      summary: Saves a vacancy which means create if it does not exist or update if it does
+      summary: Creates a new or updates an existing vacancy
       operationId: save
       consumes:
         - application/json
@@ -205,13 +205,40 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/VacancySearchParameters'
+        - name: cshr-authentication
+          in: header
+          description: cshr-authentication
+          required: false
+          type: string
       responses:
         '200':
           description: OK
           schema:
-            $ref: '#/definitions/Page«Vacancy»'
+            $ref: '#/definitions/SearchResponse'
         '503':
           description: The location service is unavailable.
+          schema:
+            $ref: '#/definitions/VacancyError'
+  /vacancy/verifyemail:
+    post:
+      tags:
+        - vacancy-search-controller
+      summary: Generate a JWT to enable access to internal vacancies
+      operationId: verifyEmailJWT
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: emailAddressJSON
+          description: emailAddressJSON
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
           schema:
             $ref: '#/definitions/VacancyError'
   '/vacancy/{vacancyId}':
@@ -317,7 +344,8 @@ definitions:
           - LEADER
           - COMMITTED
       disabilityConfidenceLevelLastUpdate:
-        $ref: '#/definitions/Timestamp'
+        type: string
+        example: 'yyyy-MM-dd''T''HH:mm:ss.SSSZ'
       disabilityLogo:
         type: string
       id:
@@ -401,41 +429,23 @@ definitions:
       totalPages:
         type: integer
         format: int32
-  Sort:
-    type: object
-  Timestamp:
+  SearchResponse:
     type: object
     properties:
-      date:
-        type: integer
-        format: int32
-      day:
-        type: integer
-        format: int32
-      hours:
-        type: integer
-        format: int32
-      minutes:
-        type: integer
-        format: int32
-      month:
-        type: integer
-        format: int32
-      nanos:
-        type: integer
-        format: int32
-      seconds:
-        type: integer
-        format: int32
-      time:
-        type: integer
-        format: int64
-      timezoneOffset:
-        type: integer
-        format: int32
-      year:
-        type: integer
-        format: int32
+      authenticatedEmail:
+        type: string
+      cshrServiceStatuses:
+        type: array
+        items:
+          $ref: '#/definitions/CSHRServiceStatus'
+      vacancies:
+        $ref: '#/definitions/Page%C2%ABVacancy%C2%BB'
+      vacancyErrors:
+        type: array
+        items:
+          $ref: '#/definitions/VacancyError'
+  Sort:
+    type: object
   Vacancy:
     type: object
     properties:
@@ -542,6 +552,14 @@ definitions:
           type: string
       message:
         type: string
+      searchStatusCode:
+        type: string
+        enum:
+          - INVALID_JWT
+          - NULL_JWT
+          - EXPIRED_JWT
+          - JWT_NO_ELIGIBILITY_CLAIM
+          - EXCEPTION
       status:
         type: string
         enum:
@@ -643,7 +661,14 @@ definitions:
         type: string
         description: word found in title or description of vacancy
       location:
+        description: location of the vacancy
         $ref: '#/definitions/Location'
+      vacancyEligibility:
+        type: string
+        enum:
+          - PUBLIC
+          - ACROSS_GOVERNMENT
+          - INTERNAL
       workingPatterns:
         type: array
         example: FLEXIBLE_WORKING FULL_TIME PART_TIME JOB_SHARE HOME_WORKING

@@ -18,4 +18,5 @@ public class SearchParameters {
 
     private VacancySearchParameters vacancySearchParameters;
     private Coordinates coordinates;
+	private VacancyEligibility vacancyEligibility;
 }

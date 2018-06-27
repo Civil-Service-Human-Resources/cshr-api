@@ -28,6 +28,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${spring.security.crud_password}")
     private String crudPassword;
 
+    @Value("${spring.security.notify_username}")
+    private String notifyUsername;
+
+    @Value("${spring.security.notify_password}")
+    private String notifyPassword;
+
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
@@ -48,5 +54,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .withUser(searchUsername)
                 .password(searchPassword)
                 .roles("SEARCH_ROLE");
+
+        auth.inMemoryAuthentication()
+                .withUser(notifyUsername)
+                .password(notifyPassword)
+                .roles("NOTIFY_ROLE");
 	}
 }

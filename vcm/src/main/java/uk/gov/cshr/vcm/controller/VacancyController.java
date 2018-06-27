@@ -35,7 +35,7 @@ import uk.gov.cshr.vcm.service.ApplicantTrackingSystemService;
 @Api(value = "vacancyservice")
 @RolesAllowed("CRUD_ROLE")
 public class VacancyController {
-    
+
     private static final Logger log = LoggerFactory.getLogger(VacancyController.class);
 
     private final ApplicantTrackingSystemService applicantTrackingSystemService;
