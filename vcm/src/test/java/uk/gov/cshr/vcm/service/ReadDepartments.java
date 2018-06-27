@@ -36,7 +36,7 @@ public class ReadDepartments {
 //                .build();
 
 
-        Reader reader = Files.newBufferedReader(Paths.get("/Users/gordon/Desktop/RPGDepartmentDataMaster.csv"));
+        Reader reader = Files.newBufferedReader(Paths.get("src/test/resources/RPGDepartmentDataMaster.csv"));
         CSVReader csvReader = new CSVReader(reader);
 
 		// skip first line

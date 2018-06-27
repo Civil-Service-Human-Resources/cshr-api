@@ -8,7 +8,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import javax.annotation.security.RolesAllowed;
 import liquibase.util.csv.CSVReader;
 import org.slf4j.Logger;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.cshr.vcm.model.Department;
+import uk.gov.cshr.vcm.model.EmailExtension;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
 
 @RestController
@@ -113,7 +116,7 @@ public class DepartmentController {
     @ApiOperation(value = "load departments", nickname = "load")
     public ResponseEntity<Department> load() throws IOException {
 
-        Reader reader = Files.newBufferedReader(Paths.get("/Users/gordon/Desktop/RPGDepartmentDataMaster.csv"));
+        Reader reader = Files.newBufferedReader(Paths.get("src/test/resources/RPGDepartmentDataMaster.csv"));
         CSVReader csvReader = new CSVReader(reader);
 
 		// skip first line
@@ -131,8 +134,12 @@ public class DepartmentController {
 			Department department = new Department();
 			department.setName(name);
 
-			HashSet<String> emailSet = new HashSet<>();
-			emailSet.addAll(Arrays.asList(emails.split("\n")));
+			Set<EmailExtension> emailSet = new HashSet<>();
+            List<String> emailsList = Arrays.asList(emails.split("\n"));
+
+            for (String string : emailsList) {
+                emailSet.add( EmailExtension.builder().emailExtension(string).build());
+            }
 
 			department.setAcceptedEmailExtensions(emailSet);
 

@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.cshr.vcm.controller.exception.SearchStatusCode;
 import uk.gov.cshr.vcm.controller.exception.VacancyError;
 import uk.gov.cshr.vcm.model.Department;
+import uk.gov.cshr.vcm.model.EmailExtension;
 import uk.gov.cshr.vcm.model.SearchResponse;
 import uk.gov.cshr.vcm.model.VacancyEligibility;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
@@ -137,14 +138,14 @@ public class CshrAuthenticationService {
 		Iterable<Department> departments = departmentRepository.findAll();
 
 		departments.forEach(d -> {
-			Set<String> emailExtensions = d.getAcceptedEmailExtensions();
-			for (String emailExtension : emailExtensions) {
+			Set<EmailExtension> emailExtensions = d.getAcceptedEmailExtensions();
+			for (EmailExtension emailExtension : emailExtensions) {
 
-				if ( emailExtension.trim().isEmpty() ) {
+				if ( emailExtension.getEmailExtension().trim().isEmpty() ) {
 					continue;
 				}
 
-				String pattern = emailExtension.replace(".", "\\.").replace("x", "([^$]*)");
+				String pattern = emailExtension.getEmailExtension().replace(".", "\\.").replace("x", "([^$]*)");
 				pattern = "([^$]*)" + pattern;
 				Pattern r = Pattern.compile(pattern);
 				Matcher m = r.matcher(emailAddress);

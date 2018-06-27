@@ -6,7 +6,6 @@ import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -15,6 +14,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinTable;
+import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -69,7 +69,7 @@ public class Department implements Serializable {
 
 	@Builder.Default
 	@JoinTable(name = "department_acceptedemailextensions")
-	@ElementCollection(fetch = FetchType.EAGER)
+	@OneToMany( mappedBy = "emailExtension", fetch = FetchType.EAGER)
 	@Column(name = "acceptedemailextensions")
-	private Set<String> acceptedEmailExtensions = new HashSet<>();
+	private Set<EmailExtension> acceptedEmailExtensions = new HashSet<>();
 }
