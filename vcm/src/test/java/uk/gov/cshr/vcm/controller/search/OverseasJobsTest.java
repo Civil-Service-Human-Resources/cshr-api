@@ -17,7 +17,6 @@ import static org.mockito.BDDMockito.given;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
-import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
@@ -33,11 +32,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.cshr.vcm.VcmApplication;
-import uk.gov.cshr.vcm.controller.VacancyPage;
+import uk.gov.cshr.vcm.controller.SearchResponsePage;
 import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
 import uk.gov.cshr.vcm.model.Coordinates;
 import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.model.Location;
+import uk.gov.cshr.vcm.model.SearchResponse;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancyLocation;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
@@ -145,14 +145,14 @@ public class OverseasJobsTest extends AbstractTestNGSpringContextTests {
         overseasVacancy.setOverseasJob(Boolean.TRUE);
         vacancyRepository.save(overseasVacancy);
 
-        Page<Vacancy> result = findVancancies("bristol", DONT_INCLUDE_OVERSEAS);
-        List<Vacancy> resultsList = result.getContent();
+        SearchResponse result = findVancancies("bristol", DONT_INCLUDE_OVERSEAS);
+        List<Vacancy> resultsList = result.getVacancies().getContent();
 
         Assert.assertEquals(1, resultsList.size());
         Assert.assertTrue("Expect Bristol Job", resultsList.get(0).getTitle().equals(BRISTOL_JOB_TITLE));
 
         result = findVancancies("bristol", INCLUDE_OVERSEAS);
-        resultsList = result.getContent();
+        resultsList = result.getVacancies().getContent();
 
         Assert.assertEquals(2, resultsList.size());
     }
@@ -175,13 +175,13 @@ public class OverseasJobsTest extends AbstractTestNGSpringContextTests {
         overseasVacancy.setOverseasJob(Boolean.TRUE);
         vacancyRepository.save(overseasVacancy);
 
-        Page<Vacancy> result = findVancancies("bristolxx", DONT_INCLUDE_OVERSEAS);
-        List<Vacancy> resultsList = result.getContent();
+        SearchResponse result = findVancancies("bristolxx", DONT_INCLUDE_OVERSEAS);
+        List<Vacancy> resultsList = result.getVacancies().getContent();
 
         Assert.assertEquals(1, resultsList.size());
     }
 
-    public Page<Vacancy> findVancancies(String place, Boolean includeOverseas) throws Exception {
+    public SearchResponse findVancancies(String place, Boolean includeOverseas) throws Exception {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -203,7 +203,7 @@ public class OverseasJobsTest extends AbstractTestNGSpringContextTests {
                 .andReturn();
 
         String searchResponse = mvcResult.getResponse().getContentAsString();
-        return objectMapper.readValue(searchResponse, VacancyPage.class);
+        return objectMapper.readValue(searchResponse, SearchResponsePage.class);
     }
 
     private static Timestamp getTime(int numberOfDaysFromNow) {

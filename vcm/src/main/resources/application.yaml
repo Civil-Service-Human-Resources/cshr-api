@@ -23,6 +23,10 @@ spring:
     search_password: searchpassword
     crud_username: crudusername
     crud_password: crudpassword
+  notifyservice:
+    templateid:
+    notifyApiKey:
+    accountEnableURL:
 server:
   port: 8080
 liquibase:

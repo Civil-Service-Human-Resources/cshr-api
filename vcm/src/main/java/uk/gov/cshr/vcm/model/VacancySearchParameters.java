@@ -41,6 +41,9 @@ public class VacancySearchParameters implements Serializable {
                       example = "FLEXIBLE_WORKING FULL_TIME PART_TIME JOB_SHARE HOME_WORKING")
 	private String[] workingPatterns;
 
+	@ApiModelProperty
+	private VacancyEligibility vacancyEligibility;
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
