@@ -35,7 +35,7 @@ import uk.gov.cshr.vcm.service.ApplicantTrackingSystemService;
 @Api(value = "vacancyservice")
 @RolesAllowed("CRUD_ROLE")
 public class VacancyController {
-
+    
     private static final Logger log = LoggerFactory.getLogger(VacancyController.class);
 
     private final ApplicantTrackingSystemService applicantTrackingSystemService;
@@ -65,6 +65,7 @@ public class VacancyController {
     }
 
     private Vacancy createVacancy(Vacancy vacancy) {
+
         if (vacancy.getVacancyLocations() != null) {
             vacancy.getVacancyLocations().forEach(vacancyLocation -> vacancyLocation.setVacancy(vacancy));
         }
@@ -89,8 +90,8 @@ public class VacancyController {
     }
 
     private Vacancy updateVacancy(@RequestBody Vacancy vacancyUpdate, Vacancy foundVacancy) {
-        vacancyUpdate.getVacancyLocations().forEach(vacancyLocation -> vacancyLocation.setVacancy(vacancyUpdate));
 
+        vacancyUpdate.getVacancyLocations().forEach(vacancyLocation -> vacancyLocation.setVacancy(vacancyUpdate));
         vacancyUpdate.setId(foundVacancy.getId());
         sanitiseApplyURL(vacancyUpdate);
         return vacancyRepository.save(vacancyUpdate);
@@ -159,13 +160,13 @@ public class VacancyController {
     private void sanitiseApplyURL(Vacancy vacancy) {
 
         String originalURL = vacancy.getApplyURL();
-
+        
         String url = vacancy.getApplyURL();
-
+        
         if (  url != null &&  !url.toLowerCase().matches("^\\w+://.*")) {
-            url = "https://" + url;
-}
-
+            url = "https://" + url;            
+        }
+        
         String[] schemes = {"http","https"};
         UrlValidator urlValidator = new UrlValidator(schemes);
         if (! urlValidator.isValid(url)) {
