@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import uk.gov.cshr.status.CSHRServiceStatus;
+import uk.gov.service.notify.NotificationClientException;
 
 @ControllerAdvice
 public class VacancyRestResponseExceptionHandler extends ResponseEntityExceptionHandler {
@@ -72,6 +73,23 @@ public class VacancyRestResponseExceptionHandler extends ResponseEntityException
     public ResponseEntity<Object> handleExpiredJwtException(JwtException ex, WebRequest request) {
         log.error(ex.getMessage(), ex);
         VacancyError vacancyError = new VacancyError(HttpStatus.UNAUTHORIZED, ex.getMessage(), null, SearchStatusCode.EXCEPTION);
+        return handleExceptionInternal(ex, vacancyError, new HttpHeaders(), vacancyError.getStatus(), request);
+    }
+
+    @ExceptionHandler({NotificationClientException.class})
+    public ResponseEntity<Object> handleNotificationClientException(NotificationClientException ex, WebRequest request) {
+        
+        log.error(ex.getMessage(), ex);
+        HttpStatus httpStatus;
+
+        try {
+            httpStatus = HttpStatus.valueOf(ex.getHttpResult());
+        }
+        catch(IllegalArgumentException e) {
+            httpStatus = HttpStatus.NOT_FOUND;
+        }
+
+        VacancyError vacancyError = new VacancyError(httpStatus, ex.getMessage(), null, SearchStatusCode.EXCEPTION);
         return handleExceptionInternal(ex, vacancyError, new HttpHeaders(), vacancyError.getStatus(), request);
     }
 }
