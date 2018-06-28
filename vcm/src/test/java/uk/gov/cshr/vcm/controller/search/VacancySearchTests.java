@@ -254,16 +254,16 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void testIncludeInternalVacancy() throws Exception {
+    public void testIncludeAcrossGovernmentVacancy() throws Exception {
 
         Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
-		newcastleVacancy.setInternalOpeningDate(YESTERDAY);
+		newcastleVacancy.setGovernmentOpeningDate(YESTERDAY);
 		newcastleVacancy.setPublicOpeningDate(YESTERDAY);
         newcastleVacancy.setTitle("Newcastle Job");
         saveVacancy(newcastleVacancy);
 
         Vacancy newcastleVacancy2 = createVacancyPrototype(newcastleLocation2);
-		newcastleVacancy2.setInternalOpeningDate(YESTERDAY);
+		newcastleVacancy2.setGovernmentOpeningDate(YESTERDAY);
 		newcastleVacancy2.setPublicOpeningDate(TOMORROW);
         newcastleVacancy2.setTitle("Newcastle Job 2");
         saveVacancy(newcastleVacancy2);
@@ -317,7 +317,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
     @Test
     public void testHandleUnauthorisedEmailOnVerifyEmail() throws Exception {
-        
+
         String requestBody = "{ \"emailAddress\": \"anyone@yahoo.co.uk\" }";
 
         MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/verifyemail")

@@ -320,7 +320,7 @@ public class HibernateSearchService {
 
 			openQuery = qb
                 .range()
-                .onField("vacancy.internalOpeningDate")
+                .onField("vacancy.governmentOpeningDate")
                 .ignoreFieldBridge()
                 .below(sdf.format(new Date()))
                 .excludeLimit()

@@ -135,10 +135,12 @@ public class Vacancy implements Serializable {
     @NonNull
     private String eligibility;
 
-    @Field(store = Store.YES)
+    @Field(store = Store.YES, analyze = Analyze.NO)
+    @DateBridge(resolution = Resolution.MINUTE, encoding = EncodingType.STRING)
+    @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT+0")
     @Column(name = "government_opening_date")
-    private Timestamp governmentOpeningDate;
+    private Date governmentOpeningDate;
 
     @Field(store = Store.YES, analyze = Analyze.NO)
     @DateBridge(resolution = Resolution.MINUTE, encoding = EncodingType.STRING)
