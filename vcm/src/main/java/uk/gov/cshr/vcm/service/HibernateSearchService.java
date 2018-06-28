@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
 import uk.gov.cshr.vcm.model.SearchParameters;
 import uk.gov.cshr.vcm.model.Vacancy;
+import uk.gov.cshr.vcm.model.VacancyEligibility;
 import uk.gov.cshr.vcm.model.VacancyLocation;
 
 @Service
@@ -71,7 +72,7 @@ public class HibernateSearchService {
 
             Query searchtermQuery = getSearchTermQuery(searchParameters, qb);
             Query salaryQuery = getSalaryQuery(searchParameters, qb);
-            Query openClosed = getOpenClosedQuery(qb);
+            Query openClosed = getOpenClosedQuery(qb, searchParameters.getVacancyEligibility());
             Query departmentQuery = getDepartmentQuery(searchParameters, qb);
             Query locationQuery = getLocationQuery(searchParameters, qb);
 
@@ -300,7 +301,7 @@ public class HibernateSearchService {
         return salaryQuery;
     }
 
-    private Query getOpenClosedQuery(QueryBuilder qb) {
+    private Query getOpenClosedQuery(QueryBuilder qb, VacancyEligibility vacancyEligibility) {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
 
@@ -312,13 +313,28 @@ public class HibernateSearchService {
                 .excludeLimit()
                 .createQuery();
 
-        Query openQuery = qb
+        Query openQuery;
+
+		if ( vacancyEligibility.equals(VacancyEligibility.INTERNAL)
+				|| vacancyEligibility.equals(VacancyEligibility.ACROSS_GOVERNMENT) ) {
+
+			openQuery = qb
+                .range()
+                .onField("vacancy.governmentOpeningDate")
+                .ignoreFieldBridge()
+                .below(sdf.format(new Date()))
+                .excludeLimit()
+                .createQuery();
+		}
+		else {
+			openQuery = qb
                 .range()
                 .onField("vacancy.publicOpeningDate")
                 .ignoreFieldBridge()
                 .below(sdf.format(new Date()))
                 .excludeLimit()
                 .createQuery();
+		}
 
         Query openClosedQuery = qb.bool().must(openQuery).must(closedQuery).createQuery();
         return openClosedQuery;
