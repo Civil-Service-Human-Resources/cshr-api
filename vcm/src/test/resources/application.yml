@@ -24,6 +24,8 @@ spring:
   notifyservice:
     templateid:
     notifyApiKey: 
+    notify_username: notifyusername
+    notify_password: notifypassword
 server:
   port: 8080
 liquibase:
