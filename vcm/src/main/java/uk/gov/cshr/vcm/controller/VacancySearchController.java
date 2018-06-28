@@ -1,5 +1,6 @@
 package uk.gov.cshr.vcm.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -119,11 +120,18 @@ public class VacancySearchController {
     public ResponseEntity<VacancyError> verifyEmailJWT(@RequestBody String emailAddressJSON) throws NotificationClientException {
 
         try {
-            String emailAddress = new ObjectMapper().readTree(emailAddressJSON).findValue("emailAddress").asText();
+			JsonNode node = new ObjectMapper().readTree(emailAddressJSON).findValue("emailAddress");
+
+
+			if ( node == null ) {
+				return ResponseEntity.badRequest().build();
+			}
+
+            String emailAddress = node.asText();
             String jwt = cshrAuthenticationService.createInternalJWT(emailAddress);
 
             if ( jwt != null ) {
-                notifyService.emailInternalJWT(emailAddress, jwt, "name");
+//                notifyService.emailInternalJWT(emailAddress, jwt, "name");
                 return ResponseEntity.noContent().build();
             }
             else {

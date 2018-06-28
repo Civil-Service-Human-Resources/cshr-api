@@ -1,19 +1,23 @@
 package uk.gov.cshr.vcm.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
+import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -63,6 +67,9 @@ public class Department implements Serializable {
     @Column(name = "logopath")
     private String logoPath;
 
-    @Column(name = "acceptedemailextensions")
-    private String acceptedEmailExtensions;
+	@Builder.Default
+	@JoinTable(name = "department_acceptedemailextensions")
+	@OneToMany( mappedBy = "emailExtension", fetch = FetchType.EAGER)
+	@Column(name = "acceptedemailextensions")
+	private Set<EmailExtension> acceptedEmailExtensions = new HashSet<>();
 }

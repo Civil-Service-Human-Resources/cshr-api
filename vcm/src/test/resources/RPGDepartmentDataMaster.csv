@@ -1,0 +1,805 @@
+id,Dept id,Dept name,Status,Disability confidence level,Disability confident last update,Logo needed?,Logo path,Accepted email extensions (comma delimited),Date created,Date changed,Is Parent,Parent,Advertise jobs on WCN?,Register only access?
+1,1-ACAS,"Advisory, Conciliation and Arbitration Service",,,2 Feb 2018,,/1-ACAS.png,"@acas.org.uk
+@certoffice.org
+@cac.gov.uk
+",2 Feb 2018,23 May 2018,Yes,,Yes,
+2,2-APHA,Animal and Plant Health Agency,,,2 Feb 2018,,/2-APHA.png,"@ahvla.gsi.gov.uk
+@ndwa.co.uk
+@vla.defra.gsi.gov.uk
+@apha.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,"Department for Environment, Food and Rural Affairs",Yes,
+3,3-AGO,Attorney General's Office,,,2 Feb 2018,,/3-AGO.png,"@attorneygeneral.gsi.gov.uk
+",2 Feb 2018,23 May 2018,Yes,,Yes,
+4,4- BBSRC,Biotechnology and Biological Sciences Research Council,,Employer,2 Feb 2018,,/4-BBSRC.gif,"@bbsrc.ac.uk
+@ssc.rcuk.ac.uk
+",2 Feb 2018,23 May 2018,Yes,,Yes,
+5,5- BC,British Council,,Employer,2 Feb 2018,,/5- BC.png,"@britishcouncil.org
+",2 Feb 2018,23 May 2018,,Foreign and Commonwealth Office,Yes,
+6,6-BTPA,British Transport Police Authority,,,2 Feb 2018,,/6-BTPA.gif,#ERROR!,2 Feb 2018,23 May 2018,,Department for Transport,Yes,
+7,7-CO,Cabinet Office,,Leader,2 Feb 2018,,/7-CO.png,"@acoba.x.gsi.gov.uk
+@acpo.x.gsi.gov.uk
+@asprs.x.gsi.gov.uk
+@bcommengland.x.gsi.gov.uk
+@butlerreview.x.gsi.gov.uk
+@cabinetoffice.gov.uk
+@cabinet-office.gsi.gov.uk
+@cabinetoffice.gsi.net
+@cabinet-office.x.gsi.gov.uk
+@pco.x.gsi.gov.uk
+@cab-test.x.gsi.gov.uk
+@civilservicecommissioners.gov.uk
+@civilservicecommissioners.x.gsi.gov.uk
+@commonsleader.x.gsi.gov.uk
+@csc.x.gsi.gov.uk
+@directgov.gsi.gov.uk
+@government-skills.x.gsi.gov.uk
+@hmso.x.gsi.gov.uk
+@independentoffices.x.gsi.gov.uk
+@isc.x.gsi.gov.uk
+@jcpc.x.gsi.gov.uk
+@lordsappointments.x.gsi.gov.uk
+@nationalarchives.x.gsi.gov.uk
+@no10.x.gsi.gov.uk
+@ocpa.x.gsi.gov.uk
+@standards.x.gsi.gov.uk
+@cslearning.gsi.gov.uk
+@digital.cabinet-office.gov.uk
+@co.gsi.gov.uk
+@bcommengland.gsi.gov.uk
+@gpa.gov.uk
+@erg.cabinet-office.gov.uk
+@gpa.gov.uk
+@csc.gsi.gov.uk
+@ipa.gov.uk
+@pco.gov.uk
+@cslearning.gov.uk
+@csep.gov.uk
+@faststream.civilservice.gov.uk
+@csc.gov.uk@gpa.gov.uk
+",2 Feb 2018,23 May 2018,Yes,,Yes,
+8,8-CQC,Care Quality Commission,,Committed,2 Feb 2018,,/8-CQC.png,"@cqc.org.uk
+",2 Feb 2018,23 May 2018,,Department of Health and Social Care,Yes,
+9,9-CEFAS,"Centre for Environment, Fisheries and Aquaculture Science",,,2 Feb 2018,,/9-CEFAS.png,"@cefas.co.uk
+",2 Feb 2018,23 May 2018,,"Department for Environment, Food and Rural Affairs",Yes,
+10,10-CC,Charity Commission,,,2 Feb 2018,,/10-CC.jpg,"@charitycommission.gsi.gov.uk
+@comisiwnelusennau.gsi.gov.uk
+@cwgc.org
+@hrp.org.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+11,11-CFCASS,Children and Family Court Advisory and Support Service,,,2 Feb 2018,,/11-CFCASS.png,"@cafcass.gov.uk
+@cafcass.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+12,12-COP,College of Policing,,,2 Feb 2018,,/12-COP.png,"@college.pnn.police.uk
+",2 Feb 2018,23 May 2018,,Home Office,Yes,
+13,13-CoCC,Committee on Climate Change,,,2 Feb 2018,,/13-CoCC.png,"@theccc.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,Department of Energy and Climate Change,Yes,
+14,14-CPAUK,Commonwealth Parliamentary Association UK,,,2 Feb 2018,,/14-CPAUK.jpg,"@parliament.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+15,15-CH,Companies House,,,2 Feb 2018,,/15-CH.png,"@companieshouse.gov.uk
+@companieshouse.gsi.gov.uk
+",2 Feb 2018,24 May 2018,,"Advisory, Conciliation and Arbitration Service",Yes,
+16,16-CMA,Competition & Markets Authority,,,2 Feb 2018,,/16-CMA.png,"@cma.gsi.gov.uk
+",2 Feb 2018,24 May 2018,Yes,,Yes,
+17,17-CC,Competition Commission,Deactivated,,2 Feb 2018,,,,2 Feb 2018,23 May 2018,,Competition & Markets Authority,No,
+18,18-CS,Competition Service/Competition Appeal Tribunal,,,2 Feb 2018,,/18-CS.jpg,"@catribunal.org.uk
+",2 Feb 2018,23 May 2018,,"Advisory, Conciliation and Arbitration Service",Yes,
+19,19-CCW,Consumer Council for Water,,,2 Feb 2018,,/19-CCW.png,"@ccwater.org.uk
+",2 Feb 2018,23 May 2018,,Welsh Government,Yes,
+20,20-CCRC,Criminal Cases Review Commission,,Committed,2 Feb 2018,,/20-CCRC.png,"@ccrc.x.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,Ministry of Justice,Yes,
+21,21-CICA,Criminal Injuries Compensation Authority,,,2 Feb 2018,,/21-CICA.png,"@cica.gsi.gov.uk
+@cicap.gov.uk
+",2 Feb 2018,23 May 2018,,Ministry of Justice,Yes,
+22,22-CDO,Cross Departmental Opportunities,,,2 Feb 2018,,,,2 Feb 2018,23 May 2018,,,Yes,
+23,23-CCS,Crown Commercial Service,,Employer,2 Feb 2018,,/23-CCS.png,"@cabinet-office.gsi.gov.uk
+@gps.gsi.gov.uk
+@ccs.gsi.gov.uk
+@crowncommercial.gov.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+24,24-COPFS,Crown Office and Procurator Fiscal Service,,,2 Feb 2018,,/24-COPFS.png,"@copfs.gsi.gov.uk
+@linets.gov.uk
+",2 Feb 2018,23 May 2018,,Scottish Government,Yes,
+25,25-CPS,Crown Prosecution Service,,Leader,2 Feb 2018,,/25-CPS.png,"@cps.gov.uk
+",2 Feb 2018,29 May 2018,,,Yes,
+26,26-DECA,Defence Electronics & Components Agency,,Employer,2 Feb 2018,,/26-DECA,"@deca.mod.uk
+",2 Feb 2018,23 May 2018,,Ministry of Defence,Yes,
+27,27-DSTL,Defence Science and Technology Laboratory,,Committed,2 Feb 2018,,/27-DSTL.png,"@dstl.gov.uk
+",2 Feb 2018,23 May 2018,,Ministry of Defence,Yes,
+28,28-BEIS,"Department for Business, Energy & Industrial Strategy",,Leader,2 Feb 2018,,/28-BEIS.png,"@appreticeships.org.uk
+@bis.gsi.gov.uk
+@nmo.gov.uk
+@ome.uk.com
+@gos.cabinetoffice.gov.uk
+@nmro.gov.uk
+@officeforlifesciences.gsi.gov.uk
+@beis.gov.uk
+@DECC.gsi.gov.uk
+",2 Feb 2018,1 Jun 2018,Yes,,Yes,
+29,39-DCMS,"Department for Digital, Culture, Media and Sport",,,2 Feb 2018,,/39-DCMS.png,"@culture.gov.uk
+",2 Feb 2018,29 May 2018,Yes,,Yes,
+30,30-DfE,Department for Education,,Leader,2 Feb 2018,,/30-DfE.png,"@geo.gsi.gov.uk
+@education.gov.uk
+
+
+",2 Feb 2018,24 May 2018,Yes,,Yes,
+31,31-DEFRA,"Department for Environment, Food and Rural Affairs",,,2 Feb 2018,,/31-DEFRA.png,"@ahvla.gsi.gov.uk
+@animalhealth.gsi.gov.uk
+@cabe.org.uk
+@defra.gsi.gov.uk
+@environment-agency.gov.uk
+@kew.org
+@naturalengland.org.uk
+@rpa.gsi.gov.uk
+@apha.gsi.gov.uk
+",2 Feb 2018,23 May 2018,Yes,,Yes,
+32,32-DEXEU,Department for Exiting the European Union,,Leader,2 Feb 2018,,/32-DEXEU.png,"@cabinetoffice.gov.uk
+@dexeu.gov.uk
+",2 Feb 2018,23 May 2018,,Cabinet Office,Yes,
+33,33-DfID,Department for International Development,,Leader,2 Feb 2018,,/33-DfID.png,"@dfid.gov.uk
+@dfid.gsx.gov.uk
+",2 Feb 2018,23 May 2018,Yes,,Yes,
+34,34-DfIT,Department for International Trade,,Leader,2 Feb 2018,,/34-DfIT.png,"@digital.trade.gov.uk
+@trade.gov.uk
+@mobile.trade.gov.uk
+@fco.gov.uk
+",2 Feb 2018,24 May 2018,,,Yes,
+35,35-DfT,Department for Transport,,Leader,2 Feb 2018,,/35-DfT.png,"@dft.gsi.gov.uk
+@dftssc.gsi.gov.uk
+@passengerfocus.org.uk
+@aaib.gov.uk
+@olev.gsi.gov.uk
+@dvsa.gov.uk
+@railexecutive.gsi.gov.uk
+@OTC.gov.uk
+@dft.gov.uk
+@dvla.gsi.gov.uk
+@vca.gov.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+36,36-DWP,Department for Work and Pensions,,Leader,2 Feb 2018,,/36-DWP.png,"@childmaintenance.gsi.gov.uk
+@csa.gsi.gov.uk
+@dwp.gsi.gov.uk
+@irs-review.org.uk
+@jiu.gsi.gov.uk
+@jobcentreplus.co.uk
+@jobcentreplus.gsi.gov.uk
+@jsastc.co.uk
+@thepensionservice.gsi.gov.uk
+@CSEMPLOYEEPOLICY.GSI.GOV.UK
+@cms.gsi.gov.uk
+@pensionwise.gov.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+37,37-DECC,Department of Energy and Climate Change,,,2 Feb 2018,,/37-DECC.png,,2 Feb 2018,23 May 2018,Yes,,Yes,
+38,38-DoH,Department of Health and Social Care,,#N/A,2 Feb 2018,,/38-DoH.png,"@cqc.org.uk
+@dh.gsi.gov.uk
+@gscc.org.uk
+@hpa.org.uk
+@mhra.gsi.gov.uk
+@nibsc.hpa.org.uk
+@HFEA.gov.uk
+@hta.gov.uk
+@nice.org.uk
+@nta-nhs.org.uk
+@nhsla.com
+@appointments.org.uk
+@chre.org.uk
+@PPA.NHS.UK
+@officeforlifesciences.gsi.gov.uk
+",2 Feb 2018,23 May 2018,Yes,,Yes,
+39,39-DBS,Disclosure & Barring Service,,,2 Feb 2018,,/39-DBS.png,,2 Feb 2018,23 May 2018,,Home Office,Yes,
+40,40-DVLA,Driver and Vehicle Licensing Agency,,,2 Feb 2018,,/40-DVLA.png,"@dvla.gsi.gov.uk
+@digital.dvla.gov.uk
+@dsa.gsi.gov.uk
+@vosa.gov.uk
+@otc.gsi.gov.uk
+@vosa.gsi.gov.uk
+@dvsa.gov.uk
+@OTC.gov.uk
+",2 Feb 2018,23 May 2018,,Department for Transport,Yes,
+41,41-DVSA,Driver and Vehicle Standards Agency,,,2 Feb 2018,,/41-DVSA.png,"@dsa.gsi.gov.uk
+@vosa.gov.uk
+@otc.gsi.gov.uk
+@vosa.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,Department for Transport,Yes,
+42,42-ESRC,Economic and Social Research Council,,,2 Feb 2018,,/42-ESRC.png,"@esrc.ac.uk
+",2 Feb 2018,23 May 2018,,Department for Transport,Yes,
+43,43-ESFA,Education and Skills Funding Agency,,,2 Feb 2018,,/43-ESFA.png,"@skillsfundingagency.bis.gov.uk
+@apprenticeships.gov.uk
+@sfa.bis.gov.uk
+@education.gov.uk
+@fasst.org.uk
+",2 Feb 2018,23 May 2018,,Department for Education,Yes,
+44,44-EPSRC,Engineering and Physical Sciences Research Council,,,2 Feb 2018,,/44-EPSRC.png,"@epsrc.ac.uk
+@rcuk.ac.uk
+@ssc.rcuk.ac.uk
+",2 Feb 2018,23 May 2018,,Biotechnology and Biological Sciences Research Council,Yes,
+45,45-EA,Environment Agency,,Committed,2 Feb 2018,,/45-EA.jpg,"@environment-agency.gov.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+46,46-EHRC,Equality and Human Rights Commission,,,2 Feb 2018,,/46-EHRCpng,"@equalityhumanrights.com
+",2 Feb 2018,23 May 2018,,Home Office,Yes,
+47,47-ESTRN,ESTYN,,,2 Feb 2018,,/47-ESTRN.jpg,"@estyn.gov.uk
+",2 Feb 2018,23 May 2018,,Home Office,Yes,
+48,48-FSA,Food Standards Agency,,,2 Feb 2018,,/48-FSA.png,"@foodstandards.gov.uk
+@food.gov.uk
+@foodstandards.gsi.gov.uk
+",2 Feb 2018,23 May 2018,Yes,,Yes,
+49,49-FSS,Food Standards Scotland,,Committed,2 Feb 2018,,/49-FSS.png,@fss.scot,2 Feb 2018,23 May 2018,,,Yes,
+50,50-50-FCO,Foreign and Commonwealth Office,,Leader,2 Feb 2018,,/50-FCO.png,"@fco.gov.uk
+@fco.gsi.gov.uk
+",2 Feb 2018,23 May 2018,Yes,,Yes,
+51,51-FC,Forestry Commission,,,2 Feb 2018,,/51-FC.jpg,"@forestry.gsi.gov.uk
+@forestryengland.uk
+@forestrycommission.gov.uk",2 Feb 2018,23 May 2018,Yes,,Yes,
+52,52-FCE,Forestry Commission England,,,2 Feb 2018,,/52-FCE.png,"@forestry.gsi.gov.uk
+@forestryengland.uk
+@forestrycommission.gov.uk",2 Feb 2018,23 May 2018,,Forestry Commission,Yes,
+53,53-GC,Gambling Commission,,,2 Feb 2018,,/53-GC.png,"@gamblingcommission.gov.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+54,54-GLAA,Gangmasters and Labour Abuse Authority,,,2 Feb 2018,,/54-GLAA.png,"@gla.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+55,55-GAD,Government Actuary's Department,,Employer,2 Feb 2018,,/55-GAD.png,"@gad.gov.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+56,56-GCF,Government Commercial Function,,,2 Feb 2018,,/56-GCF.png,"@cabinetoffice.gov.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+57,57-GCS,Government Communication Service,Deactivated,,2 Feb 2018,,/57-GCS.png,"@gchq.gsi.gov.uk
+@cesg.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,,No,
+58,58-GCH,Government Communications Headquarters,,,2 Feb 2018,,/58-GCH.png,"@gchq.gsi.gov.uk
+@cesg.gsi.gov.uk
+@ncsc.gov.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+59,59-GDS,Government Digital Service,,,2 Feb 2018,,/59-GDS.png,"@digital.cabinet-office.gov.uk
+",2 Feb 2018,25 May 2018,,Cabinet Office,Yes,
+60,60-GIAA,Government Internal Audit Agency,,,2 Feb 2018,,/60-GIAA.png,"@giaa.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,HM Treasury,Yes,
+61,61-GLD,Government Legal Department,,Leader,2 Feb 2018,,/61-GLD.png,"@attorneygeneral.gsi.gov.uk
+@cabinetoffice.gov.uk
+@cabinet-office.gsi.gov.uk
+@cabinet-office.x.gsi.gov.uk
+@communities.gsi.gov.uk
+@culture.gsi.gov.uk
+@decc.gsi.gov.uk
+@defra.gsi.gov.uk
+@dft.gov.uk
+@dh.gsi.gov.uk
+@dwp.gsi.gov.uk
+@education.gsi.gov.uk
+@hmrc.gsi.gov.uk
+@hmtreasury.gsi.gov.uk
+@homeoffice.gsi.gov.uk
+@infrastructure.gsi.gov.uk
+@justice.gsi.gov.uk
+@mod.uk
+@tsol.gsi.gov.uk
+@culture.gov.uk
+@governmentlegal.gov.uk
+@culture.gov.uk
+@beis.gov.uk
+@dexeu.gov.uk
+@trade.gov.uk
+@justice.gov.uk
+",2 Feb 2018,23 May 2018,,Attorney General's Office,Yes,
+62,62-GORS,Government Operational Research Service,,,2 Feb 2018,,/62-GORS.gif,"@hmrc.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+63,63-GPDP,Government Project Delivery Profession,,,2 Feb 2018,,/63-GPDP.png,,2 Feb 2018,23 May 2018,,,Yes,
+64,64-GRS,Government Recruitment Service,,,2 Feb 2018,,/64-GRS.png,"
+",2 Feb 2018,23 May 2018,,HM Revenue and Customs,Yes,
+65,65-GSS,Government Statistical Service,,,2 Feb 2018,,/65-GSS.png,"@census.gov.uk
+@ons.gsi.gov.uk
+@statistics.gov.uk
+@ons.gov.uk
+@statistics.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,Office for National Statistics,Yes,
+66,66-GCA,Groceries Code Adjudicator,,,2 Feb 2018,,/66-GCA.png,"@gca.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,"Department for Business, Energy & Industrial Strategy",Yes,
+67,67-H&SE,Health and Safety Executive,,Employer,2 Feb 2018,,/67-H&SE.png,"@hsl.gov.uk
+@hse.gov.uk",2 Feb 2018,25 May 2018,,"Department for Business, Energy & Industrial Strategy",Yes,
+68,68-HMGCC,Her Majesty's Government Communications Centre,,,2 Feb 2018,,/68-HMGCC.png,"@hmgcc.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,"Department for Business, Energy & Industrial Strategy",Yes,
+69,69-HEFCE,Higher Education Funding Council for England,,,2 Feb 2018,,/69-HEFCE.gif,"@officeforstudents.org.uk
+
+",2 Feb 2018,29 May 2018,,"Department for Business, Energy & Industrial Strategy",Yes,
+70,70-HEFCW,Higher Education Funding Council for Wales,,,2 Feb 2018,,/70-HEFCW.png,"@hefcw.ac.uk
+",2 Feb 2018,23 May 2018,,"Department for Business, Energy & Industrial Strategy",Yes,
+71,71-HE,Highways England,,Committed,2 Feb 2018,,/71-HE.jpg,"@highways.gsi.gov.uk 
+@highwaysengland.co.uk
+",2 Feb 2018,23 May 2018,,"Department for Business, Energy & Industrial Strategy",Yes,
+72,72-HES,Historic Environment Scotland,,Committed,2 Feb 2018,,/72-HES.jpg,"@hes.scot
+
+",2 Feb 2018,25 May 2018,,"Department for Business, Energy & Industrial Strategy",Yes,
+73,73-HMCTS,HM Courts and Tribunals Service,,,2 Feb 2018,,/73-HMCTS.png,"@hmcts.gsi.gov.uk
+@hmcts.x.gsi.gov.uk
+@justice.gsi.gov.uk
+@tribunals.gsi.gov.uk
+@hmcourts-service.gsi.gov.uk
+@rpt.gsi.gov.uk
+@justice.gov.uk",2 Feb 2018,23 May 2018,,Ministry of Justice,Yes,
+74,74-HMCPSI,HM Crown Prosecution Service Inspectorate,,,2 Feb 2018,,/74-HMCPSI.png,@hmcpsi.gov.uk,2 Feb 2018,25 May 2018,,,Yes,
+75,75-HMLR,HM Land Registry,,Employer,2 Feb 2018,,/75-HMLR.png,"@landregistry.gov.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+76,76-HMP&PS,HM Prison & Probation Service,,,2 Feb 2018,,/76-HMP&PS.png,"@hmps.gsi.gov.uk
+@justice.gsi.gov.uk
+@noms.gsi.gov.uk
+@probation.gsi.gov.uk
+@justice.gov.uk
+",2 Feb 2018,23 May 2018,,Ministry of Justice,Yes,
+77,77-HMRC,HM Revenue and Customs,,,2 Feb 2018,,/77-HMRC.png,@hmrc.gsi.gov.uk,2 Feb 2018,25 May 2018,Yes,,Yes,
+78,78-HMT,HM Treasury,,Leader,2 Feb 2018,,/78-HMT.png,"@crownestate.co.uk
+@hm-treasury.gov.uk
+@hmtreasury.gsi.gov.uk
+@UKGI.ORG.UK",2 Feb 2018,23 May 2018,Yes,,Yes,
+79,79-HO,Home Office,,Leader,2 Feb 2018,,/79-HO.png,"@homeoffice.gsi.gov.uk
+@homeoffice.x.gsi.gov.uk
+@ind.homeoffice.gsi.gov.uk
+@ipo.gov.uk
+@ipo.gsi.gov.uk
+@ips.gsi.gov.uk
+@the.sia.org.uk
+@ukba.gsi.gov.uk
+@hmic.gsi.gov.uk
+@cslearning.gsi.gov.uk
+@hmpo.gsi.gov.uk
+@homeoffice.pnn.police.uk
+@gro.gsi.gov.uk
+@iicsa.org.uk
+@ipco.gsi.gov.uk
+@antislaverycommissioner.gsi.gov.uk",2 Feb 2018,23 May 2018,Yes,,Yes,
+80,80-HE,Homes England,,Employer,2 Feb 2018,,/80-HE.png,"@homesengland.gov.uk
+@hca.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,"Ministry of Housing, Communities & Local Government",Yes,
+81,81-HoC,House of Commons,,Committed,2 Feb 2018,,/81-HoC.png,"@parliament.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+82,82-HoL,House of Lords,,,2 Feb 2018,,/82-HoL.png,"@parliament.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+83,83-HOS,Housing Ombudsman Service,,,2 Feb 2018,,/83-HOS.png,"@housing-ombudsman.org.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+84,84-HF&EA,Human Fertilisation & Embryology Authority,,,2 Feb 2018,,/84-HF&EA.jpg,"@HFEA.gov.uk
+",2 Feb 2018,23 May 2018,,Department of Health and Social Care,Yes,
+85,85-HTA,Human Tissue Authority,,,2 Feb 2018,,/85-HTA.png,"@hta.gov.uk
+",2 Feb 2018,23 May 2018,,Department of Health and Social Care,Yes,
+86,86-IAC,Independent Anti-Slavery Commission,Deactivated,,2 Feb 2018,,/86-IAC.png,,2 Feb 2018,23 May 2018,,Home Office,No,
+87,87-IICSA,Independent Inquiry into Child Sexual Abuse,,,2 Feb 2018,,/87-IICSA.png,"@iicsa.org.uk
+",2 Feb 2018,23 May 2018,,Home Office,Yes,
+88,88-IOPC,Independent Office for Police Conduct,,,2 Feb 2018,,/88-IOPC.png,"
+@policeconduct.gov.uk
+",2 Feb 2018,29 May 2018,,,Yes,
+89,89-IPSA,Independent Parliamentary Standards Authority,,,2 Feb 2018,,/89-IPSA.png,"@parliamentarystandards.org.uk
+@theipsa.org.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+90,90-ICO,Information Commissioner's Office,,,2 Feb 2018,,/90-ICO.png,"@ico.org.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+91,91-IUK,Innovate UK,,,2 Feb 2018,,/91-IUK.png,"@innovateuk.gov.uk
+",2 Feb 2018,31 May 2018,,Biotechnology and Biological Sciences Research Council,Yes,
+92,92-IS,Insolvency Service,,,2 Feb 2018,,/92-IS.png,"@insolvency.gsi.gov.uk
+@cib.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+93,93-IFA,Institute for Apprenticeships,,,2 Feb 2018,,/93-IFA.png,"@education.gov.uk
+",2 Feb 2018,23 May 2018,,Department for Education,Yes,
+94,94-IPO,Intellectual Property Office,,Leader,2 Feb 2018,,/94-IPO.png,"@ipo.gov.uk
+@ipo.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,"Department for Business, Energy & Industrial Strategy",Yes,
+95,95-JNCC,Joint Nature Conservation Committee,,,2 Feb 2018,,/95-JNCC.png,"@jncc.gov.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+96,96-LAA,Legal Aid Agency,,Employer,2 Feb 2018,,/96-LAA.png,"@legal services.gsi.gov.uk
+@legalservices.gsi.gov.uk
+@legalaid.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,Ministry of Justice,Yes,
+97,97-LDBCW,Local Democracy and Boundary Commission for Wales,,,2 Feb 2018,,/97-LDBCW.gif,"@wales.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,Welsh Government,Yes,
+98,98-LGSCO,Local Government & Social Care Ombudsman,,,2 Feb 2018,,/98-LGSCO.png,,2 Feb 2018,23 May 2018,,"Ministry of Housing, Communities & Local Government",Yes,
+99,99-MMO,Marine Management Organisation,,,2 Feb 2018,,/99-MMO.png,"@marinemanagement.org.uk
+@marinemanagement.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,"Ministry of Housing, Communities & Local Government",Yes,
+100,100-MCA,Maritime and Coastguard Agency,,Employer,2 Feb 2018,,/100-MCA.png,"@mcga.gov.uk
+@mcga.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,"Ministry of Housing, Communities & Local Government",Yes,
+101,101-MRC,Medical Research Council,,Employer,2 Feb 2018,,/101-MRC.png,"@headoffice.mrc.ac.uk 
+@mrc.ac.uk 
+@mrc-lmb.cam.ac.uk 
+@har.mrc.ac.uk 
+@Mrc-lmb.cam.ac.uk 
+@lms.mrc.ac.uk
+",2 Feb 2018,25 May 2018,,"Ministry of Housing, Communities & Local Government",Yes,
+102,102-MHPRA,Medicines and Healthcare Products Regulatory Agency,,,2 Feb 2018,,/102-MHPRA.png,"@mhra.gsi.gov.uk
+@nibsc.org
+@mhra.gov.uk
+",2 Feb 2018,23 May 2018,,"Ministry of Housing, Communities & Local Government",Yes,
+103,103-MO,Met Office,,,2 Feb 2018,,/103-MO.jpg,"@metoffice.gov.uk
+
+",2 Feb 2018,31 May 2018,,"Ministry of Housing, Communities & Local Government",Yes,
+104,104-MI5,MI5,,Leader,2 Feb 2018,,/104-MI5.png,"@mi5.x.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,Ministry of Defence,Yes,
+105,105-MoD,Ministry of Defence,,Leader,2 Feb 2018,,/105-MoD.png,"@apc.army.mod.uk
+@atc.raf.mod.uk
+@benson.raf.mod.uk
+@boscombedown.raf.mod.uk
+@cosford.raf.mod.uk
+@croughton.af.mil
+@deca.mil
+@diif.r.mil.uk
+@dla.mil
+@dstl.gov.uk
+@ebluey.com
+@fairford.af.mil
+@gloucesterschool.de
+@halton.raf.mod.uk
+@infantry-unit.co.uk
+@infantry-units.co.uk
+@jsastc.co.uk
+@kinloss.raf.co.uk
+@lakenheath.af.mil
+@mdpga.pnn.police.uk
+@menwithhill.af.mil
+@mildenhall.af.mil
+@mod.uk
+@molesworth.af.mil
+@pmdp.pnn.police.uk
+@rafamt.org
+@ramsteinfus.afpaa.mod.uk
+@sceschools.com
+@spva.gsi.gov.uk
+@ukho.gov.uk
+@alconbury.af.mil
+@metoffice.com
+@marham.raf.mod.uk
+@fleetfost.mod.uk
+@nrta.mod.uk
+@defenceacademy.mod.uk
+@alc.detsa.co.uk
+@sealand.raf.mod.uk
+@mdpga.mod.uk
+@dfg.sg
+@us.af.mil
+@oscc.gsi.gov.uk
+@defence.gsi.gov.uk
+@sceschools.org
+@qvs.org.uk
+@nsgi.gov.uk
+@vectoraerospace.r.mil.uk
+@rcds.mod.uk
+@tribune.mod.uk
+@servicecomplaintsombudsman.gsi.gov.uk
+@mod.gov.uk
+@modschools.org
+@diif.dla.mil
+@r.mil.uk 
+@hall.af.mil",2 Feb 2018,25 May 2018,Yes,,Yes,
+106,106-MHCLG,"Ministry of Housing, Communities & Local Government",,,2 Feb 2018,,/106-MHCLG.png,#N/A,2 Feb 2018,23 May 2018,Yes,,Yes,
+107,107-MoJ,Ministry of Justice,,Leader,2 Feb 2018,,/107-MoJ.png,"@courtfunds.gsi.gov.uk
+@@hmcts.gsi.gov.uk
+@hmcts.x.gsi.gov.uk
+@hmica.gsi.gov.uk
+@hmps.gsi.gov.uk
+@jac.gsi.gov.uk
+@a.dii.mod.uk
+@judiciary.gsi.gov.uk
+@justice.gsi.gov.uk
+@noms.gsi.gov.uk
+@scotland.gsi.gov.uk
+@tribunals.gsi.gov.uk
+@hmcourts-service.gsi.gov.uk
+@offsol.gsi.gov.uk
+@ajtc.gsi.gov.uk
+@lawcommission.gov.uk
+@cjs.gsi.gov.uk
+@hmiprobation.gsi.gov.uk
+@legalaid.gsi.gov.uk
+@demstrgregt.army.mod.uk
+@south-yorkshire.probation.gsi.gov.uk
+@ppo.gsi.gov.uk
+@hmiprisons.gsi.gov.uk
+@jcio.gsi.gov.uk
+@victimscommissioner.gsi.gov.uk
+@digital.justice.gov.uk
+@justice.gov.uk
+@jac.gov.uk
+@judiciary.gov.uk
+@hmiprobation.gov.uk
+@offsol.gov.uk
+@PPO.gov.uk
+@victimscommissioner.gov.uk
+@Judicialappointments.gov.uk
+@Judicialombudsman.gov.uk
+@sentencingcouncil.gov.uk
+@hmiprisons.gov.uk
+@OSPT.gov.uk
+@judicialconduct.gov.uk
+@victimscommissioner.org.uk
+@demstrgregt.army.mod.uk
+",2 Feb 2018,13 Jun 2018,Yes,,Yes,
+108,108-NCA,National Crime Agency,,Leader,2 Feb 2018,,/108-NCA.png,"@soca.gov.uk
+@soca.gsi.gov.uk
+@soca.x.gsi.co.uk
+@soca.x.gsi.gov.uk
+@nca.x.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,Home Office,Yes,
+109,109-NFA,National Fraud Authority,Deactivated,,2 Feb 2018,Yes,,,2 Feb 2018,23 May 2018,,Home Office,No,
+110,110-HLF,National Heritage Memorial Fund/ Heritage Lottery Fund,,,2 Feb 2018,,/110-HLF.png,,2 Feb 2018,23 May 2018,,,Yes,
+111,111-NIC,National Infrastructure Commission,,,2 Feb 2018,,/111-NIC.png,"@nic.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,HM Treasury,Yes,
+112,112-NMRO,National Measurement and Regulation Office,Deactivated,,2 Feb 2018,Yes,,,2 Feb 2018,23 May 2018,,"Department for Business, Energy & Industrial Strategy",No,
+113,113-NSI,National Savings and Investments,,,2 Feb 2018,,/113-NSI.png,"@nationalsavings.co.uk
+@nationalsavings.uk.com
+@nsandi.com
+",2 Feb 2018,23 May 2018,,,Yes,
+114,114-NE,Natural England,,Employer,2 Feb 2018,,/114-NE.png,"@naturalengland.org.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+115,115-NDPB,Non Departmental Public Body,Deactivated,,2 Feb 2018,,,,2 Feb 2018,23 May 2018,,"Department for Digital, Culture, Media and Sport",No,
+116,116-NIO,Northern Ireland Office,,Employer,2 Feb 2018,,/116-NIO.png,"@nio.x.gsi.gov.uk
+@csoni.gsi.gov.uk
+@csoni.gov.uk
+@nio.gov.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+117,117-PBR,Office for Budget Responsibility,,,2 Feb 2018,,/117-PBR.png,"@hmtreasury.gsi.gov.uk
+@budgetresponsibility.org.uk
+@obr.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,HM Treasury,Yes,
+118,118-ONS,Office for National Statistics,,,2 Feb 2018,,/118-ONS.png,"@ons.gov.uk
+",2 Feb 2018,25 May 2018,Yes,,Yes,
+119,119-OFSTED,"Office for Standards in Education, Children's Services and Skills",,,2 Feb 2018,,/119-OFSTED.png,@ofsted.gov.uk,2 Feb 2018,23 May 2018,,,Yes,
+120,120-OGEM,Office of Gas and Electricity Markets,,,2 Feb 2018,,/120-OGEM.png,"@ofgem.gov.uk
+",2 Feb 2018,23 May 2018,,"Advisory, Conciliation and Arbitration Service",Yes,
+121,121-OQER,Office of Qualifications and Examinations Regulation,,,2 Feb 2018,,/121-OQER.png,"@ofqual.gov.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+122,122-ORR,Office of Rail and Road,,Committed,2 Feb 2018,,/122-ORR.png,"@orr.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,Department for Transport,Yes,
+123,123-AGS,Office of the Advocate General for Scotland,,,2 Feb 2018,,/123-AGS.png,"@advocategeneral.gsi.gov.uk
+@scotlandoffice.gsi.gov.uk
+@scotland.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,Department for Transport,Yes,
+124,124-OCC,Office of the Children's Commissioner,,,2 Feb 2018,,/124-OCC.png,"@childrenscommissioner.gsi.gov.uk
+",2 Feb 2018,31 May 2018,,,Yes,
+125,125-OISC,Office of the Immigration Services Commissioner,,,2 Feb 2018,,/125-OISC.png,"@oisc.gov.uk
+",2 Feb 2018,23 May 2018,,Home Office,Yes,
+126,126-OPC,Office of the Parliamentary Counsel,,,2 Feb 2018,,/126-OPC.png,"@cabinet-office.x.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+127,127-OPG,Office of the Public Guardian,,,2 Feb 2018,,/127-OPG.png,"@publicguardian.gsi.gov.uk
+@guardianship.gsi.gov.uk
+@publicguardian.gov.uk
+",2 Feb 2018,23 May 2018,,Ministry of Justice,Yes,
+128,128-Ofwat,Ofwat (Water Services Regulation Authority),,,2 Feb 2018,,/128-Ofwat.jpg,@ofwat.gsi.gov.uk,2 Feb 2018,23 May 2018,,,Yes,
+129,129-OGA,Oil and Gas Authority,,,2 Feb 2018,,/129-OGA.jpg,,2 Feb 2018,23 May 2018,,Department of Energy and Climate Change,Yes,
+130,130-OS,Ordnance Survey,,,2 Feb 2018,,/130-OS.png,,2 Feb 2018,23 May 2018,,,Yes,
+131,131-PHSO,Parliamentary and Health Service Ombudsman,,,2 Feb 2018,,/131-PHSO.png,@ombudsman.org.uk,2 Feb 2018,23 May 2018,,,Yes,
+132,132-PBR,Parole Board,,,2 Feb 2018,,/132-PBR.jpg,"@paroleboard.gov.uk
+@paroleboard.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,Ministry of Justice,Yes,
+133,133-PAS,Pensions Advisory Service,,,2 Feb 2018,,/133-PAS.png,"@pensions-ombudsman.org.uk
+@pensionsadvisoryservice.org.uk
+",2 Feb 2018,23 May 2018,,Department for Work and Pensions,Yes,
+134,134-PR,Pensions Regulator,,,2 Feb 2018,,/134-PR.png,,2 Feb 2018,23 May 2018,,Department for Work and Pensions,Yes,
+135,135-PI,Planning Inspectorate,,,2 Feb 2018,,/135-PI.png,"@infrastructure.gsi.gov.uk
+@pins.gsi.gov.uk
+@planning-inspectorate.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+136,136-PHE,Public Health England,,Committed,2 Feb 2018,,/136-PHE.png,"@hpa.org.uk
+@nibsc.hpa.org.uk
+@nta-nhs.org.uk
+@phe.gov.uk
+",2 Feb 2018,23 May 2018,,Department of Health and Social Care,Yes,
+137,137-QECC,Queen Elizabeth II Conference Centre,,,2 Feb 2018,,/137-QECC.jpeg,@qeiicentre.london,2 Feb 2018,29 May 2018,,,Yes,
+138,138-RoS,Registers of Scotland,,Employer,2 Feb 2018,,/138-RoS.png,"@ros.gov.uk
+",2 Feb 2018,23 May 2018,,Scottish Government,Yes,
+139,139-RBGK,Royal Botanic Gardens Kew,,,2 Feb 2018,,/139-RBGK.png,"@kew.org
+",2 Feb 2018,23 May 2018,,,Yes,
+140,140-RCAHMW,Royal Commission on the Ancient and Historical Monuments of Wales,,,2 Feb 2018,,/140-RCAHMW.png,"@rcahmw.gov.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+141,141-RP,Royal Parks,,,2 Feb 2018,,/141-RP.png,"@royalparks.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,"Department for Digital, Culture, Media and Sport",Yes,
+142,142-RRA,Rural Payments Agency,,,2 Feb 2018,,/142-RRA.png,"@rpa.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,"Department for Environment, Food and Rural Affairs",Yes,
+143,143-SO,Scotland Office,,,2 Feb 2018,,/143-SO.png,"@advocategeneral.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,Biotechnology and Biological Sciences Research Council,Yes,
+144,144-SCS,Scottish Court and Tribuneral Service,,,2 Feb 2018,,/144-SCS.png,,2 Feb 2018,23 May 2018,,Scottish Government,Yes,
+145,145-SG,Scottish Government,,Leader,2 Feb 2018,,/145-SG.png,"@copfs.gsi.gov.uk
+@learndirectscotland.com
+@ltscotland.com
+@oscr.org.uk
+@scotland.gsi.gov.uk
+@scottish.parliament.uk
+@sportscotland.org.uk
+@transportscotland.gsi.gov.uk
+@visitscotland.com
+@aib.gsi.gov.uk
+@scottishhousingregulator.gsi.gov.uk
+@scottishboundaries.gov.uk
+@crofting.scotland.gov.uk
+@gov.scot
+@transport.gov.scot
+@lochlomond-trossachs.org
+",2 Feb 2018,23 May 2018,Yes,,Yes,
+146,146-SNH,Scottish Natural Heritage,,,2 Feb 2018,,/146-SNH.jpg,"@snh.org.uk
+",2 Feb 2018,23 May 2018,,Scottish Government,Yes,
+147,147-SIS,Secret Intelligence Service (MI6),Deactivated,,2 Feb 2018,,/147-SIS.png,,2 Feb 2018,23 May 2018,,Scottish Government,No,
+148,148-SIA,Security Industry Authority,,,2 Feb 2018,,/148-SIA.gif,"@sia.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,Home Office,Yes,
+149,149-SFO,Serious Fraud Office,,Committed,2 Feb 2018,,/149-SFO.png,"@sfo.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+150,150-SGSA,Sports Grounds Safety Authority,,,2 Feb 2018,,/150-SGSA.png,"@sgsamail.org.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+151,151-SU,Stabilisation Unit,,,2 Feb 2018,,/151-SU.png,"@dfid.gov.uk
+@fco.gov.uk
+@mod.uk
+
+",2 Feb 2018,23 May 2018,Yes,,Yes,
+152,152-SoJ,States of Jersey,Deactivated,,2 Feb 2018,,/152-SoJ.jpg,,2 Feb 2018,23 May 2018,,,No,
+153,153-SAA,Student Awards Agency,,,2 Feb 2018,,/153-SAA.png,,2 Feb 2018,23 May 2018,,Scottish Government,Yes,
+154,154-SLC,Student Loans Company,,Employer,2 Feb 2018,,/154-SLC.png,,2 Feb 2018,23 May 2018,,"Department for Business, Energy & Industrial Strategy",Yes,
+155,155-NA,The National Archives,,Employer,2 Feb 2018,,/155-NA.png,"@nationalarchives.gov.uk
+
+",2 Feb 2018,31 May 2018,,"Department for Digital, Culture, Media and Sport",Yes,
+156,156-PO,The Pensions Ombudsman,,Committed,2 Feb 2018,,/156-PO.png,"@pensions-ombudsman.org.uk
+",2 Feb 2018,23 May 2018,,"Department for Digital, Culture, Media and Sport",Yes,
+157,157-PI,The Pirbright Institute,Deactivated,,2 Feb 2018,,/157-PI.png,,2 Feb 2018,23 May 2018,,Biotechnology and Biological Sciences Research Council,No,
+158,158-TF,Transport Focus,,,2 Feb 2018,,/158-TF.jpg,"@passengerfocus.org.uk
+",2 Feb 2018,23 May 2018,,Department for Transport,Yes,
+159,159-TS,Tribunals Service - de-activated 18/06/12,Deactivated,,2 Feb 2018,,,,2 Feb 2018,23 May 2018,,Department for Transport,No,
+160,160-UKDMO,UK Debt Management Office,,,2 Feb 2018,,/160-UKDMO.png,"@dmo.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+161,161-UKEF,UK Export Finance,,Leader,2 Feb 2018,,/161-UKEF.png,"@ukexportfinance.gov.uk
+",2 Feb 2018,31 May 2018,,,Yes,
+162,162-UKGI,UK Government Investments,,,2 Feb 2018,,/162-UKGI.png,,2 Feb 2018,23 May 2018,,,Yes,
+163,163-UKHO,UK Hydrographic Office,,,2 Feb 2018,,/163-UKHO.png,@ukho.gov.uk,2 Feb 2018,23 May 2018,,Ministry of Defence,Yes,
+164,164-UKSA,UK Space Agency,,,2 Feb 2018,,/164-UKSA.jpg,"@ukspaceagency.bis.gsi.gov.uk
+@ukspaceagency.gov.uk 
+",2 Feb 2018,23 May 2018,,"Advisory, Conciliation and Arbitration Service",Yes,
+165,165-UKSA,UK Statistics Authority,,,2 Feb 2018,,/165-UKSA.png,,2 Feb 2018,23 May 2018,,Office for National Statistics,Yes,
+166,166-UKSC,UK Supreme Court,,,2 Feb 2018,,/166-UKSC.png,"@supremecourt.gsi.gov.uk
+@jcpc.gsi.gov.uk
+@supremecourt.uk
+",2 Feb 2018,23 May 2018,,Ministry of Justice,Yes,
+167,167-VOA,Valuation Office Agency,,Leader,2 Feb 2018,,/167-VOA.png,"@voa.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,,Yes,
+168,168-VTS,Valuation Tribunal Service,,,2 Feb 2018,,/168-VTS.jpg,"@vts.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,"Ministry of Housing, Communities & Local Government",Yes,
+169,169-VCA,Vehicle Certification Agency,,,2 Feb 2018,,/169-VCA.png,"@vca.gov.uk
+",2 Feb 2018,23 May 2018,,Department for Transport,Yes,
+170,170-VMD,Veterinary Medicines Directorate,,,2 Feb 2018,,/170-VMD.png,"@defra.gsi.gov.uk
+@vmd.defra.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,"Department for Environment, Food and Rural Affairs",Yes,
+171,171-WO,Wales Office,,,2 Feb 2018,,/171-WO.png,"@noms.gsi.gov.uk
+@walesoffice.gsi.gov.uk
+@walesoffice.gov.uk
+",2 Feb 2018,23 May 2018,,"Department for Environment, Food and Rural Affairs",Yes,
+172,172-WG,Welsh Government,,Leader,2 Feb 2018,,/172-WG.png,"@wra.gov.wales
+@gov.wales
+@llyw.cymru
+@wales.gsi.gov.uk
+@wda.co.uk
+
+",2 Feb 2018,23 May 2018,Yes,,Yes,
+173,173-WFD,Westminster Foundation for Democracy,,,2 Feb 2018,,/173-WFD.jpg,@wfd.org,2 Feb 2018,23 May 2018,,Foreign and Commonwealth Office,Yes,
+174,174-WP,Wilton Park,,,2 Feb 2018,,/174-WP.jpg,@wiltonpark.org.uk,2 Feb 2018,23 May 2018,,Foreign and Commonwealth Office,Yes,
+175,175-YJB,Youth Justice Board,,,2 Feb 2018,,/175-YJB.gif,"@justice.gsi.gov.uk
+@yjb.gov.uk
+@yjb.gsi.gov.uk
+",2 Feb 2018,23 May 2018,,Ministry of Justice,Yes,
+176,176-HMICFRS,Her Majesty’s Inspectorate of Constabulary and Fire & Rescue Services (HMICFRS),,,30/04/2018,,/176-HMICFRS.png,,30/04/2018,23 May 2018,,"Department for Business, Energy & Industrial Strategy",Yes,
+177,177-OfS,Office for Students,,,30/04/2018,,/177-OfS.png,,30/04/2018,23 May 2018,Yes,,Yes,
+178,178-DCLG,Department for Communities and Local Government,,,30/04/2018,,,,30/04/2018,23 May 2018,,,Yes,
+179,179-AHRC,Arts and Humanities Research Council,,,,,N/A,"@ahrc.ac.uk
+@artscouncil.org.uk
+@culturenortheast.org",23 May 2018,23 May 2018,,,,Yes
+180,180-AC,Arts Council,,,,,N/A,"@artscouncil.org.uk
+",23 May 2018,23 May 2018,,,,Yes
+181,181-BLF,Big Lottery Fund,,,,,N/A,"@Biglotteryfund.org.uk
+",23 May 2018,23 May 2018,,,,Yes
+182,182-DBS,DBS,,,,,N/A,"@crb.gsi.gov.uk
+@homeoffice.gsi.gov.uk
+@isa.gsi.gov.uk
+@dbs.gsi.gov.uk
+",23 May 2018,23 May 2018,,,,Yes
+183,183-DE&S,Defence Equipment and Support,,,,,N/A,"@mod.gov.uk
+",23 May 2018,23 May 2018,,,,Yes
+184,184-DEC,Department for Communities (Northern Ireland),,,,,N/A,"@nissa.gsi.gov.uk
+@communities-ni.gov.uk
+@cms.gsi.gov.uk
+",23 May 2018,23 May 2018,,,,Yes
+185,185-DfI,Department for Infrastructure (Northern Ireland),,,,,N/A,"@infrastructure-ni.gov.uk
+",23 May 2018,23 May 2018,,,,Yes
+186,186-DftE,Department for the Economy (Northern Ireland),,,,,N/A,"@economy-ni.gov.uk
+",23 May 2018,23 May 2018,,,,Yes
+187,187-AERA,"Department of Agriculture, Environment & Rural Affairs (Northern Ireland)",,,,,N/A,"@daera-ni.gov.uk
+",23 May 2018,23 May 2018,,,,Yes
+188,188-DoENI,Department of Education (Northern Ireland),,,,,N/A,"@deni.gov.uk
+@education-ni.gov.uk
+",23 May 2018,23 May 2018,,,,Yes
+189,189-DoFNI,Department of Finance (Northern Ireland),,,,,N/A,"@finance-ni.gov.uk
+",23 May 2018,23 May 2018,,,,Yes
+190,190-DoHNI,Department of Health (Northern Ireland),,,,,N/A,"@health-ni.gov.uk
+",23 May 2018,23 May 2018,,,,Yes
+191,191-DoJNI,Department of Justice (Northern Ireland),,,,,N/A,"@fsni.x.gsi.gov.uk
+@justice-ni.gov.uk
+@parolecommni.x.gsi.gov.
+@dojni.x.gsi.gov.uk
+@justice-ni.x.gsi.gov.uk
+@parolecomni.gsi.gov.uk
+@PAROLECOMNI.X.GSI.GOV.UK
+",23 May 2018,23 May 2018,,,,Yes
+192,192-DS,Disclosure Scotland,,,,,N/A,"@scotland.gsi.gov.uk
+",23 May 2018,23 May 2018,,,,Yes
+193,193-ES,Education Scotland,,,,,N/A,"@educationscotland.gov.uk
+@scotland.gsi.gov.uk
+",23 May 2018,23 May 2018,,,,Yes
+194,194-FCS,Forest Central Services,,,,,N/A,"
+",23 May 2018,23 May 2018,,,,Yes
+195,195-FR,Forestry Research,,,,,N/A,"@forestry.gsi.gov.uk
+@forestryengland.uk
+@forestrycommission.gov.uk",23 May 2018,23 May 2018,,,,Yes
+196,196-GBCC,Great Britain-China Centre,,,,,N/A,"@gbcc.org.uk
+",23 May 2018,23 May 2018,,,,Yes
+197,197-HMCC,HM Government Communications Centre,,,,,N/A,"
+",23 May 2018,23 May 2018,,,,Yes
+198,198-H&CA,Homes and Communities Agency,,,,,N/A,"@hca.gsi.gov.uk
+",23 May 2018,23 May 2018,,,,Yes
+199,199-LGO,Local Government Ombudsman,,,,,N/A,"@lgo.org.uk
+",23 May 2018,23 May 2018,,,,Yes
+200,200-MoHCLG,"Ministry of Housing,Communities & Local Government",,,,,N/A,"@communities.gsi.gov.uk
+
+",23 May 2018,23 May 2018,,,,Yes
+201,201-NAW,National Assembly for Wales,,,,,N/A,"@assembly.wales
+@cynulliad.cymru
+@wales.gov.uk
+",23 May 2018,23 May 2018,,,,Yes
+202,202-NCfTL,National College for Teaching and Leadership,,,,,N/A,"
+",23 May 2018,23 May 2018,,,,Yes
+203,203-NRS,National Records of Scotland,,,,,N/A,"@nas.gov.uk
+@scotland.gsi.gov.uk
+@nrscotland.gov.uk
+",23 May 2018,23 May 2018,,,,Yes
+204,204-NERC,Natural Environment Research Council,,,,,N/A,"@bas.ac.uk
+@bgs.ac.uk
+@ceh.ac.uk
+@nerc.ac.uk
+@noc.ac.uk
+@noc.soton.ac.uk
+@ssc.rcuk.ac.uk
+",23 May 2018,23 May 2018,,,,Yes
+205,205-NHM,Natural History Museum,,,,,N/A,"@nhm.ac.uk
+",23 May 2018,23 May 2018,,,,Yes
+206,206-NRW,Natural Resources Wales,,,,,N/A,"@cyfoethnaturiolcymru.gov.uk
+@naturalresourceswales.gov.uk
+",23 May 2018,23 May 2018,,,,Yes
+207,207-NHSD,NHS Digital,,,,,N/A,"@nhsdigital.nhs.net
+@nhsdigital.net
+",23 May 2018,23 May 2018,,,,Yes
+208,208-NHSEfS,NHS Education for Scotland,,,,,N/A,"@nes.scot.nhs.uk
+",23 May 2018,23 May 2018,,,,Yes
+209,209-NHSLA,NHS Litigation Authority,,,,,N/A,"@nhsla.com
+@resolution.nhs.uk
+",23 May 2018,23 May 2018,,,,Yes
+210,210-NIPPS,Northern Ireland Public Prosecution Service,,,,,N/A,#N/A,23 May 2018,23 May 2018,,,,Yes
+211,211-OftSCR,Office for the Scottish Charity Regulator,,,,,N/A,"@scotland.gsi.gov.uk
+@oscr.org.uk
+",23 May 2018,23 May 2018,,,,Yes
+212,212-OAB,Office of Accountant in Bankruptcy,,,,,N/A,"@scotland.gsi.gov.uk
+",23 May 2018,23 May 2018,,,,Yes
+213,213-OTS,Office of Tax Simplification,,,,,N/A,"@hmtreasury.gov.uk
+@ots.gov.uk
+",23 May 2018,18 Jun 2018,,,,Yes
+214,214-PCA,Pubs Code Adjudicator,,,,,N/A,"@pcs.gsi.gov.uk
+",23 May 2018,23 May 2018,,,,Yes
+215,215-SCRA,Scottish Children's Reporter Administration,,,,,N/A,"@scra.gsi.gov.uk
+",23 May 2018,23 May 2018,,,,Yes
+216,216-SF&HEFC,Scottish Further and Higher Education Funding Council,,,,,N/A,"@sfc.ac.uk
+",23 May 2018,23 May 2018,,,,Yes
+217,217-SPSH,Scottish Prison Service Headquarters,,,,,N/A,"@sps.pnn.gov.uk
+",23 May 2018,23 May 2018,,,,Yes
+218,218-SPPA,Scottish Public Pensions Agency,,,,,N/A,"@scotland.gsi.gov.uk
+",23 May 2018,23 May 2018,,,,Yes
+219,219-SW,Sport Wales,,,,,N/A,"@sportwales.org.uk
+",23 May 2018,23 May 2018,,,,Yes
+220,220-SAAfS,Student Awards Agency for Scotland,,,,,N/A,"@scotland.gsi.gov.uk
+",23 May 2018,23 May 2018,,,,Yes
+221,221-TEONI,The Executive Office (Northern Ireland),,,,,N/A,"@executiveoffice-ni.gov.uk
+",23 May 2018,23 May 2018,,,,Yes
+222,222-TPR,The Pensions Regulator,,,,,N/A,"@thepensionsregulator.gsi.gov.uk
+",23 May 2018,23 May 2018,,,,Yes
+223,223-UKSBA,UK Shared Business Authority,,,,,N/A,"@uksbs.co.uk
+@ssc.rcuk.ac.uk
+",23 May 2018,23 May 2018,,,,Yes
+224,224-UKSA,UK Statisics Authority,,,,,N/A,"@census.gov.uk
+@ons.gsi.gov.uk
+@statistics.gov.uk
+@ons.gov.uk
+@statistics.gsi.gov.uk
+",23 May 2018,23 May 2018,,,,Yes

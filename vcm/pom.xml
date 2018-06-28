@@ -141,14 +141,4 @@
             </plugin>
         </plugins>
     </build>
-	<repositories>
-		<repository>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<id>bintray-gov-uk-notify-maven</id>
-			<name>bintray</name>
-			<url>https://dl.bintray.com/gov-uk-notify/maven</url>
-		</repository>
-	</repositories>
 </project>
