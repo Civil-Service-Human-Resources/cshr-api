@@ -13,7 +13,7 @@ if [[ ${#} -eq 0 ]]; then
     echo "Starting filebeat"
     sudo -E filebeat -e -c /etc/filebeat/filebeat.yml &
     echo "Starting application"
-    java -Djava.security.egd=file:/dev/./urandom -jar /app/vcm-0.0.1.jar \
+    java -Djava.security.egd=file:/dev/./urandom -jar /app/vcm-1.0.0.jar \
             --spring.location.service.url=${LOCATION_SERVICE_URL} \
             --spring.location.service.username=${LOCATION_SERVICE_USERNAME} \
             --spring.location.service.password=${LOCATION_SERVICE_PASSWORD} \
