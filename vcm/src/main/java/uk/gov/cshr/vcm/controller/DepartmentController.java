@@ -2,17 +2,9 @@ package uk.gov.cshr.vcm.controller;
 
 import io.swagger.annotations.ApiOperation;
 import java.io.IOException;
-import java.io.Reader;
 import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import javax.annotation.security.RolesAllowed;
-import liquibase.util.csv.CSVReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +21,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.cshr.vcm.model.Department;
-import uk.gov.cshr.vcm.model.EmailExtension;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
+import uk.gov.cshr.vcm.service.LoadDepartmentEmailsService;
 
 @RestController
 @RequestMapping(value = "/department", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -40,6 +32,9 @@ public class DepartmentController {
     private static final Logger log = LoggerFactory.getLogger(DepartmentController.class);
 
     private final DepartmentRepository departmentRepository;
+
+    @Autowired
+    private LoadDepartmentEmailsService loadDepartmentEmailsService;
 
     @Autowired
     DepartmentController(DepartmentRepository departmentRepository) {
@@ -66,7 +61,6 @@ public class DepartmentController {
         }
 
         ResponseEntity<Department> notFound = ResponseEntity.notFound().build();
-
         return foundDepartment.map(department -> ResponseEntity.ok().body(department)).orElse(notFound);
     }
 
@@ -98,10 +92,14 @@ public class DepartmentController {
         return foundDepartment.map((Department department) -> {
             // Attention, mutable state on the argument
             departmentUpdate.setId(department.getId());
+            if ( departmentUpdate.getAcceptedEmailExtensions() == null ) {
+                departmentUpdate.setAcceptedEmailExtensions(department.getAcceptedEmailExtensions());
+            }
             departmentRepository.save(departmentUpdate);
             return ResponseEntity.ok().body(department);
         }).orElse(notFound);
     }
+
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/{departmentId}")
     @ApiOperation(value = "Delete a department", nickname = "deleteById")
@@ -112,39 +110,11 @@ public class DepartmentController {
     }
 
 	@CacheEvict(value = "emailAddresses", allEntries = true)
-    @RequestMapping(method = RequestMethod.PUT, value = "/load")
+    @RequestMapping(method = RequestMethod.PUT, value = "/loademails")
     @ApiOperation(value = "load departments", nickname = "load")
     public ResponseEntity<Department> load() throws IOException {
 
-        Reader reader = Files.newBufferedReader(Paths.get("src/test/resources/RPGDepartmentDataMaster.csv"));
-        CSVReader csvReader = new CSVReader(reader);
-
-		// skip first line
-		csvReader.readNext();
-
-        String[] nextRecord;
-
-        while ((nextRecord = csvReader.readNext()) != null) {
-            System.out.println("id : " + nextRecord[0]);
-            String name = nextRecord[1];
-            System.out.println("Phone : " + nextRecord[2]);
-            String emails = nextRecord[8];
-            System.out.println("==========================");
-
-			Department department = new Department();
-			department.setName(name);
-
-			Set<EmailExtension> emailSet = new HashSet<>();
-            List<String> emailsList = Arrays.asList(emails.split("\n"));
-
-            for (String string : emailsList) {
-                emailSet.add( EmailExtension.builder().emailExtension(string).build());
-            }
-
-			department.setAcceptedEmailExtensions(emailSet);
-
-			departmentRepository.save(department);
-        }
+        loadDepartmentEmailsService.readEmails("RPGDepartmentDataMaster.csv");
         return ResponseEntity.noContent().build();
     }
 }

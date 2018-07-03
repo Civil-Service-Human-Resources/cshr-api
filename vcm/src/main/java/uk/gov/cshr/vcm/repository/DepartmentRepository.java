@@ -34,4 +34,6 @@ public interface DepartmentRepository extends PagingAndSortingRepository<Departm
 	@Override
 	@Cacheable(value = "departments")
 	public Iterable<Department> findAll();
+
+    public Department findByIdentifier(String idendifier);
 }

@@ -11,16 +11,14 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.xml.bind.DatatypeConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import uk.gov.cshr.vcm.controller.exception.SearchStatusCode;
 import uk.gov.cshr.vcm.controller.exception.VacancyError;
@@ -28,7 +26,7 @@ import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.model.EmailExtension;
 import uk.gov.cshr.vcm.model.SearchResponse;
 import uk.gov.cshr.vcm.model.VacancyEligibility;
-import uk.gov.cshr.vcm.repository.DepartmentRepository;
+import uk.gov.cshr.vcm.repository.EmailExtensionRepository;
 import uk.gov.service.notify.NotificationClientException;
 
 @Service
@@ -38,18 +36,16 @@ public class CshrAuthenticationService {
 
 	private static final String SECRET = UUID.randomUUID().toString();
 
-	@Inject
-	private DepartmentRepository departmentRepository;
+    @Inject
+    private EmailExtensionRepository emailExtensionRepository;
 
 	public String createInternalJWT(String emailAddress) throws NotificationClientException {
 
-		List<Department> departments = verifyEmailAddress(emailAddress);
+		Set<Department> departments = verifyEmailAddress(emailAddress);
 		StringBuilder stringBuilder = new StringBuilder();
 
 		for (Department department : departments) {
 			stringBuilder.append(department.getId() + ",");
-
-			System.out.println(department.getName());
 		}
 
 		if( ! departments.isEmpty() ) {
@@ -74,7 +70,24 @@ public class CshrAuthenticationService {
 			return compactJws;
 		}
 		else {
-			return null;
+			Date date = Date.from(
+					LocalDateTime
+							.now()
+							.plusDays(1)
+							.atZone(ZoneId.systemDefault())
+							.toInstant());
+
+			String compactJws = Jwts.builder()
+					.setSubject("internal candidate")
+					.claim("Vacancy Eligibility", VacancyEligibility.PUBLIC.toString())
+                    .claim("Email Address", emailAddress)
+					.claim("Departments", stringBuilder.toString())
+					.signWith(SignatureAlgorithm.HS512, SECRET)
+					.setExpiration(date)
+					.compact();
+
+			log.debug("jwt=" + compactJws);
+			return compactJws;
 		}
 	}
 
@@ -104,9 +117,25 @@ public class CshrAuthenticationService {
             searchResponse.setAuthenticatedEmail(emailAddress);
 
 			Object eligibilityClaim = claims.get("Vacancy Eligibility");
+            Object departmentsIDs = claims.get("Department IDs");
 
 			if ( eligibilityClaim != null ) {
-				return VacancyEligibility.valueOf(eligibilityClaim.toString());
+				VacancyEligibility vacancyEligibility = VacancyEligibility.valueOf(eligibilityClaim.toString());
+                vacancyEligibility.setEmailAddress(emailAddress);
+
+                List<Long> longArrayList = new ArrayList<>();
+
+                if ( departmentsIDs != null ) {
+
+                    String[] longStrings = departmentsIDs.toString().split(",");
+
+                    for (String longString : longStrings) {
+                        longArrayList.add(Long.parseLong(longString));
+                    }
+                }
+
+                vacancyEligibility.setDepartments(longArrayList);
+                return vacancyEligibility;
 			}
 			else {
                 VacancyError vacancyError = VacancyError.builder()
@@ -116,8 +145,8 @@ public class CshrAuthenticationService {
 				return VacancyEligibility.PUBLIC;
 			}
 		}
-		// Who knows what exceptions Jwts.parser may throw
 		catch(ExpiredJwtException | MalformedJwtException | SignatureException | UnsupportedJwtException | IllegalArgumentException e) {
+            
 			log.error(e.getMessage(), e);
             VacancyError vacancyError = VacancyError.builder()
                     .message(e.getMessage())
@@ -128,38 +157,18 @@ public class CshrAuthenticationService {
 		}
 	}
 
-	@Cacheable("emailAddresses")
-	public List<Department> verifyEmailAddress(String emailAddress) {
+	public Set<Department> verifyEmailAddress(String emailAddress) {
 
-		System.out.println("emailAddresses");
+		Set<Department> departments = new HashSet<>();
 
-		List<Department> departmentIDs = new ArrayList<>();
+        Iterable<EmailExtension> emailExtensions = emailExtensionRepository.findAll();
 
-		Iterable<Department> departments = departmentRepository.findAll();
+        emailExtensions.forEach(e -> {
+            if ( emailAddress.endsWith(e.getEmailExtension()) ) {
+                departments.add(e.getDepartment());
+            }
+        });
 
-		departments.forEach(d -> {
-			Set<EmailExtension> emailExtensions = d.getAcceptedEmailExtensions();
-			for (EmailExtension emailExtension : emailExtensions) {
-
-				if ( emailExtension.getEmailExtension().trim().isEmpty() ) {
-					continue;
-				}
-
-				String pattern = emailExtension.getEmailExtension().replace(".", "\\.").replace("x", "([^$]*)");
-				pattern = "([^$]*)" + pattern;
-				Pattern r = Pattern.compile(pattern);
-				Matcher m = r.matcher(emailAddress);
-
-				if ( m.find() ) {
-					departmentIDs.add(d);
-				}
-			}
-		});
-
-//		return emailAddress.endsWith(".gov.uk")
-//				|| emailAddress.endsWith("valtech.co.uk")
-//                || emailAddress.endsWith("cabinetoffice.gov.uk");
-
-		return departmentIDs;
+		return departments;
 	}
 }

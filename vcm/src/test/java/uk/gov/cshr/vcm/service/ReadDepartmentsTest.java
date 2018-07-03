@@ -7,7 +7,6 @@ import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.HashSet;
 import javax.inject.Inject;
 import liquibase.util.csv.CSVReader;
 import org.junit.Test;
@@ -17,18 +16,25 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.cshr.vcm.VcmApplication;
 import uk.gov.cshr.vcm.model.Department;
+import uk.gov.cshr.vcm.model.EmailExtension;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
+import uk.gov.cshr.vcm.repository.EmailExtensionRepository;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = VcmApplication.class)
 @ContextConfiguration
-public class ReadDepartments {
+public class ReadDepartmentsTest {
 
 	@Inject
 	private DepartmentRepository departmentRepository;
 
+    @Inject
+    private EmailExtensionRepository emailExtensionRepository;
+
     @Test
     public void readDepartments() throws FileNotFoundException, IOException {
+
+//        if (true) return;
 
 //        this.mvc = MockMvcBuilders
 //                .webAppContextSetup(webApplicationContext)
@@ -36,7 +42,7 @@ public class ReadDepartments {
 //                .build();
 
 
-        Reader reader = Files.newBufferedReader(Paths.get("src/test/resources/RPGDepartmentDataMaster.csv"));
+        Reader reader = Files.newBufferedReader(Paths.get("src/main/resources/RPGDepartmentDataMaster.csv"));
         CSVReader csvReader = new CSVReader(reader);
 
 		// skip first line
@@ -51,24 +57,26 @@ public class ReadDepartments {
             String emails = nextRecord[8];
             System.out.println("==========================");
 
-			Department department = new Department();
-			department.setName(name);
+			Department department = departmentRepository.findByIdentifier(name);
 
-			HashSet<String> emailSet = new HashSet<>();
-			emailSet.addAll(Arrays.asList(emails.split("\n")));
+            if ( department != null ) {
 
-			department.setAcceptedEmailExtensions(emailSet);
 
-			departmentRepository.save(department);
+                for (String string : Arrays.asList(emails.split("\n"))) {
+                    EmailExtension emailExtension = EmailExtension.builder()
+                            .emailExtension(string)
+                            .department(department)
+                            .build();
+                    emailExtension = emailExtensionRepository.save(emailExtension);
+//                    department.getAcceptedEmailExtensions().add(emailExtension);
+                }
+
+//                departmentRepository.save(department);
+            }
+            else {
+                System.out.println("new dept: " + name);
+            }			
         }
-
-        // "@fsni.x.gsi.gov.uk
-        //    @justice-ni.gov.uk
-        //@parolecommni.x.gsi.gov.
-        //@dojni.x.gsi.gov.uk
-        //@justice-ni.x.gsi.gov.uk
-        //@parolecomni.gsi.gov.uk
-        //@PAROLECOMNI.X.GSI.GOV.UK
 
 
 //        String pattern = "(.*)(\\d+)(.*)";

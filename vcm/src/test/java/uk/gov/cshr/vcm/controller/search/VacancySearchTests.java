@@ -51,6 +51,7 @@ import uk.gov.cshr.vcm.controller.exception.VacancyError;
 import uk.gov.cshr.vcm.model.ContractType;
 import uk.gov.cshr.vcm.model.Coordinates;
 import uk.gov.cshr.vcm.model.Department;
+import uk.gov.cshr.vcm.model.EmailExtension;
 import uk.gov.cshr.vcm.model.Location;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancyLocation;
@@ -62,6 +63,7 @@ import uk.gov.cshr.vcm.service.ApplicantTrackingSystemService;
 import uk.gov.cshr.vcm.service.CshrAuthenticationService;
 import uk.gov.cshr.vcm.service.HibernateSearchService;
 import uk.gov.cshr.vcm.service.LocationService;
+import uk.gov.cshr.vcm.service.NotifyService;
 import uk.gov.cshr.vcm.service.SearchService;
 
 @ActiveProfiles("dev")
@@ -105,8 +107,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     @MockBean
     private LocationService locationService;
 
-//	@MockBean
-//    private SearchService searchService;
+    @MockBean
+    private NotifyService notifyService;
 
     @Inject
     private HibernateSearchService hibernateSearchService;
@@ -158,11 +160,20 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
 
-        department1 = departmentRepository.save(
-                Department.builder()
+        department1 = Department.builder()
                         .name("Department One")
                         .disabilityLogo("disabilityLogo")
-                        .build());
+                        .build();
+
+        EmailExtension emailExtension = EmailExtension.builder()
+                                        .department(department1)
+                                        .emailExtension("cabinetoffice.gov.uk")
+                                        .build();
+
+        department1.getAcceptedEmailExtensions().add(emailExtension);
+        department1 = departmentRepository.save(department1);      
+
+        department1 = departmentRepository.save(department1);
 
         department2 = departmentRepository.save(
                 Department.builder()

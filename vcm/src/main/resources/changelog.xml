@@ -276,12 +276,21 @@
             columnName="dept_id"
             tableName="vacancies"/>
     </changeSet>
-    <changeSet author="Gordon" id="33">
-        <createTable tableName="department_acceptedemailextensions">
-            <column name="department_id" type="BIGINT">
+    <changeSet author="gordon" id="34">
+        <createTable tableName="acceptedemailextensions">
+            <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints nullable="false"/>
             </column>
-            <column name="acceptedemailextensions" type="TEXT"/>
+            <column name="emailextension" type="TEXT"/>
+            <column name="department_id" type="BIGINT"/>
         </createTable>
+         <addPrimaryKey columnNames="id" constraintName="acceptedemailextensions_pkey" tableName="acceptedemailextensions"/>
+    <addForeignKeyConstraint baseColumnNames="department_id"
+                             baseTableName="acceptedemailextensions"
+                             constraintName="fk_acceptedemailextensions_departments"
+                             onDelete="NO ACTION"
+                             onUpdate="NO ACTION"
+                             referencedColumnNames="id"
+                             referencedTableName="departments"/>
     </changeSet>
 </databaseChangeLog>

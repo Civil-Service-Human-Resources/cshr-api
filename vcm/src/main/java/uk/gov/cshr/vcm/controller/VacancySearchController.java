@@ -130,9 +130,12 @@ public class VacancySearchController {
             String emailAddress = node.asText();
             String jwt = cshrAuthenticationService.createInternalJWT(emailAddress);
 
-            if ( jwt != null ) {
-//                notifyService.emailInternalJWT(emailAddress, jwt, "name");
-                return ResponseEntity.noContent().build();
+            VacancyEligibility vacancyEligibility = cshrAuthenticationService.parseVacancyEligibility(jwt, new SearchResponse());
+
+            if ( vacancyEligibility.equals(VacancyEligibility.ACROSS_GOVERNMENT)
+                || vacancyEligibility.equals(VacancyEligibility.INTERNAL) ) {
+                notifyService.emailInternalJWT(emailAddress, jwt, "name");
+                return ResponseEntity.ok().build();
             }
             else {
                 VacancyError vacancyError = VacancyError.builder()
