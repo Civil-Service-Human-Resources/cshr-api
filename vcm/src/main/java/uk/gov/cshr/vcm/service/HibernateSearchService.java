@@ -303,46 +303,58 @@ public class HibernateSearchService {
         return salaryQuery;
     }
 
-    private Query getOpenQuery(QueryBuilder qb, VacancyEligibility vacancyEligibility) {
+	private Query getOpenQuery(QueryBuilder qb, VacancyEligibility vacancyEligibility) {
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
 
-        if ( vacancyEligibility.equals(VacancyEligibility.PUBLIC) ) {
+		if (vacancyEligibility.equals(VacancyEligibility.PUBLIC)) {
 
-            Query publicQuery = qb
-                    .range()
-                    .onField("vacancy.publicOpeningDate")
-                    .ignoreFieldBridge()
-                    .above(sdf.format(new Date()))
-                    .excludeLimit()
-                    .createQuery();
+			Query publicQuery = qb
+					.range()
+					.onField("vacancy.publicOpeningDate")
+					.ignoreFieldBridge()
+					.below(sdf.format(new Date()))
+					.excludeLimit()
+					.createQuery();
 
-            return qb.bool().must(publicQuery).not().createQuery();
-        }
-        else {
+			return qb.bool().must(publicQuery).createQuery();
+		}
+		else {
 
-            Query internalQuery = qb
-                    .range()
-                    .onField("vacancy.internalOpeningDate")
-                    .ignoreFieldBridge()
-                    .above(sdf.format(new Date()))
-                    .excludeLimit()
-                    .createQuery();
+			Query internalQuery = qb
+					.range()
+					.onField("vacancy.internalOpeningDate")
+					.ignoreFieldBridge()
+					.above(sdf.format(new Date()))
+					.excludeLimit()
+					.createQuery();
 
-            Query departmentQuery = qb
-                    .keyword()
-                    .onField("vacancy.departmentID")
-                    .matching(vacancyEligibility.getDepartmentID().toString())
-                    .createQuery();
+			Query departmentQuery = qb
+					.keyword()
+					.onField("vacancy.departmentID")
+					.matching(vacancyEligibility.getDepartmentID().toString())
+					.createQuery();
 
-            Query internalDepartmentQuery = qb.bool()
-                    .must(internalQuery).not()
-                    .must(departmentQuery)
-                    .createQuery();
+			Query internalDepartmentQuery = qb.bool()
+					.must(internalQuery).not()
+					.must(departmentQuery)
+					.createQuery();
 
-            return internalDepartmentQuery;
-        }
-    }
+			Query publicQuery = qb
+					.range()
+					.onField("vacancy.publicOpeningDate")
+					.ignoreFieldBridge()
+					.below(sdf.format(new Date()))
+					.excludeLimit()
+					.createQuery();
+
+			return qb.bool()
+					.should(internalDepartmentQuery)
+					.should(publicQuery)
+					.createQuery();
+//			return internalDepartmentQuery;
+		}
+	}
 
     private Query getClosedVacanciesQuery(QueryBuilder qb) {
 

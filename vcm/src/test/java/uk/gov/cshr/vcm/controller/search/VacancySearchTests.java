@@ -172,7 +172,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                                         .build();
 
         department1.getAcceptedEmailExtensions().add(emailExtension);
-        department1 = departmentRepository.save(department1);      
+        department1 = departmentRepository.save(department1);
 
         department1 = departmentRepository.save(department1);
 
@@ -291,7 +291,62 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         List<Vacancy> resultsList = result.getVacancies().getContent();
 
         Assert.assertEquals("internal vacancy included", 2, resultsList.size());
-        Assert.assertEquals("Newcastle Job", resultsList.get(0).getTitle());
+    }
+
+    @Test
+    public void testPublicDateBeforeAcrossGovernment() throws Exception {
+
+        Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
+		newcastleVacancy.setGovernmentOpeningDate(YESTERDAY);
+		newcastleVacancy.setPublicOpeningDate(YESTERDAY);
+        newcastleVacancy.setTitle("Newcastle Job");
+        saveVacancy(newcastleVacancy);
+
+        Vacancy newcastleVacancy2 = createVacancyPrototype(newcastleLocation2);
+		newcastleVacancy2.setGovernmentOpeningDate(YESTERDAY);
+		newcastleVacancy2.setPublicOpeningDate(TOMORROW);
+        newcastleVacancy2.setTitle("Newcastle Job 2");
+        saveVacancy(newcastleVacancy2);
+
+		String jwt = cshrAuthenticationService.createInternalJWT("cabinetoffice.gov.uk", department1);
+		System.out.println("JWT=" + jwt);
+
+        VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
+                .keyword("newcastle")
+                .build();
+
+        SearchResponsePage result = findVancanciesByKeyword(vacancySearchParameters, jwt);
+        List<Vacancy> resultsList = result.getVacancies().getContent();
+
+        Assert.assertEquals("internal vacancy included", 2, resultsList.size());
+    }
+
+    @Test
+    public void testPublicDateBeforeInternalGovernment() throws Exception {
+
+        Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
+		newcastleVacancy.setPublicOpeningDate(YESTERDAY);
+		newcastleVacancy.setInternalOpeningDate(TOMORROW);
+        newcastleVacancy.setTitle("Newcastle Job");
+        saveVacancy(newcastleVacancy);
+
+        Vacancy newcastleVacancy2 = createVacancyPrototype(newcastleLocation2);
+		newcastleVacancy2.setPublicOpeningDate(YESTERDAY);
+		newcastleVacancy2.setInternalOpeningDate(TOMORROW);
+        newcastleVacancy2.setTitle("Newcastle Job 2");
+        saveVacancy(newcastleVacancy2);
+
+		String jwt = cshrAuthenticationService.createInternalJWT("cabinetoffice.gov.uk", department1);
+		System.out.println("JWT=" + jwt);
+
+        VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
+                .keyword("newcastle")
+                .build();
+
+        SearchResponsePage result = findVancanciesByKeyword(vacancySearchParameters, jwt);
+        List<Vacancy> resultsList = result.getVacancies().getContent();
+
+        Assert.assertEquals(2, resultsList.size());
     }
 
     @Test
@@ -306,7 +361,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         saveVacancy(newcastleVacancy);
 
         Vacancy newcastleVacancy2 = createVacancyPrototype(newcastleLocation2);
-        newcastleVacancy2.setDepartment(department2);        
+        newcastleVacancy2.setDepartment(department2);
 		newcastleVacancy2.setGovernmentOpeningDate(TOMORROW);
 		newcastleVacancy2.setPublicOpeningDate(TOMORROW);
         newcastleVacancy2.setInternalOpeningDate(YESTERDAY);
@@ -376,7 +431,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         String response = mvcResult.getResponse().getContentAsString();
 
         VerifyResponse verifyResponse = new ObjectMapper().readValue(response, VerifyResponse.class);
-        Assert.assertEquals("Expect UNAUTHORIZED error status", 
+        Assert.assertEquals("Expect UNAUTHORIZED error status",
                 HttpStatus.UNAUTHORIZED,
                 verifyResponse.getVacancyError().getStatus());
     }
