@@ -325,7 +325,7 @@ public class HibernateSearchService {
 					.range()
 					.onField("vacancy.internalOpeningDate")
 					.ignoreFieldBridge()
-					.above(sdf.format(new Date()))
+					.below(sdf.format(new Date()))
 					.excludeLimit()
 					.createQuery();
 
@@ -336,7 +336,7 @@ public class HibernateSearchService {
 					.createQuery();
 
 			Query internalDepartmentQuery = qb.bool()
-					.must(internalQuery).not()
+					.must(internalQuery)
 					.must(departmentQuery)
 					.createQuery();
 
@@ -348,9 +348,18 @@ public class HibernateSearchService {
 					.excludeLimit()
 					.createQuery();
 
+			Query governmentQuery = qb
+					.range()
+					.onField("vacancy.governmentOpeningDate")
+					.ignoreFieldBridge()
+					.below(sdf.format(new Date()))
+					.excludeLimit()
+					.createQuery();
+
 			return qb.bool()
 					.should(internalDepartmentQuery)
 					.should(publicQuery)
+                    .should(governmentQuery)
 					.createQuery();
 		}
 	}

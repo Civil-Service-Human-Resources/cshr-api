@@ -270,7 +270,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
 		newcastleVacancy.setGovernmentOpeningDate(YESTERDAY);
-		newcastleVacancy.setPublicOpeningDate(YESTERDAY);
+		newcastleVacancy.setPublicOpeningDate(TOMORROW);
         newcastleVacancy.setTitle("Newcastle Job");
         saveVacancy(newcastleVacancy);
 
@@ -280,7 +280,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         newcastleVacancy2.setTitle("Newcastle Job 2");
         saveVacancy(newcastleVacancy2);
 
-		String jwt = cshrAuthenticationService.createInternalJWT("cabinetoffice.gov.uk", department1);
+		String jwt = cshrAuthenticationService.createInternalJWT("cabinetoffice.gov.uk", department2);
 		System.out.println("JWT=" + jwt);
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()

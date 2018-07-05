@@ -8,9 +8,9 @@ import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import org.slf4j.Logger;
@@ -132,12 +132,7 @@ public class VacancySearchController {
         }
 
         Set<Department> departments = cshrAuthenticationService.verifyEmailAddress(emailAddress);
-        List<Long> permittedDepartmentIDs = new ArrayList<>();
-
-        for (Department department : departments) {
-            permittedDepartmentIDs.add(department.getId());
-        }
-
+        
         if (departments.size() == 1) {
 
             String jwt = cshrAuthenticationService.createInternalJWT(emailAddress, departments.iterator().next());
@@ -155,6 +150,11 @@ public class VacancySearchController {
                 return ResponseEntity.ok().body(verifyResponse);
             }
 
+            Set<Long> permittedDepartmentIDs = departments
+                    .stream()
+                    .map(Department::getId)
+                    .collect(Collectors.toSet());
+
             if (!permittedDepartmentIDs.contains(departmentID)) {
 
                 VacancyError vacancyError = VacancyError.builder()
@@ -169,7 +169,6 @@ public class VacancySearchController {
                 notifyService.emailInternalJWT(emailAddress, jwt, "name");
                 return ResponseEntity.noContent().build();
             }
-
         }
 
         else {

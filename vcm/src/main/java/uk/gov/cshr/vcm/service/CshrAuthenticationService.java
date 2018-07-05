@@ -12,11 +12,11 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 import javax.inject.Inject;
 import javax.xml.bind.DatatypeConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.cshr.vcm.controller.exception.SearchStatusCode;
 import uk.gov.cshr.vcm.controller.exception.VacancyError;
@@ -32,7 +32,8 @@ public class CshrAuthenticationService {
 
 	private static final Logger log = LoggerFactory.getLogger(CshrAuthenticationService.class);
 
-	private static final String SECRET = UUID.randomUUID().toString();
+    @Value("${spring.cshrAuthenticationService.secret}")
+    private String SECRET;
 
     @Inject
     private EmailExtensionRepository emailExtensionRepository;
