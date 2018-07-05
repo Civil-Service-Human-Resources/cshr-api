@@ -198,7 +198,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         createVacancyWithClosingDate("yesterday", YESTERDAY, department1);
 
         // beacuse these are timestamp basesd this job will be closed
-        Timestamp earlierToday = new Timestamp(now.getTime() - 10000);
+        Timestamp earlierToday = new Timestamp(now.getTime() - 60000);
         createVacancyWithClosingDate("earlier today", earlierToday, department1);
 
         createVacancyWithClosingDate("tomorrow", TOMORROW, department1);
