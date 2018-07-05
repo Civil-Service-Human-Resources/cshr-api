@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import javax.inject.Inject;
 import liquibase.util.csv.CSVReader;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,6 +32,7 @@ public class ReadDepartmentsTest {
     @Inject
     private EmailExtensionRepository emailExtensionRepository;
 
+	@Ignore
     @Test
     public void readDepartments() throws FileNotFoundException, IOException {
 
@@ -75,7 +77,7 @@ public class ReadDepartmentsTest {
             }
             else {
                 System.out.println("new dept: " + name);
-            }			
+            }
         }
 
 
