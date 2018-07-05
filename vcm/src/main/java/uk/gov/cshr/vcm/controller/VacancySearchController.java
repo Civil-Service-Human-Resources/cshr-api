@@ -8,8 +8,11 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import org.slf4j.Logger;
@@ -29,10 +32,12 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
 import uk.gov.cshr.vcm.controller.exception.VacancyClosedException;
 import uk.gov.cshr.vcm.controller.exception.VacancyError;
+import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.model.SearchResponse;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancyEligibility;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
+import uk.gov.cshr.vcm.model.VerifyResponse;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
 import uk.gov.cshr.vcm.service.CshrAuthenticationService;
 import uk.gov.cshr.vcm.service.NotifyService;
@@ -117,32 +122,82 @@ public class VacancySearchController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/verifyemail")
     @ApiOperation(value = "Generate a JWT to enable access to internal vacancies", nickname = "verifyEmailJWT")
-    public ResponseEntity<VacancyError> verifyEmailJWT(@RequestBody String emailAddressJSON) throws NotificationClientException {
+    public ResponseEntity<VerifyResponse> verifyEmailJWT(@RequestBody String emailAddressJSON) throws NotificationClientException {
 
         try {
-			JsonNode node = new ObjectMapper().readTree(emailAddressJSON).findValue("emailAddress");
+			JsonNode emailAddressNode = new ObjectMapper().readTree(emailAddressJSON).findValue("emailAddress");
+            JsonNode departmentIDNode = new ObjectMapper().readTree(emailAddressJSON).findValue("departmentID");
 
-
-			if ( node == null ) {
+			if ( emailAddressNode == null ) {
 				return ResponseEntity.badRequest().build();
 			}
 
-            String emailAddress = node.asText();
-            String jwt = cshrAuthenticationService.createInternalJWT(emailAddress);
+            String emailAddress = emailAddressNode.asText();
 
-            VacancyEligibility vacancyEligibility = cshrAuthenticationService.parseVacancyEligibility(jwt, new SearchResponse());
+            Set<Department> departments = cshrAuthenticationService.verifyEmailAddress(emailAddress);
+            List<Long> permittedDepartmentIDs = new ArrayList<>();
 
-            if ( vacancyEligibility.equals(VacancyEligibility.ACROSS_GOVERNMENT)
-                || vacancyEligibility.equals(VacancyEligibility.INTERNAL) ) {
-                notifyService.emailInternalJWT(emailAddress, jwt, "name");
-                return ResponseEntity.ok().build();
+            for (Department department : departments) {
+                permittedDepartmentIDs.add(department.getId());
             }
-            else {
+
+            if ( departments.size() == 1 ) {
+
+                String jwt = cshrAuthenticationService.createInternalJWT(emailAddress, departments.iterator().next());
+                notifyService.emailInternalJWT(emailAddress, jwt, "name");
+                return ResponseEntity.noContent().build();
+            }
+
+            else if ( departments.size() > 1 ) {
+
+                if ( departmentIDNode == null ) {
+
+                    VerifyResponse verifyResponse = VerifyResponse.builder()
+                            .departments(new ArrayList<>(departments))
+                            .build();
+                    return ResponseEntity.ok().body(verifyResponse);
+                }
+
+                Long departmentID = Long.parseLong(departmentIDNode.asText());
+
+                if (!permittedDepartmentIDs.contains(departmentID)) {
+
+                    VacancyError vacancyError = VacancyError.builder()
+                            .status(HttpStatus.UNAUTHORIZED)
+                            .build();
+                    return ResponseEntity.ok().body(VerifyResponse.builder()
+                            .vacancyError(vacancyError)
+                            .build());
+                }
+                else {
+                    String jwt = cshrAuthenticationService.createInternalJWT(emailAddress, findDepartment(departmentID, departments));
+                    notifyService.emailInternalJWT(emailAddress, jwt, "name");
+                    return ResponseEntity.noContent().build();
+                }
+
+            }
+            
+            else  {
+
                 VacancyError vacancyError = VacancyError.builder()
                         .status(HttpStatus.UNAUTHORIZED)
                         .build();
-                return ResponseEntity.ok().body(vacancyError);
+                return ResponseEntity.ok().body(VerifyResponse.builder().vacancyError(vacancyError).build());
             }
+
+
+//
+//            VacancyEligibility vacancyEligibility = cshrAuthenticationService.parseVacancyEligibility(jwt, new SearchResponse());
+//
+//            if ( vacancyEligibility.equals(VacancyEligibility.ACROSS_GOVERNMENT)
+//                || vacancyEligibility.equals(VacancyEligibility.INTERNAL) ) {
+//
+//
+//                return ResponseEntity.ok().build();
+//            }
+//            else {
+//
+//            }
         }
         catch (IOException ex) {
             log.error(ex.getMessage(), ex);
@@ -150,5 +205,14 @@ public class VacancySearchController {
         }
 
 
+    }
+
+    private Department findDepartment(Long id, Set<Department> departments) {
+        for (Department department : departments) {
+            if ( department.getId().equals(id) ) {
+                return department;
+            }
+        }
+        return null;
     }
 }

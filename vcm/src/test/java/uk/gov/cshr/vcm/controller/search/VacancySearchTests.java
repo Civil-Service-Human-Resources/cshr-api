@@ -56,6 +56,7 @@ import uk.gov.cshr.vcm.model.Location;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancyLocation;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
+import uk.gov.cshr.vcm.model.VerifyResponse;
 import uk.gov.cshr.vcm.model.WorkingPattern;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
@@ -279,7 +280,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         newcastleVacancy2.setTitle("Newcastle Job 2");
         saveVacancy(newcastleVacancy2);
 
-		String jwt = cshrAuthenticationService.createInternalJWT("cabinetoffice.gov.uk");
+		String jwt = cshrAuthenticationService.createInternalJWT("cabinetoffice.gov.uk", department1);
 		System.out.println("JWT=" + jwt);
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
@@ -291,6 +292,39 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         Assert.assertEquals("internal vacancy included", 2, resultsList.size());
         Assert.assertEquals("Newcastle Job", resultsList.get(0).getTitle());
+    }
+
+    @Test
+    public void testExcludeInternalVacancyByDepartment() throws Exception {
+
+        Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
+        newcastleVacancy.setDepartment(department1);
+		newcastleVacancy.setGovernmentOpeningDate(TOMORROW);
+		newcastleVacancy.setPublicOpeningDate(TOMORROW);
+        newcastleVacancy.setInternalOpeningDate(YESTERDAY);
+        newcastleVacancy.setTitle("Newcastle Job");
+        saveVacancy(newcastleVacancy);
+
+        Vacancy newcastleVacancy2 = createVacancyPrototype(newcastleLocation2);
+        newcastleVacancy2.setDepartment(department2);        
+		newcastleVacancy2.setGovernmentOpeningDate(TOMORROW);
+		newcastleVacancy2.setPublicOpeningDate(TOMORROW);
+        newcastleVacancy2.setInternalOpeningDate(YESTERDAY);
+        newcastleVacancy2.setTitle("Newcastle Job 2");
+        saveVacancy(newcastleVacancy2);
+
+		String jwt = cshrAuthenticationService.createInternalJWT("cabinetoffice.gov.uk", department2);
+		System.out.println("JWT=" + jwt);
+
+        VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
+                .keyword("newcastle")
+                .build();
+
+        SearchResponsePage result = findVancanciesByKeyword(vacancySearchParameters, jwt);
+        List<Vacancy> resultsList = result.getVacancies().getContent();
+
+        Assert.assertEquals("department2 vacancy included", 1, resultsList.size());
+        Assert.assertEquals("Newcastle Job 2", resultsList.get(0).getTitle());
     }
 
     @Test
@@ -308,7 +342,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         newcastleVacancy2.setTitle("Newcastle Job 2");
         saveVacancy(newcastleVacancy2);
 
-		String jwt = cshrAuthenticationService.createInternalJWT("cabinetoffice.gov.uk");
+		String jwt = cshrAuthenticationService.createInternalJWT("cabinetoffice.gov.uk", department1);
 		System.out.println("JWT=" + jwt);
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
@@ -341,8 +375,10 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         String response = mvcResult.getResponse().getContentAsString();
 
-        VacancyError vacancyError = new ObjectMapper().readValue(response, VacancyError.class);
-        Assert.assertEquals("Expect UNAUTHORIZED error status", HttpStatus.UNAUTHORIZED, vacancyError.getStatus());
+        VerifyResponse verifyResponse = new ObjectMapper().readValue(response, VerifyResponse.class);
+        Assert.assertEquals("Expect UNAUTHORIZED error status", 
+                HttpStatus.UNAUTHORIZED,
+                verifyResponse.getVacancyError().getStatus());
     }
 
     @Test

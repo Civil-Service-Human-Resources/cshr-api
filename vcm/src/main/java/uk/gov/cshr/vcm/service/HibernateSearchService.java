@@ -72,7 +72,8 @@ public class HibernateSearchService {
 
             Query searchtermQuery = getSearchTermQuery(searchParameters, qb);
             Query salaryQuery = getSalaryQuery(searchParameters, qb);
-            Query openClosed = getOpenClosedQuery(qb, searchParameters.getVacancyEligibility());
+            Query closedQuery = getClosedVacanciesQuery(qb);
+            Query openQuery = getOpenQuery(qb, searchParameters.getVacancyEligibility());
             Query departmentQuery = getDepartmentQuery(searchParameters, qb);
             Query locationQuery = getLocationQuery(searchParameters, qb);
 
@@ -85,9 +86,10 @@ public class HibernateSearchService {
             Query activeQuery = getActiveQuery(qb);
 
             combinedQuery = qb.bool()
+                    .must(closedQuery).not()
+                    .must(openQuery)
                     .must(locationQuery)
                     .must(salaryQuery)
-                    .must(openClosed)
                     .must(departmentQuery)
                     .must(searchtermQuery)
                     .must(contractTypeQuery)
@@ -301,7 +303,48 @@ public class HibernateSearchService {
         return salaryQuery;
     }
 
-    private Query getOpenClosedQuery(QueryBuilder qb, VacancyEligibility vacancyEligibility) {
+    private Query getOpenQuery(QueryBuilder qb, VacancyEligibility vacancyEligibility) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
+
+        if ( vacancyEligibility.equals(VacancyEligibility.PUBLIC) ) {
+
+            Query publicQuery = qb
+                    .range()
+                    .onField("vacancy.publicOpeningDate")
+                    .ignoreFieldBridge()
+                    .above(sdf.format(new Date()))
+                    .excludeLimit()
+                    .createQuery();
+
+            return qb.bool().must(publicQuery).not().createQuery();
+        }
+        else {
+
+            Query internalQuery = qb
+                    .range()
+                    .onField("vacancy.internalOpeningDate")
+                    .ignoreFieldBridge()
+                    .above(sdf.format(new Date()))
+                    .excludeLimit()
+                    .createQuery();
+
+            Query departmentQuery = qb
+                    .keyword()
+                    .onField("vacancy.departmentID")
+                    .matching(vacancyEligibility.getDepartmentID().toString())
+                    .createQuery();
+
+            Query internalDepartmentQuery = qb.bool()
+                    .must(internalQuery).not()
+                    .must(departmentQuery)
+                    .createQuery();
+
+            return internalDepartmentQuery;
+        }
+    }
+
+    private Query getClosedVacanciesQuery(QueryBuilder qb) {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
 
@@ -309,35 +352,11 @@ public class HibernateSearchService {
                 .range()
                 .onField("vacancy.closingDate")
                 .ignoreFieldBridge()
-                .above(sdf.format(new Date()))
-                .excludeLimit()
-                .createQuery();
-
-        Query openQuery;
-
-		if ( vacancyEligibility.equals(VacancyEligibility.INTERNAL)
-				|| vacancyEligibility.equals(VacancyEligibility.ACROSS_GOVERNMENT) ) {
-
-			openQuery = qb
-                .range()
-                .onField("vacancy.governmentOpeningDate")
-                .ignoreFieldBridge()
                 .below(sdf.format(new Date()))
                 .excludeLimit()
                 .createQuery();
-		}
-		else {
-			openQuery = qb
-                .range()
-                .onField("vacancy.publicOpeningDate")
-                .ignoreFieldBridge()
-                .below(sdf.format(new Date()))
-                .excludeLimit()
-                .createQuery();
-		}
 
-        Query openClosedQuery = qb.bool().must(openQuery).must(closedQuery).createQuery();
-        return openClosedQuery;
+        return closedQuery;
     }
 
     private Query getDepartmentQuery(SearchParameters searchParameters, QueryBuilder qb) {

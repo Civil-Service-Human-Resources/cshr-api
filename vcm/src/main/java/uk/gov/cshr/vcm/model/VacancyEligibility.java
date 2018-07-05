@@ -1,24 +1,13 @@
 package uk.gov.cshr.vcm.model;
 
-import java.util.List;
-
 public enum VacancyEligibility {
 
 	PUBLIC,
-	ACROSS_GOVERNMENT,
 	INTERNAL;
 
-    private List<Long> departments;
+    private Long departmentID;
 
     private String emailAddress;
-
-    public List<Long> getDepartments() {
-        return departments;
-    }
-
-    public void setDepartments(List<Long> departments) {
-        this.departments = departments;
-    }
 
     public String getEmailAddress() {
         return emailAddress;
@@ -26,6 +15,14 @@ public enum VacancyEligibility {
 
     public void setEmailAddress(String emailAddress) {
         this.emailAddress = emailAddress;
+    }
+
+    public Long getDepartmentID() {
+        return departmentID;
+    }
+
+    public void setDepartmentID(Long departmentID) {
+        this.departmentID = departmentID;
     }
     
 }

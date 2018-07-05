@@ -9,10 +9,8 @@ import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import javax.inject.Inject;
@@ -39,56 +37,26 @@ public class CshrAuthenticationService {
     @Inject
     private EmailExtensionRepository emailExtensionRepository;
 
-	public String createInternalJWT(String emailAddress) throws NotificationClientException {
+	public String createInternalJWT(String emailAddress, Department department) throws NotificationClientException {
 
-		Set<Department> departments = verifyEmailAddress(emailAddress);
-		StringBuilder stringBuilder = new StringBuilder();
+        Date date = Date.from(
+                LocalDateTime
+                        .now()
+                        .plusDays(1)
+                        .atZone(ZoneId.systemDefault())
+                        .toInstant());
 
-		for (Department department : departments) {
-			stringBuilder.append(department.getId() + ",");
-		}
+        String compactJws = Jwts.builder()
+                .setSubject("internal candidate")
+                .claim("Vacancy Eligibility", VacancyEligibility.INTERNAL.toString())
+                .claim("Email Address", emailAddress)
+                .claim("Department ID", department.getId())
+                .signWith(SignatureAlgorithm.HS512, SECRET)
+                .setExpiration(date)
+                .compact();
 
-		if( ! departments.isEmpty() ) {
-
-			Date date = Date.from(
-					LocalDateTime
-							.now()
-							.plusDays(1)
-							.atZone(ZoneId.systemDefault())
-							.toInstant());
-
-			String compactJws = Jwts.builder()
-					.setSubject("internal candidate")
-					.claim("Vacancy Eligibility", VacancyEligibility.ACROSS_GOVERNMENT.toString())
-                    .claim("Email Address", emailAddress)
-					.claim("Departments", stringBuilder.toString())
-					.signWith(SignatureAlgorithm.HS512, SECRET)
-					.setExpiration(date)
-					.compact();
-
-			log.debug("jwt=" + compactJws);
-			return compactJws;
-		}
-		else {
-			Date date = Date.from(
-					LocalDateTime
-							.now()
-							.plusDays(1)
-							.atZone(ZoneId.systemDefault())
-							.toInstant());
-
-			String compactJws = Jwts.builder()
-					.setSubject("internal candidate")
-					.claim("Vacancy Eligibility", VacancyEligibility.PUBLIC.toString())
-                    .claim("Email Address", emailAddress)
-					.claim("Departments", stringBuilder.toString())
-					.signWith(SignatureAlgorithm.HS512, SECRET)
-					.setExpiration(date)
-					.compact();
-
-			log.debug("jwt=" + compactJws);
-			return compactJws;
-		}
+        log.debug("jwt=" + compactJws);
+        return compactJws;
 	}
 
 	/**
@@ -117,24 +85,14 @@ public class CshrAuthenticationService {
             searchResponse.setAuthenticatedEmail(emailAddress);
 
 			Object eligibilityClaim = claims.get("Vacancy Eligibility");
-            Object departmentsIDs = claims.get("Department IDs");
+            Object departmentID = claims.get("Department ID");
 
 			if ( eligibilityClaim != null ) {
 				VacancyEligibility vacancyEligibility = VacancyEligibility.valueOf(eligibilityClaim.toString());
                 vacancyEligibility.setEmailAddress(emailAddress);
-
-                List<Long> longArrayList = new ArrayList<>();
-
-                if ( departmentsIDs != null ) {
-
-                    String[] longStrings = departmentsIDs.toString().split(",");
-
-                    for (String longString : longStrings) {
-                        longArrayList.add(Long.parseLong(longString));
-                    }
+                if (departmentID != null) {
+                    vacancyEligibility.setDepartmentID(Long.parseLong(departmentID.toString()));
                 }
-
-                vacancyEligibility.setDepartments(longArrayList);
                 return vacancyEligibility;
 			}
 			else {
