@@ -33,6 +33,7 @@ import uk.gov.cshr.vcm.model.EmailExtension;
 import uk.gov.cshr.vcm.model.VerifyRequest;
 import uk.gov.cshr.vcm.model.VerifyResponse;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
+import uk.gov.cshr.vcm.repository.EmailExtensionRepository;
 import uk.gov.cshr.vcm.service.NotifyService;
 
 @ActiveProfiles("dev")
@@ -59,6 +60,9 @@ public class VerifyEmailTests extends AbstractTestNGSpringContextTests {
     @Inject
     private DepartmentRepository departmentRepository;
 
+	@Inject
+	private EmailExtensionRepository emailExtensionRepository;
+
     private MockMvc mockMvc;
 
     @MockBean
@@ -70,7 +74,8 @@ public class VerifyEmailTests extends AbstractTestNGSpringContextTests {
     @Before
     public void before() throws LocationServiceException {
 
-        departmentRepository.deleteAll();;
+		emailExtensionRepository.deleteAll();
+        departmentRepository.deleteAll();
 
         this.mockMvc = MockMvcBuilders
                 .webAppContextSetup(webApplicationContext)

@@ -352,7 +352,6 @@ public class HibernateSearchService {
 					.should(internalDepartmentQuery)
 					.should(publicQuery)
 					.createQuery();
-//			return internalDepartmentQuery;
 		}
 	}
 
