@@ -190,6 +190,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     @Test
     public void testExcludeClosedVacancies() throws Exception {
 
+		Date now = new Date();
+
         given(locationService.find(any()))
                 .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
 
@@ -206,8 +208,6 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         List<Vacancy> resultsList = result.getVacancies().getContent();
 
         Assert.assertTrue("Expected results", !resultsList.isEmpty());
-
-        Date now = new Date();
 
         for (Vacancy vacancy : resultsList) {
             if (vacancy.getClosingDate().before(now)) {
