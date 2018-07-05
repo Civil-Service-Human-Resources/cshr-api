@@ -1,7 +1,5 @@
 package uk.gov.cshr.vcm.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -37,6 +35,7 @@ import uk.gov.cshr.vcm.model.SearchResponse;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancyEligibility;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
+import uk.gov.cshr.vcm.model.VerifyRequest;
 import uk.gov.cshr.vcm.model.VerifyResponse;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
 import uk.gov.cshr.vcm.service.CshrAuthenticationService;
@@ -122,89 +121,64 @@ public class VacancySearchController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/verifyemail")
     @ApiOperation(value = "Generate a JWT to enable access to internal vacancies", nickname = "verifyEmailJWT")
-    public ResponseEntity<VerifyResponse> verifyEmailJWT(@RequestBody String emailAddressJSON) throws NotificationClientException {
+    public ResponseEntity<VerifyResponse> verifyEmailJWT(@RequestBody VerifyRequest verifyRequest) throws NotificationClientException {
 
-        try {
-			JsonNode emailAddressNode = new ObjectMapper().readTree(emailAddressJSON).findValue("emailAddress");
-            JsonNode departmentIDNode = new ObjectMapper().readTree(emailAddressJSON).findValue("departmentID");
+        String emailAddress = verifyRequest.getEmailAddress();
+        Long departmentID = verifyRequest.getDepartmentID();
 
-			if ( emailAddressNode == null ) {
-				return ResponseEntity.badRequest().build();
-			}
+        if (emailAddress == null) {
+            log.debug("emailAddress cannot be null");
+            return ResponseEntity.badRequest().build();
+        }
 
-            String emailAddress = emailAddressNode.asText();
+        Set<Department> departments = cshrAuthenticationService.verifyEmailAddress(emailAddress);
+        List<Long> permittedDepartmentIDs = new ArrayList<>();
 
-            Set<Department> departments = cshrAuthenticationService.verifyEmailAddress(emailAddress);
-            List<Long> permittedDepartmentIDs = new ArrayList<>();
+        for (Department department : departments) {
+            permittedDepartmentIDs.add(department.getId());
+        }
 
-            for (Department department : departments) {
-                permittedDepartmentIDs.add(department.getId());
+        if (departments.size() == 1) {
+
+            String jwt = cshrAuthenticationService.createInternalJWT(emailAddress, departments.iterator().next());
+            notifyService.emailInternalJWT(emailAddress, jwt, "name");
+            return ResponseEntity.noContent().build();
+        }
+
+        else if (departments.size() > 1) {
+
+            if (departmentID == null) {
+
+                VerifyResponse verifyResponse = VerifyResponse.builder()
+                        .departments(new ArrayList<>(departments))
+                        .build();
+                return ResponseEntity.ok().body(verifyResponse);
             }
 
-            if ( departments.size() == 1 ) {
-
-                String jwt = cshrAuthenticationService.createInternalJWT(emailAddress, departments.iterator().next());
-                notifyService.emailInternalJWT(emailAddress, jwt, "name");
-                return ResponseEntity.noContent().build();
-            }
-
-            else if ( departments.size() > 1 ) {
-
-                if ( departmentIDNode == null ) {
-
-                    VerifyResponse verifyResponse = VerifyResponse.builder()
-                            .departments(new ArrayList<>(departments))
-                            .build();
-                    return ResponseEntity.ok().body(verifyResponse);
-                }
-
-                Long departmentID = Long.parseLong(departmentIDNode.asText());
-
-                if (!permittedDepartmentIDs.contains(departmentID)) {
-
-                    VacancyError vacancyError = VacancyError.builder()
-                            .status(HttpStatus.UNAUTHORIZED)
-                            .build();
-                    return ResponseEntity.ok().body(VerifyResponse.builder()
-                            .vacancyError(vacancyError)
-                            .build());
-                }
-                else {
-                    String jwt = cshrAuthenticationService.createInternalJWT(emailAddress, findDepartment(departmentID, departments));
-                    notifyService.emailInternalJWT(emailAddress, jwt, "name");
-                    return ResponseEntity.noContent().build();
-                }
-
-            }
-            
-            else  {
+            if (!permittedDepartmentIDs.contains(departmentID)) {
 
                 VacancyError vacancyError = VacancyError.builder()
                         .status(HttpStatus.UNAUTHORIZED)
                         .build();
-                return ResponseEntity.ok().body(VerifyResponse.builder().vacancyError(vacancyError).build());
+                return ResponseEntity.ok().body(VerifyResponse.builder()
+                        .vacancyError(vacancyError)
+                        .build());
+            }
+            else {
+                String jwt = cshrAuthenticationService.createInternalJWT(emailAddress, findDepartment(departmentID, departments));
+                notifyService.emailInternalJWT(emailAddress, jwt, "name");
+                return ResponseEntity.noContent().build();
             }
 
-
-//
-//            VacancyEligibility vacancyEligibility = cshrAuthenticationService.parseVacancyEligibility(jwt, new SearchResponse());
-//
-//            if ( vacancyEligibility.equals(VacancyEligibility.ACROSS_GOVERNMENT)
-//                || vacancyEligibility.equals(VacancyEligibility.INTERNAL) ) {
-//
-//
-//                return ResponseEntity.ok().build();
-//            }
-//            else {
-//
-//            }
-        }
-        catch (IOException ex) {
-            log.error(ex.getMessage(), ex);
-            return ResponseEntity.noContent().build();
         }
 
+        else {
 
+            VacancyError vacancyError = VacancyError.builder()
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .build();
+            return ResponseEntity.ok().body(VerifyResponse.builder().vacancyError(vacancyError).build());
+        }
     }
 
     private Department findDepartment(Long id, Set<Department> departments) {

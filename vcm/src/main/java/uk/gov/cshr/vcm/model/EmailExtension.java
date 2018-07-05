@@ -13,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -39,6 +40,7 @@ public class EmailExtension implements Serializable {
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "department_id")
+    @NotNull
     private Department department;
 
     @Override
