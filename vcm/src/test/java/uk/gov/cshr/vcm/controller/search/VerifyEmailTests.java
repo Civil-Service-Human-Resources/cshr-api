@@ -5,6 +5,7 @@ import java.nio.charset.Charset;
 import javax.inject.Inject;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,6 +43,7 @@ import uk.gov.cshr.vcm.service.NotifyService;
 @ContextConfiguration
 @WebAppConfiguration
 @TestExecutionListeners(MockitoTestExecutionListener.class)
+@Ignore
 public class VerifyEmailTests extends AbstractTestNGSpringContextTests {
 
     public static final double BRISTOL_LATITUDE = 51.4549291;
