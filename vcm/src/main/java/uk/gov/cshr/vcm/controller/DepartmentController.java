@@ -2,6 +2,7 @@ package uk.gov.cshr.vcm.controller;
 
 import io.swagger.annotations.ApiOperation;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.Optional;
 import javax.annotation.security.RolesAllowed;
@@ -17,8 +18,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
@@ -110,11 +113,13 @@ public class DepartmentController {
     }
 
 	@CacheEvict(value = "emailAddresses", allEntries = true)
-    @RequestMapping(method = RequestMethod.PUT, value = "/loademails")
+    @RequestMapping(method = RequestMethod.POST, value = "/loademails")
     @ApiOperation(value = "load departments", nickname = "load")
-    public ResponseEntity<Department> load() throws IOException {
+    public ResponseEntity<?> load(@RequestParam("file") MultipartFile file) throws IOException {
 
-        loadDepartmentEmailsService.readEmails("RPGDepartmentDataMaster.csv");
-        return ResponseEntity.noContent().build();
+        try (InputStream inputStream = file.getInputStream()) {
+            loadDepartmentEmailsService.readEmails(inputStream);
+            return ResponseEntity.noContent().build();
+        }
     }
 }

@@ -18,10 +18,7 @@ public class LoadDepartmentEmailsService {
 	@Inject
 	private DepartmentRepository departmentRepository;
 
-    public void readEmails(String fileName) throws IOException {
-
-        ClassLoader classLoader = getClass().getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream(fileName);
+    public void readEmails(InputStream inputStream) throws IOException {
 
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
