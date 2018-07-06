@@ -116,18 +116,20 @@ public class CshrAuthenticationService {
 		}
 	}
 
-	public Set<Department> verifyEmailAddress(String emailAddress) {
+    public Set<Department> verifyEmailAddress(String emailAddress) {
 
-		Set<Department> departments = new HashSet<>();
+        Set<Department> departments = new HashSet<>();
 
         Iterable<EmailExtension> emailExtensions = emailExtensionRepository.findAll();
 
         emailExtensions.forEach(e -> {
-            if ( emailAddress.endsWith(e.getEmailExtension()) ) {
+            if ((e.getEmailExtension() != null)
+                    && (!e.getEmailExtension().trim().isEmpty())
+                    && (emailAddress.endsWith(e.getEmailExtension().trim()))) {
                 departments.add(e.getDepartment());
             }
         });
 
-		return departments;
-	}
+        return departments;
+    }
 }
