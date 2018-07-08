@@ -276,4 +276,9 @@
             columnName="dept_id"
             tableName="vacancies"/>
     </changeSet>
+    <changeSet author="gordon" id="34">
+        <addColumn tableName="vacancies">
+            <column name="lengthofemployment" type="TEXT" />
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
