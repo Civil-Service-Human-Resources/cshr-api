@@ -16,6 +16,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.SequenceGenerator;
@@ -100,4 +102,8 @@ public class Department implements Serializable {
         }
         return true;
     }
+
+    @ManyToOne
+    @JoinColumn(name = "parentdepartmentid")
+    private Department parent;
 }

@@ -293,4 +293,9 @@
                              referencedColumnNames="id"
                              referencedTableName="departments"/>
     </changeSet>
+    <changeSet author="Gordon" id="35">
+        <addColumn tableName="departments">
+            <column name="parentdepartmentid" type="BIGINT" />
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
