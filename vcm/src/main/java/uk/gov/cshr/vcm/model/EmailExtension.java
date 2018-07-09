@@ -50,9 +50,15 @@ public class EmailExtension implements Serializable {
         return hash;
     }
 
+
+
+    @Override
+    public String toString() {
+        return "EmailExtension{" + "id=" + id + ", emailExtension=" + emailExtension + ", department=" + department.getId() + '}';
+    }
+
     @Override
     public boolean equals(Object obj) {
-
         if (this == obj) {
             return true;
         }
@@ -63,14 +69,12 @@ public class EmailExtension implements Serializable {
             return false;
         }
         final EmailExtension other = (EmailExtension) obj;
+        if (!Objects.equals(this.emailExtension, other.emailExtension)) {
+            return false;
+        }
         if (!Objects.equals(this.id, other.id)) {
             return false;
         }
         return true;
-    }
-
-    @Override
-    public String toString() {
-        return "EmailExtension{" + "id=" + id + ", emailExtension=" + emailExtension + ", department=" + department.getId() + '}';
     }
 }
