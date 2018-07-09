@@ -241,5 +241,8 @@ public class Vacancy implements Serializable {
 	@Column(name = "active")
 	@Builder.Default
     private Boolean active = Boolean.TRUE;
+
+	@Column(name = "lengthofemployment")
+    private String lengthOfEmployment;
 }
 
