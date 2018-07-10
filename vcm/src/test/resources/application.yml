@@ -23,7 +23,7 @@ spring:
     crud_password: crudpassword
   notifyservice:
     templateid:
-    notifyApiKey: 
+    notifyApiKey:
     notify_username: notifyusername
     notify_password: notifypassword
 server:

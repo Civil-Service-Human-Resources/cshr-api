@@ -12,6 +12,7 @@ import javax.annotation.security.RolesAllowed;
 import org.apache.commons.validator.UrlValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -28,6 +29,7 @@ import uk.gov.cshr.status.StatusCode;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
 import uk.gov.cshr.vcm.service.ApplicantTrackingSystemService;
+import uk.gov.cshr.vcm.service.HibernateSearchService;
 
 @RestController
 @RequestMapping(value = "/vacancy", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -40,6 +42,9 @@ public class VacancyController {
 
     private final ApplicantTrackingSystemService applicantTrackingSystemService;
     private final VacancyRepository vacancyRepository;
+
+    @Autowired
+    private HibernateSearchService hibernateSearchService;
 
     VacancyController(ApplicantTrackingSystemService applicantTrackingSystemService,
                       VacancyRepository vacancyRepository) {
@@ -155,6 +160,13 @@ public class VacancyController {
                 .summary(message)
                 .detail(Collections.emptyList())
                 .build());
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/refresh")
+    public ResponseEntity<?> refresh() throws InterruptedException {
+        
+        hibernateSearchService.initializeHibernateSearch();
+        return ResponseEntity.noContent().build();
     }
 
     private void sanitiseApplyURL(Vacancy vacancy) {
