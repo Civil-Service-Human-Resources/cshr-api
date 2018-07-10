@@ -10,15 +10,21 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.UUID;
+import java.util.HashSet;
+import java.util.Set;
+import javax.inject.Inject;
 import javax.xml.bind.DatatypeConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.cshr.vcm.controller.exception.SearchStatusCode;
 import uk.gov.cshr.vcm.controller.exception.VacancyError;
+import uk.gov.cshr.vcm.model.Department;
+import uk.gov.cshr.vcm.model.EmailExtension;
 import uk.gov.cshr.vcm.model.SearchResponse;
 import uk.gov.cshr.vcm.model.VacancyEligibility;
+import uk.gov.cshr.vcm.repository.EmailExtensionRepository;
 import uk.gov.service.notify.NotificationClientException;
 
 @Service
@@ -26,33 +32,32 @@ public class CshrAuthenticationService {
 
 	private static final Logger log = LoggerFactory.getLogger(CshrAuthenticationService.class);
 
-	private static final String SECRET = UUID.randomUUID().toString();
+    @Value("${spring.cshrAuthenticationService.secret}")
+    private String SECRET;
 
-	public String createInternalJWT(String emailAddress) throws NotificationClientException {
+    @Inject
+    private EmailExtensionRepository emailExtensionRepository;
 
-		if( verifyEmailAddress(emailAddress) ) {
+	public String createInternalJWT(String emailAddress, Department department) throws NotificationClientException {
 
-			Date date = Date.from(
-					LocalDateTime
-							.now()
-							.plusDays(1)
-							.atZone(ZoneId.systemDefault())
-							.toInstant());
+        Date date = Date.from(
+                LocalDateTime
+                        .now()
+                        .plusDays(1)
+                        .atZone(ZoneId.systemDefault())
+                        .toInstant());
 
-			String compactJws = Jwts.builder()
-					.setSubject("internal candidate")
-					.claim("Vacancy Eligibility", VacancyEligibility.ACROSS_GOVERNMENT.toString())
-                    .claim("Email Address", emailAddress)
-					.signWith(SignatureAlgorithm.HS512, SECRET)
-					.setExpiration(date)
-					.compact();
+        String compactJws = Jwts.builder()
+                .setSubject("internal candidate")
+                .claim("Vacancy Eligibility", VacancyEligibility.INTERNAL.toString())
+                .claim("Email Address", emailAddress)
+                .claim("Department ID", department.getId())
+                .signWith(SignatureAlgorithm.HS512, SECRET)
+                .setExpiration(date)
+                .compact();
 
-			log.debug("jwt=" + compactJws);
-			return compactJws;
-		}
-		else {
-			return null;
-		}
+        log.debug("jwt=" + compactJws);
+        return compactJws;
 	}
 
 	/**
@@ -81,9 +86,15 @@ public class CshrAuthenticationService {
             searchResponse.setAuthenticatedEmail(emailAddress);
 
 			Object eligibilityClaim = claims.get("Vacancy Eligibility");
+            Object departmentID = claims.get("Department ID");
 
 			if ( eligibilityClaim != null ) {
-				return VacancyEligibility.valueOf(eligibilityClaim.toString());
+				VacancyEligibility vacancyEligibility = VacancyEligibility.valueOf(eligibilityClaim.toString());
+                vacancyEligibility.setEmailAddress(emailAddress);
+                if (departmentID != null) {
+                    vacancyEligibility.setDepartmentID(Long.parseLong(departmentID.toString()));
+                }
+                return vacancyEligibility;
 			}
 			else {
                 VacancyError vacancyError = VacancyError.builder()
@@ -93,8 +104,8 @@ public class CshrAuthenticationService {
 				return VacancyEligibility.PUBLIC;
 			}
 		}
-		// Who knows what exceptions Jwts.parser may throw
 		catch(ExpiredJwtException | MalformedJwtException | SignatureException | UnsupportedJwtException | IllegalArgumentException e) {
+            
 			log.error(e.getMessage(), e);
             VacancyError vacancyError = VacancyError.builder()
                     .message(e.getMessage())
@@ -105,10 +116,20 @@ public class CshrAuthenticationService {
 		}
 	}
 
-	private boolean verifyEmailAddress(String emailAddress) {
+    public Set<Department> verifyEmailAddress(String emailAddress) {
 
-		return emailAddress.endsWith(".gov.uk")
-				|| emailAddress.endsWith("valtech.co.uk")
-                || emailAddress.endsWith("cabinetoffice.gov.uk");
-	}
+        Set<Department> departments = new HashSet<>();
+
+        Iterable<EmailExtension> emailExtensions = emailExtensionRepository.findAll();
+
+        emailExtensions.forEach(e -> {
+            if ((e.getEmailExtension() != null)
+                    && (!e.getEmailExtension().trim().isEmpty())
+                    && (emailAddress.endsWith(e.getEmailExtension().trim()))) {
+                departments.add(e.getDepartment());
+            }
+        });
+
+        return departments;
+    }
 }

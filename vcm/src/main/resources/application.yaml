@@ -27,8 +27,10 @@ spring:
     notify_password: notifypassword
   notifyservice:
     templateid:
-    notifyApiKey:
+    notifyApiKey: 
     accountEnableURL: http://localhost:3000/verifyemail/%s
+  cshrAuthenticationService:
+    secret: f0fb2106-a5c6-4b06-9300-e954a31efcf9
 server:
   port: 8080
 liquibase:
