@@ -361,34 +361,6 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
 		newcastleVacancy.setGovernmentOpeningDate(YESTERDAY);
-		newcastleVacancy.setPublicOpeningDate(TOMORROW);
-        newcastleVacancy.setTitle("Newcastle Job");
-        saveVacancy(newcastleVacancy);
-
-        Vacancy newcastleVacancy2 = createVacancyPrototype(newcastleLocation2);
-		newcastleVacancy2.setGovernmentOpeningDate(YESTERDAY);
-		newcastleVacancy2.setPublicOpeningDate(TOMORROW);
-        newcastleVacancy2.setTitle("Newcastle Job 2");
-        saveVacancy(newcastleVacancy2);
-
-		String jwt = cshrAuthenticationService.createInternalJWT("cabinetoffice.gov.uk", department2);
-		System.out.println("JWT=" + jwt);
-
-        VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
-                .keyword("newcastle")
-                .build();
-
-        SearchResponsePage result = findVancanciesByKeyword(vacancySearchParameters, jwt);
-        List<Vacancy> resultsList = result.getVacancies().getContent();
-
-        Assert.assertEquals("internal vacancy included", 2, resultsList.size());
-    }
-
-    @Test
-    public void testPublicDateBeforeAcrossGovernment() throws Exception {
-
-        Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
-		newcastleVacancy.setGovernmentOpeningDate(YESTERDAY);
 		newcastleVacancy.setPublicOpeningDate(YESTERDAY);
         newcastleVacancy.setTitle("Newcastle Job");
         saveVacancy(newcastleVacancy);
