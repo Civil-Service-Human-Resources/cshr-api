@@ -77,7 +77,6 @@ workflows:
               only:
                 - master
                 - develop
-                - CSHRCP-1405-Across-gov-jobs
       - notify_pipeline:
           requires:
             - ship
@@ -85,4 +84,3 @@ workflows:
             branches:
               only:
                 - develop
-                - CSHRCP-1405-Across-gov-jobs
