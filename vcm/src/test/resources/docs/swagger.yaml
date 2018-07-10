@@ -11,6 +11,10 @@ info:
 host: 'localhost:8080'
 basePath: /
 tags:
+  - name: vacancy-tests-loader
+    description: Vacancy Tests Loader
+  - name: notify-controller
+    description: Notify Controller
   - name: vacancy-controller
     description: Vacancy Controller
   - name: Vacancy Service
@@ -56,6 +60,27 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/Department'
+  /department/loademails:
+    post:
+      tags:
+        - department-controller
+      summary: load departments
+      operationId: load
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      parameters:
+        - name: file
+          in: formData
+          description: file
+          required: true
+          type: file
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
   '/department/{departmentId}':
     get:
       tags:
@@ -126,6 +151,28 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/Department'
+  /notify:
+    post:
+      tags:
+        - notify-controller
+      summary: Sent notification code
+      operationId: notify
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: notification
+          description: notification
+          required: true
+          schema:
+            $ref: '#/definitions/Notification'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Notification'
   /vacancy:
     get:
       tags:
@@ -162,6 +209,21 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/Vacancy'
+  /vacancy/refresh:
+    get:
+      tags:
+        - vacancy-controller
+      summary: refresh
+      operationId: refreshUsingGET
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
   /vacancy/save:
     post:
       tags:
@@ -231,16 +293,16 @@ paths:
         - application/json
       parameters:
         - in: body
-          name: emailAddressJSON
-          description: emailAddressJSON
+          name: verifyRequest
+          description: verifyRequest
           required: true
           schema:
-            type: string
+            $ref: '#/definitions/VerifyRequest'
       responses:
         '200':
           description: OK
           schema:
-            $ref: '#/definitions/VacancyError'
+            $ref: '#/definitions/VerifyResponse'
   '/vacancy/{vacancyId}':
     get:
       tags:
@@ -315,6 +377,21 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/Vacancy'
+  /vacancytests:
+    get:
+      tags:
+        - vacancy-tests-loader
+      summary: loadTestData
+      operationId: loadTestDataUsingGET
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
 definitions:
   CSHRServiceStatus:
     type: object
@@ -330,8 +407,6 @@ definitions:
   Department:
     type: object
     properties:
-      acceptedEmailExtensions:
-        type: string
       departmentStatus:
         type: string
         enum:
@@ -373,6 +448,15 @@ definitions:
         format: int32
         description: the distance in miles to search from the given place
     description: The parameters that make a location for search made of a place and a radius to search from this place
+  Notification:
+    type: object
+    properties:
+      email:
+        type: string
+      templateID:
+        type: string
+      notifyCode:
+        type: string
   Page«Department»:
     type: object
     properties:
@@ -434,14 +518,18 @@ definitions:
     properties:
       authenticatedEmail:
         type: string
+        description: The email which was verified to give access to non-public jobs
       cshrServiceStatuses:
         type: array
+        description: A list of statuses indicating the system status
         items:
           $ref: '#/definitions/CSHRServiceStatus'
       vacancies:
+        description: 'The search results '
         $ref: '#/definitions/Page%C2%ABVacancy%C2%BB'
       vacancyErrors:
         type: array
+        description: A list of errors which may have affected the search results
         items:
           $ref: '#/definitions/VacancyError'
   Sort:
@@ -495,6 +583,8 @@ definitions:
       internalOpeningDate:
         type: string
         example: 'yyyy-MM-dd''T''HH:mm:ss.SSSZ'
+      lengthOfEmployment:
+        type: string
       locationOverride:
         type: string
       nationalityStatement:
@@ -667,7 +757,6 @@ definitions:
         type: string
         enum:
           - PUBLIC
-          - ACROSS_GOVERNMENT
           - INTERNAL
       workingPatterns:
         type: array
@@ -684,3 +773,20 @@ definitions:
       overseasJob:
         type: boolean
     description: The parameters allowed for when searching for vacancies
+  VerifyRequest:
+    type: object
+    properties:
+      emailAddress:
+        type: string
+      departmentID:
+        type: integer
+        format: int64
+  VerifyResponse:
+    type: object
+    properties:
+      departments:
+        type: array
+        items:
+          $ref: '#/definitions/Department'
+      vacancyError:
+        $ref: '#/definitions/VacancyError'

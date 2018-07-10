@@ -293,7 +293,12 @@
                              referencedColumnNames="id"
                              referencedTableName="departments"/>
     </changeSet>
-    <changeSet author="Gordon" id="35">
+    <changeSet author="gordon" id="35">
+        <addColumn tableName="vacancies">
+            <column name="lengthofemployment" type="TEXT" />
+        </addColumn>
+    </changeSet>
+    <changeSet author="Gordon" id="36">
         <addColumn tableName="departments">
             <column name="parentdepartmentid" type="BIGINT" />
         </addColumn>

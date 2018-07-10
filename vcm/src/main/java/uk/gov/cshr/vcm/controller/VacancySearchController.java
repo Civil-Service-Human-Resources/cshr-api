@@ -136,7 +136,7 @@ public class VacancySearchController {
         if (departments.size() == 1) {
 
             String jwt = cshrAuthenticationService.createInternalJWT(emailAddress, departments.iterator().next());
-//            notifyService.emailInternalJWT(emailAddress, jwt, "name");
+            notifyService.emailInternalJWT(emailAddress, jwt, "name");
             return ResponseEntity.noContent().build();
         }
 
@@ -166,7 +166,7 @@ public class VacancySearchController {
             }
             else {
                 String jwt = cshrAuthenticationService.createInternalJWT(emailAddress, findDepartment(departmentID, departments));
-//                notifyService.emailInternalJWT(emailAddress, jwt, "name");
+                notifyService.emailInternalJWT(emailAddress, jwt, "name");
                 return ResponseEntity.noContent().build();
             }
         }
