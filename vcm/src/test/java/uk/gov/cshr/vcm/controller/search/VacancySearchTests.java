@@ -123,6 +123,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     private Department department2;
     private Department parentDepartment;
     private Department childDepartment;
+    private Department siblingDepartment;
 
 
     private final VacancyLocation newcastleLocation = VacancyLocation.builder()
@@ -201,6 +202,13 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 Department.builder()
                         .name("Child Department")
                         .disabilityLogo("disabilityLogo")
+                        .build());
+
+        siblingDepartment = departmentRepository.save(
+                Department.builder()
+                        .name("Grand Child Department")
+                        .disabilityLogo("disabilityLogo")
+                        .parent(parentDepartment)
                         .build());
 
         EmailExtension childDepartmentEmail = EmailExtension.builder()
@@ -303,7 +311,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 		newcastleVacancy.setGovernmentOpeningDate(TOMORROW);
 		newcastleVacancy.setPublicOpeningDate(TOMORROW);
         newcastleVacancy.setInternalOpeningDate(YESTERDAY);
-        newcastleVacancy.setTitle("Newcastle Job");
+        newcastleVacancy.setTitle("Parent Vacancy");
         saveVacancy(newcastleVacancy);
 
         Vacancy newcastleVacancy2 = createVacancyPrototype(newcastleLocation2);
@@ -311,8 +319,16 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 		newcastleVacancy2.setGovernmentOpeningDate(TOMORROW);
 		newcastleVacancy2.setPublicOpeningDate(TOMORROW);
         newcastleVacancy2.setInternalOpeningDate(YESTERDAY);
-        newcastleVacancy2.setTitle("Newcastle Job 2");
+        newcastleVacancy2.setTitle("Child Vacancy");
         saveVacancy(newcastleVacancy2);
+
+        Vacancy newcastleVacancy3 = createVacancyPrototype(newcastleLocation3);
+        newcastleVacancy3.setDepartment(siblingDepartment);
+		newcastleVacancy3.setGovernmentOpeningDate(TOMORROW);
+		newcastleVacancy3.setPublicOpeningDate(TOMORROW);
+        newcastleVacancy3.setInternalOpeningDate(YESTERDAY);
+        newcastleVacancy3.setTitle("Sibling Vacancy");
+        saveVacancy(newcastleVacancy3);
 
         // a candiate with a parent email should also match jobs in the child departments
         String jwt = cshrAuthenticationService.createInternalJWT("parentdepartment@email.com", parentDepartment);
@@ -323,7 +339,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         SearchResponsePage result = findVancanciesByKeyword(vacancySearchParameters, jwt);
         List<Vacancy> resultsList = result.getVacancies().getContent();
 
-        Assert.assertEquals(2, resultsList.size());
+        Assert.assertEquals(3, resultsList.size());
     }
 
     @Test
