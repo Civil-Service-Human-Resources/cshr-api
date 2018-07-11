@@ -315,11 +315,9 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         saveVacancy(newcastleVacancy2);
 
         // a candiate with a parent email should also match jobs in the child departments
-
         String jwt = cshrAuthenticationService.createInternalJWT("parentdepartment@email.com", parentDepartment);
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
-//                .keyword("newcastle")
                 .build();
 
         SearchResponsePage result = findVancanciesByKeyword(vacancySearchParameters, jwt);
