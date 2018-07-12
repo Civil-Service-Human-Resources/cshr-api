@@ -121,6 +121,9 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
     private Department department1;
     private Department department2;
+    private Department parentDepartment;
+    private Department childDepartment;
+    private Department siblingDepartment;
 
 
     private final VacancyLocation newcastleLocation = VacancyLocation.builder()
@@ -181,6 +184,41 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                         .name("Department two")
                         .disabilityLogo("disabilityLogo")
                         .build());
+
+        parentDepartment = departmentRepository.save(
+                Department.builder()
+                        .name("Parent Department")
+                        .disabilityLogo("disabilityLogo")
+                        .build());
+
+        EmailExtension parentDepartmentEmail = EmailExtension.builder()
+                                        .department(parentDepartment)
+                                        .emailExtension("parentdepartment@email.com")
+                                        .build();
+        parentDepartment.getAcceptedEmailExtensions().add(parentDepartmentEmail);
+        departmentRepository.save(parentDepartment);
+
+        childDepartment = departmentRepository.save(
+                Department.builder()
+                        .name("Child Department")
+                        .disabilityLogo("disabilityLogo")
+                        .build());
+
+        siblingDepartment = departmentRepository.save(
+                Department.builder()
+                        .name("Grand Child Department")
+                        .disabilityLogo("disabilityLogo")
+                        .parent(parentDepartment)
+                        .build());
+
+        EmailExtension childDepartmentEmail = EmailExtension.builder()
+                                        .department(parentDepartment)
+                                        .emailExtension("childdepartment@email.com")
+                                        .build();
+        childDepartment.getAcceptedEmailExtensions().add(childDepartmentEmail);
+        childDepartment.setParent(parentDepartment);
+        departmentRepository.save(childDepartment);
+
     }
 
     @After
@@ -263,6 +301,45 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         Assert.assertEquals("internal vacancy excluded", 1, resultsList.size());
         Assert.assertEquals("Newcastle Job", resultsList.get(0).getTitle());
+    }
+
+    @Test
+    public void findParentDepartments() throws Exception {
+
+        Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
+        newcastleVacancy.setDepartment(parentDepartment);
+		newcastleVacancy.setGovernmentOpeningDate(TOMORROW);
+		newcastleVacancy.setPublicOpeningDate(TOMORROW);
+        newcastleVacancy.setInternalOpeningDate(YESTERDAY);
+        newcastleVacancy.setTitle("Parent Vacancy");
+        saveVacancy(newcastleVacancy);
+
+        Vacancy newcastleVacancy2 = createVacancyPrototype(newcastleLocation2);
+        newcastleVacancy2.setDepartment(childDepartment);
+		newcastleVacancy2.setGovernmentOpeningDate(TOMORROW);
+		newcastleVacancy2.setPublicOpeningDate(TOMORROW);
+        newcastleVacancy2.setInternalOpeningDate(YESTERDAY);
+        newcastleVacancy2.setTitle("Child Vacancy");
+        saveVacancy(newcastleVacancy2);
+
+        Vacancy newcastleVacancy3 = createVacancyPrototype(newcastleLocation3);
+        newcastleVacancy3.setDepartment(siblingDepartment);
+		newcastleVacancy3.setGovernmentOpeningDate(TOMORROW);
+		newcastleVacancy3.setPublicOpeningDate(TOMORROW);
+        newcastleVacancy3.setInternalOpeningDate(YESTERDAY);
+        newcastleVacancy3.setTitle("Sibling Vacancy");
+        saveVacancy(newcastleVacancy3);
+
+        // a candiate with a parent email should also match jobs in the child departments
+        String jwt = cshrAuthenticationService.createInternalJWT("parentdepartment@email.com", parentDepartment);
+
+        VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
+                .build();
+
+        SearchResponsePage result = findVancanciesByKeyword(vacancySearchParameters, jwt);
+        List<Vacancy> resultsList = result.getVacancies().getContent();
+
+        Assert.assertEquals(3, resultsList.size());
     }
 
     @Test
