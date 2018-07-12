@@ -284,18 +284,23 @@
             <column name="emailextension" type="TEXT"/>
             <column name="department_id" type="BIGINT"/>
         </createTable>
-        <addPrimaryKey columnNames="id" constraintName="acceptedemailextensions_pkey" tableName="acceptedemailextensions"/>
-        <addForeignKeyConstraint baseColumnNames="department_id"
-                                 baseTableName="acceptedemailextensions"
-                                 constraintName="fk_acceptedemailextensions_departments"
-                                 onDelete="NO ACTION"
-                                 onUpdate="NO ACTION"
-                                 referencedColumnNames="id"
-                                 referencedTableName="departments"/>
+         <addPrimaryKey columnNames="id" constraintName="acceptedemailextensions_pkey" tableName="acceptedemailextensions"/>
+    <addForeignKeyConstraint baseColumnNames="department_id"
+                             baseTableName="acceptedemailextensions"
+                             constraintName="fk_acceptedemailextensions_departments"
+                             onDelete="NO ACTION"
+                             onUpdate="NO ACTION"
+                             referencedColumnNames="id"
+                             referencedTableName="departments"/>
     </changeSet>
     <changeSet author="gordon" id="35">
         <addColumn tableName="vacancies">
             <column name="lengthofemployment" type="TEXT" />
+        </addColumn>
+    </changeSet>
+    <changeSet author="Gordon" id="36">
+        <addColumn tableName="departments">
+            <column name="parentdepartmentid" type="BIGINT" />
         </addColumn>
     </changeSet>
 </databaseChangeLog>
