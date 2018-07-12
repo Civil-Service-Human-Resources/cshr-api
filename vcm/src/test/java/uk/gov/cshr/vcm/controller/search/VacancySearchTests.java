@@ -304,7 +304,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void findChildDepartments() throws Exception {
+    public void findParentDepartments() throws Exception {
 
         Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
         newcastleVacancy.setDepartment(parentDepartment);
@@ -332,45 +332,6 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         // a candiate with a parent email should also match jobs in the child departments
         String jwt = cshrAuthenticationService.createInternalJWT("parentdepartment@email.com", parentDepartment);
-
-        VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
-                .build();
-
-        SearchResponsePage result = findVancanciesByKeyword(vacancySearchParameters, jwt);
-        List<Vacancy> resultsList = result.getVacancies().getContent();
-
-        Assert.assertEquals(3, resultsList.size());
-    }
-
-    @Test
-    public void findParentDepartments() throws Exception {
-
-        Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
-        newcastleVacancy.setDepartment(parentDepartment);
-		newcastleVacancy.setGovernmentOpeningDate(TOMORROW);
-		newcastleVacancy.setPublicOpeningDate(TOMORROW);
-        newcastleVacancy.setInternalOpeningDate(YESTERDAY);
-        newcastleVacancy.setTitle("Parent Vacancy");
-        saveVacancy(newcastleVacancy);
-
-        Vacancy newcastleVacancy2 = createVacancyPrototype(newcastleLocation2);
-        newcastleVacancy2.setDepartment(childDepartment);
-		newcastleVacancy2.setGovernmentOpeningDate(TOMORROW);
-		newcastleVacancy2.setPublicOpeningDate(TOMORROW);
-        newcastleVacancy2.setInternalOpeningDate(YESTERDAY);
-        newcastleVacancy2.setTitle("Child Vacancy");
-        saveVacancy(newcastleVacancy2);
-
-        Vacancy newcastleVacancy3 = createVacancyPrototype(newcastleLocation3);
-        newcastleVacancy3.setDepartment(siblingDepartment);
-		newcastleVacancy3.setGovernmentOpeningDate(TOMORROW);
-		newcastleVacancy3.setPublicOpeningDate(TOMORROW);
-        newcastleVacancy3.setInternalOpeningDate(YESTERDAY);
-        newcastleVacancy3.setTitle("Sibling Vacancy");
-        saveVacancy(newcastleVacancy3);
-
-        // a candiate with a child email should also match jobs in the parent department
-        String jwt = cshrAuthenticationService.createInternalJWT("childdepartment@email.com", childDepartment);
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
                 .build();
