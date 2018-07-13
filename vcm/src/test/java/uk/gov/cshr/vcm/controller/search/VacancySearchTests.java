@@ -52,6 +52,7 @@ import uk.gov.cshr.vcm.model.ContractType;
 import uk.gov.cshr.vcm.model.Coordinates;
 import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.model.EmailExtension;
+import uk.gov.cshr.vcm.model.HibernateSearchOptions;
 import uk.gov.cshr.vcm.model.Location;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancyLocation;
@@ -595,7 +596,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
     @Test
     public void testTitleMoreRelevantThanDescription() throws Exception {
-
+        
         Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
         newcastleVacancy.setTitle("any old title");
         newcastleVacancy.setDescription("jobs in newcastle are great");
@@ -611,6 +612,48 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         Assert.assertEquals("Expect two results", 2, resultsList.size());
         Assert.assertEquals("title match is first", newcastleVacancy2.getId(),
+                resultsList.get(0).getId());
+    }
+
+    @Test
+    public void testSearchOptions() throws Exception {
+
+        Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
+        newcastleVacancy.setTitle("anything findme");
+        newcastleVacancy.setDescription("random");
+        saveVacancy(newcastleVacancy);
+
+        Vacancy newcastleVacancy2 = createVacancyPrototype(newcastleLocation2);
+        newcastleVacancy2.setTitle("other");
+        newcastleVacancy2.setDescription("other findme");
+        saveVacancy(newcastleVacancy2);
+
+        HibernateSearchOptions hibernateSearchOptions = HibernateSearchOptions.builder()
+                .descriptionFuzzyBoost(5f)
+                .titleFuzzyBoost(-5f)
+                .titleOriginalBoost(-5f)
+                .titleOriginalPhraseBoost(-5f)
+                .build();
+
+        SearchResponsePage result = findVancanciesByKeyword("findme", hibernateSearchOptions);
+        List<Vacancy> resultsList = result.getVacancies().getContent();
+
+        Assert.assertEquals("Expect two results", 2, resultsList.size());
+        Assert.assertEquals("description match is first", newcastleVacancy2.getId(),
+                resultsList.get(0).getId());
+
+        hibernateSearchOptions = HibernateSearchOptions.builder()
+                .descriptionFuzzyBoost(-5f)
+                .titleFuzzyBoost(5f)
+                .titleOriginalBoost(5f)
+                .titleOriginalPhraseBoost(5f)
+                .build();
+
+        result = findVancanciesByKeyword("findme", hibernateSearchOptions);
+        resultsList = result.getVacancies().getContent();
+
+        Assert.assertEquals("Expect two results", 2, resultsList.size());
+        Assert.assertEquals("description match is first", newcastleVacancy.getId(),
                 resultsList.get(0).getId());
     }
 
@@ -1062,8 +1105,41 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
+        HibernateSearchOptions hibernateSearchOptions = HibernateSearchOptions.builder()
+                .descriptionFuzzyBoost(5f)
+                .build();
+
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
                 .keyword(keyword)
+                .hibernateSearchOptions(hibernateSearchOptions)
+                .build();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(vacancySearchParameters);
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/search")
+				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(json)
+                .accept(APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String searchResponse = mvcResult.getResponse().getContentAsString();
+
+        System.out.println("searchRespons=" + searchResponse);
+
+        return objectMapper.readValue(searchResponse, SearchResponsePage.class);
+    }
+
+    private SearchResponsePage findVancanciesByKeyword(String keyword,
+            HibernateSearchOptions hibernateSearchOptions) throws Exception {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
+                .keyword(keyword)
+                .hibernateSearchOptions(hibernateSearchOptions)
                 .build();
 
         ObjectMapper mapper = new ObjectMapper();

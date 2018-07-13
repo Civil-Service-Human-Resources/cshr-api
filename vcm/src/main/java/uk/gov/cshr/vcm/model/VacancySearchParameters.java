@@ -44,6 +44,9 @@ public class VacancySearchParameters implements Serializable {
 	@ApiModelProperty
 	private VacancyEligibility vacancyEligibility;
 
+    @Builder.Default
+    private HibernateSearchOptions hibernateSearchOptions = HibernateSearchOptions.builder().build();
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);

@@ -27,6 +27,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
+import uk.gov.cshr.vcm.model.HibernateSearchOptions;
 import uk.gov.cshr.vcm.model.SearchParameters;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancyEligibility;
@@ -66,6 +67,8 @@ public class HibernateSearchService {
         FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
         QueryBuilder qb = fullTextEntityManager.getSearchFactory().buildQueryBuilder().forEntity(VacancyLocation.class).get();
 
+        HibernateSearchOptions hibernateSearchOptions = searchParameters.getHibernateSearchOptions();
+
         BooleanJunction combinedQuery;
 
         try {
@@ -76,25 +79,49 @@ public class HibernateSearchService {
             Query openQuery = getOpenQuery(qb, searchParameters.getVacancyEligibility());
             Query departmentQuery = getDepartmentQuery(searchParameters, qb);
             Query locationQuery = getLocationQuery(searchParameters, qb);
-
             Query contractTypeQuery = getFieldQuery("vacancy.contractTypes",
                     getContractTypes(searchParameters), qb);
-
             Query workingPatternsQuery = getFieldQuery("vacancy.workingPatterns",
                     getWorkingPatterns(searchParameters), qb);
-
             Query activeQuery = getActiveQuery(qb);
 
-            combinedQuery = qb.bool()
-                    .must(closedQuery).not()
-                    .must(openQuery)
-                    .must(locationQuery)
-                    .must(salaryQuery)
-                    .must(departmentQuery)
-                    .must(searchtermQuery)
-                    .must(contractTypeQuery)
-                    .must(workingPatternsQuery)
-                    .must(activeQuery);
+            combinedQuery = qb.bool();
+
+            if (hibernateSearchOptions.isClosed() ) {
+                combinedQuery = combinedQuery.must(closedQuery).not();
+            }
+
+            if ( hibernateSearchOptions.isOpen() ) {
+                combinedQuery = combinedQuery.must(openQuery);
+            }
+
+            if ( hibernateSearchOptions.isLocation() ) {
+                combinedQuery = combinedQuery.must(locationQuery);
+            }
+
+            if ( hibernateSearchOptions.isSalary() ) {
+                combinedQuery = combinedQuery.must(salaryQuery);
+            }
+
+            if (hibernateSearchOptions.isDepartment() ) {
+                combinedQuery = combinedQuery.must(departmentQuery);
+            }
+
+            if( hibernateSearchOptions.isSearchTerm() ) {
+                combinedQuery = combinedQuery.must(searchtermQuery);
+            }
+
+            if( hibernateSearchOptions.isContractType() ) {
+                combinedQuery = combinedQuery.must(contractTypeQuery);
+            }
+            
+            if( hibernateSearchOptions.isWorkingPatterns() ) {
+                combinedQuery = combinedQuery.must(workingPatternsQuery);
+            }
+
+            if ( hibernateSearchOptions.isActive() ) {
+                combinedQuery = combinedQuery.must(activeQuery);
+            }
         }
         catch(EmptyQueryException e) {
             log.error(e.getMessage(), e);
@@ -155,6 +182,8 @@ public class HibernateSearchService {
 
     private Query getLocationQuery(SearchParameters searchParameters, QueryBuilder qb) {
 
+        HibernateSearchOptions hibernateSearchOptions = searchParameters.getHibernateSearchOptions();
+
 		boolean includeOverseasJobs = BooleanUtils.isTrue(
 			searchParameters.getVacancySearchParameters().getOverseasJob());
 
@@ -165,7 +194,7 @@ public class HibernateSearchService {
             BooleanJunction locationQuery = qb.bool();
 
             Query spatialQuery = qb
-                    .spatial().boostedTo(01.f)
+                    .spatial().boostedTo(hibernateSearchOptions.getLocationBoost())
                     .within(kms, Unit.KM)
                     .ofLatitude(searchParameters.getCoordinates().getLatitude())
                     .andLongitude(searchParameters.getCoordinates().getLongitude())
@@ -205,31 +234,31 @@ public class HibernateSearchService {
 
     private Query getSearchTermQuery(SearchParameters searchParameters, QueryBuilder qb) {
 
+        HibernateSearchOptions hibernateSearchOptions = searchParameters.getHibernateSearchOptions();
+
         String searchTerm = searchParameters.getVacancySearchParameters().getKeyword();
 
         if (searchTerm != null && !searchTerm.isEmpty()) {
 
             searchTerm = searchTerm.toLowerCase();
 
-            searchTerm = searchTerm.toLowerCase();
-
             Query titleFuzzyQuery = qb.keyword().fuzzy()
-                    .withEditDistanceUpTo(1)
-                    .withPrefixLength(1)
+                    .withEditDistanceUpTo(hibernateSearchOptions.getTitleEditDistance())
+                    .withPrefixLength(hibernateSearchOptions.getTitlePrefixLength())
                     .onField("vacancy.title")
-                    .boostedTo(1.5f)
+                    .boostedTo(hibernateSearchOptions.getTitleFuzzyBoost())
                     .matching(searchTerm)
                     .createQuery();
 
             Query titleQuery = qb.keyword()
                     .onField("vacancy.titleOriginal")
-                    .boostedTo(2f)
+                    .boostedTo(hibernateSearchOptions.getTitleOriginalBoost())
                     .matching(searchTerm)
                     .createQuery();
 
             Query titlePhraseQuery = qb.phrase()
                     .onField("vacancy.titleOriginal")
-                    .boostedTo(2f)
+                    .boostedTo(hibernateSearchOptions.getTitleOriginalPhraseBoost())
                     .ignoreAnalyzer()
                     .sentence(searchTerm)
                     .createQuery();
@@ -242,9 +271,9 @@ public class HibernateSearchService {
 
 
             Query descriptionQuery = qb.keyword().fuzzy()
-                    .withEditDistanceUpTo(1)
-                    .boostedTo(1.2f)
-                    .withPrefixLength(1)
+                    .withEditDistanceUpTo(hibernateSearchOptions.getDescriptionFuzzyEditDistance())
+                    .boostedTo(hibernateSearchOptions.getDescriptionFuzzyBoost())
+                    .withPrefixLength(hibernateSearchOptions.getDescriptionFuzzyPrefix())
                     .onField("vacancy.description")
                     .matching(searchTerm)
                     .createQuery();
@@ -272,6 +301,8 @@ public class HibernateSearchService {
     }
 
     private Query getSalaryQuery(SearchParameters searchParameters, QueryBuilder qb) {
+
+        HibernateSearchOptions hibernateSearchOptions = searchParameters.getHibernateSearchOptions();
 
         Integer minSalary = searchParameters.getVacancySearchParameters().getMinSalary();
         if (minSalary == null) {

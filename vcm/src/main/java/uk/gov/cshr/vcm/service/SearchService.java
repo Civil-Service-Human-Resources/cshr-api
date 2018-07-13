@@ -34,6 +34,7 @@ public class SearchService {
         SearchParameters searchParameters = SearchParameters.builder()
                 .vacancySearchParameters(vacancySearchParameters)
 				.vacancyEligibility(vacancySearchParameters.getVacancyEligibility())
+                .hibernateSearchOptions(vacancySearchParameters.getHibernateSearchOptions())
                 .build();
 
         boolean filterByLocation = vacancySearchParameters.getLocation() != null;

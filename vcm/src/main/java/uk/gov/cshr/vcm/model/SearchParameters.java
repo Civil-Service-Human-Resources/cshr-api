@@ -19,4 +19,7 @@ public class SearchParameters {
     private VacancySearchParameters vacancySearchParameters;
     private Coordinates coordinates;
 	private VacancyEligibility vacancyEligibility;
+
+    @Builder.Default
+    private HibernateSearchOptions hibernateSearchOptions = HibernateSearchOptions.builder().build();
 }
