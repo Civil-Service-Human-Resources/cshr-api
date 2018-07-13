@@ -25,7 +25,9 @@ if [[ ${#} -eq 0 ]]; then
             --spring.security.crud_username=${CRUD_USERNAME} \
             --spring.security.crud_password=${CRUD_PASSWORD} \
             --spring.notifyService.templateid=${NOTIFY_SERVICE_TEMPLATE_ID} \
-            --spring.notifyservice.notifyApiKey=${NOTIFY_SERVICE_NOTIFY_API_KEY}
+            --spring.notifyservice.notifyApiKey=${NOTIFY_SERVICE_NOTIFY_API_KEY} \
+            --spring.security.notify_username=${NOTIFY_USERNAME} \
+            --spring.security.notify_password=${NOTIFY_PASSWORD} 
 else
     echo "Running command:"
     exec "$@"
