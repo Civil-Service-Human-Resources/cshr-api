@@ -107,10 +107,6 @@ public class HibernateSearchService {
                 combinedQuery = combinedQuery.must(departmentQuery);
             }
 
-            if( hibernateSearchOptions.isSearchTerm() ) {
-                combinedQuery = combinedQuery.must(searchtermQuery);
-            }
-
             if( hibernateSearchOptions.isContractType() ) {
                 combinedQuery = combinedQuery.must(contractTypeQuery);
             }
@@ -122,6 +118,8 @@ public class HibernateSearchService {
             if ( hibernateSearchOptions.isActive() ) {
                 combinedQuery = combinedQuery.must(activeQuery);
             }
+
+            combinedQuery = combinedQuery.must(searchtermQuery);
         }
         catch(EmptyQueryException e) {
             log.error(e.getMessage(), e);
@@ -284,16 +282,33 @@ public class HibernateSearchService {
                     .matching(searchTerm.replaceAll(" ", "* ") + "*")
                     .createQuery();
 
-            Query keywordQuery = qb.bool()
-                    .should(titleFuzzyQuery)
-                    .should(descriptionQuery)
-                    .should(titleQuery)
-                    .should(titlePhraseQuery)
-                    .should(descriptiopnPhraseQuery)
-                    .should(wildcardQuery)
-                    .createQuery();
+            BooleanJunction booleanJunction = qb.bool();
 
-            return keywordQuery;
+            if ( hibernateSearchOptions.isTitleFuzzyQuery() ) {
+                booleanJunction = booleanJunction .should(titleFuzzyQuery);
+            }
+
+            if ( hibernateSearchOptions.isTitleFuzzyQuery() ) {
+                booleanJunction = booleanJunction .should(titleQuery);
+            }
+
+            if ( hibernateSearchOptions.isTitleFuzzyQuery() ) {
+                booleanJunction = booleanJunction .should(wildcardQuery);
+            }
+
+            if ( hibernateSearchOptions.isTitleFuzzyQuery() ) {
+                booleanJunction = booleanJunction .should(titlePhraseQuery);
+            }
+
+            if ( hibernateSearchOptions.isTitleFuzzyQuery() ) {
+                booleanJunction = booleanJunction .should(descriptionQuery);
+            }
+
+            if ( hibernateSearchOptions.isTitleFuzzyQuery() ) {
+                booleanJunction = booleanJunction .should(descriptiopnPhraseQuery);
+            }            
+
+            return booleanJunction.createQuery();
         }
         else {
             return qb.all().createQuery();

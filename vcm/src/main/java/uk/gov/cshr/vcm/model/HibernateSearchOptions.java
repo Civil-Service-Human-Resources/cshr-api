@@ -26,8 +26,6 @@ public class HibernateSearchOptions {
     @Builder.Default
     private boolean department = true;
 
-    @Builder.Default
-    private boolean searchTerm = true;
 
     @Builder.Default
     private boolean contractType = true;
@@ -65,5 +63,22 @@ public class HibernateSearchOptions {
     @Builder.Default
     private int descriptionFuzzyEditDistance = 1;
 
+    @Builder.Default
+    private boolean titleFuzzyQuery = true;
+
+    @Builder.Default
+    private boolean titleQuery = true;
+
+    @Builder.Default
+    private boolean wildcardQuery = true;
+
+    @Builder.Default
+    private boolean titlePhraseQuery = true;
+
+    @Builder.Default
+    private boolean descriptionQuery = true;
+
+    @Builder.Default
+    private boolean descriptiopnPhraseQuery = true;    
 
 }
