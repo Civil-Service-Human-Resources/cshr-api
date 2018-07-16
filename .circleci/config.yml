@@ -77,7 +77,7 @@ workflows:
               only:
                 - master
                 - develop
-		- release*
+                - release*
       - notify_pipeline:
           requires:
             - ship
