@@ -69,8 +69,6 @@ public class LoadDepartmentEmailsService {
 
             String parent = entry.getValue();
 
-            System.out.println("parent=" + parent);
-
             Department parentDepartment = departmentsMap.get(parent);
             department.setParent(parentDepartment);
             departmentRepository.save(department);
