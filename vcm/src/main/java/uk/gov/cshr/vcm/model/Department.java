@@ -106,4 +106,10 @@ public class Department implements Serializable {
     @ManyToOne
     @JoinColumn(name = "parentdepartmentid")
     private Department parent;
+
+    @Override
+    public String toString() {
+        return "Department{" + "id=" + id + ", name=" + name + '}';
+    }
+
 }
