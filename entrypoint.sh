@@ -20,6 +20,7 @@ if [[ ${#} -eq 0 ]]; then
             --spring.datasource.url=${DATASOURCE_URL} \
             --spring.datasource.username=${DATASOURCE_USERNAME} \
             --spring.datasource.password=${DATASOURCE_PASSWORD} \
+            --spring.profiles.active=${SPRING_PROFILES_ACTIVE} \
             --spring.security.search_username=${SEARCH_USERNAME} \
             --spring.security.search_password=${SEARCH_PASSWORD} \
             --spring.security.crud_username=${CRUD_USERNAME} \
@@ -27,7 +28,7 @@ if [[ ${#} -eq 0 ]]; then
             --spring.notifyService.templateid=${NOTIFY_SERVICE_TEMPLATE_ID} \
             --spring.notifyservice.notifyApiKey=${NOTIFY_SERVICE_NOTIFY_API_KEY} \
             --spring.security.notify_username=${NOTIFY_USERNAME} \
-            --spring.security.notify_password=${NOTIFY_PASSWORD} 
+            --spring.security.notify_password=${NOTIFY_PASSWORD}
 else
     echo "Running command:"
     exec "$@"
