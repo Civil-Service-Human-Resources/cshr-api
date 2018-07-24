@@ -348,6 +348,11 @@ public class HibernateSearchService {
             // include the department itself
             eligibleDepartments.add(department);
 
+            // add the parent if there is one
+            if ( department.getParent() != null ) {
+                eligibleDepartments.add(department.getParent());
+            }
+
             StringBuilder stringBuilder = new StringBuilder();
             eligibleDepartments.forEach((department1) -> {
                 stringBuilder.append(department1.getId()).append(" ");
