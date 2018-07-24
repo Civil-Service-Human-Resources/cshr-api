@@ -71,6 +71,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
     private static final Timestamp THIRTY_DAYS_FROM_NOW = getTime(30);
     private static final int TWENTY_DAYS_AGO = -20;
     private static final int TWENTY_DAYS_FROM_NOW = 20;
+    private static final Timestamp CREATED_DATE = getTime(0);
 
     @Inject
     private WebApplicationContext webApplicationContext;
@@ -107,6 +108,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
             .contactEmail("testContactEmail")
             .contactTelephone("testContactTelephone")
             .eligibility("testEligibility")
+            .createdDate(CREATED_DATE)
             .salaryMin(10)
             .salaryMax(100)
             .numberVacancies(1)
@@ -365,6 +367,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
         String path = "/vacancy";
 
         Vacancy vacancy = createVacancyPrototype();
+        vacancy.setCreatedDate(CREATED_DATE);
         vacancy.setApplyURL("www.google.com");
         vacancy.setDepartment(department1);
 

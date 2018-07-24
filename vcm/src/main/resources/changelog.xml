@@ -298,4 +298,9 @@
             <column name="lengthofemployment" type="TEXT" />
         </addColumn>
     </changeSet>
+    <changeSet author="gordon" id="36">
+        <addColumn tableName="vacancies">
+            <column name="createddate" type="TIMESTAMP WITH TIME ZONE" />
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
