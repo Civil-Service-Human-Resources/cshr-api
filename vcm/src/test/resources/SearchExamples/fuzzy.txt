@@ -1,0 +1,37 @@
+Trying to find 'Behaviours' in the title.
+Keyword: Behaviourxy  will only match when titleEditDistance=2
+
+Keyword: Behaviourx will match if the titleEditDistance=1
+
+{
+  "keyword": "Behaviourxy",
+  "hibernateSearchOptions": {
+    "closed": true,
+    "open": true,
+    "location": true,
+    "salary": true,
+    "department": true,
+    "contractType": true,
+    "workingPatterns": true,
+    "active": true,
+    "locationBoost": 0,
+    "titleFuzzyBoost": 0,
+    "titleEditDistance": 2,
+    "titlePrefixLength": 0,
+    "titleOriginalBoost": 0,
+    "titleOriginalPhraseBoost": 0,
+    "descriptionFuzzyBoost": 0,
+    "descriptionFuzzyPrefix": 0,
+    "descriptionFuzzyEditDistance": 1,
+    "titleFuzzyQuery": true,
+    "titleQuery": true,
+    "wildcardQuery": true,
+    "titlePhraseQuery": false,
+    "descriptionQuery": true,
+    "descriptiopnPhraseQuery": false
+  }
+}
+
+Result:
+"title": "Behaviours Int only FH",
+"description": "test",

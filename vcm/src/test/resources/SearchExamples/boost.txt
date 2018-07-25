@@ -1,0 +1,43 @@
+{
+  "keyword": "Behaviours administrativx",
+  "hibernateSearchOptions": {
+    "closed": true,
+    "open": true,
+    "location": true,
+    "salary": true,
+    "department": true,
+    "contractType": true,
+    "workingPatterns": true,
+    "active": true,
+    "locationBoost": 0,
+    "titleFuzzyBoost": 0,
+    "titleEditDistance": 1,
+    "titlePrefixLength": 0,
+    "titleOriginalBoost": 0,
+    "titleOriginalPhraseBoost": 0,
+    "descriptionFuzzyBoost": 10,
+    "descriptionFuzzyPrefix": 0,
+    "descriptionFuzzyEditDistance": 1,
+    "titleFuzzyQuery": true,
+    "titleQuery": true,
+    "wildcardQuery": true,
+    "titlePhraseQuery": false,
+    "descriptionQuery": true,
+    "descriptiopnPhraseQuery": false
+  }
+}
+
+By boosting descriptionFuzzyBoost to 10 misspelt matches in 'description' will be
+of higher relevance than matches in title
+
+Result 1
+"title": "Oleeo Dev Test Vacancy Sift Forms",
+"description": "A testing administrative assistant role",
+
+Result 2
+"title": "Oleeo Dev Test Vacancy Sift Forms 2",
+"description": "A testing administrative assistant role",
+
+Result 3
+"title": "Behaviours Int only FH",
+"description": "test",

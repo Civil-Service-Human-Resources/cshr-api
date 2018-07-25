@@ -284,31 +284,44 @@ public class HibernateSearchService {
 
             BooleanJunction booleanJunction = qb.bool();
 
+            boolean anyOption = false;
+
             if ( hibernateSearchOptions.isTitleFuzzyQuery() ) {
                 booleanJunction = booleanJunction .should(titleFuzzyQuery);
+                anyOption = true;
             }
 
-            if ( hibernateSearchOptions.isTitleFuzzyQuery() ) {
+            if ( hibernateSearchOptions.isTitleQuery() ) {
                 booleanJunction = booleanJunction .should(titleQuery);
+                anyOption = true;
             }
 
-            if ( hibernateSearchOptions.isTitleFuzzyQuery() ) {
+            if ( hibernateSearchOptions.isWildcardQuery() ) {
                 booleanJunction = booleanJunction .should(wildcardQuery);
+                anyOption = true;
             }
 
-            if ( hibernateSearchOptions.isTitleFuzzyQuery() ) {
+            if ( hibernateSearchOptions.isTitlePhraseQuery() ) {
                 booleanJunction = booleanJunction .should(titlePhraseQuery);
+                anyOption = true;
             }
 
-            if ( hibernateSearchOptions.isTitleFuzzyQuery() ) {
+            if ( hibernateSearchOptions.isDescriptionQuery() ) {
                 booleanJunction = booleanJunction .should(descriptionQuery);
+                anyOption = true;
             }
 
-            if ( hibernateSearchOptions.isTitleFuzzyQuery() ) {
+            if ( hibernateSearchOptions.isTitlePhraseQuery() ) {
                 booleanJunction = booleanJunction .should(descriptiopnPhraseQuery);
+                anyOption = true;
             }            
 
-            return booleanJunction.createQuery();
+            if ( anyOption ) {
+                return booleanJunction.createQuery();
+            }
+            else {
+                return qb.all().createQuery();
+            }
         }
         else {
             return qb.all().createQuery();

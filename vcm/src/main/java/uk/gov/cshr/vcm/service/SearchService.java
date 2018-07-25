@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
 import uk.gov.cshr.vcm.model.Coordinates;
+import uk.gov.cshr.vcm.model.HibernateSearchOptions;
 import uk.gov.cshr.vcm.model.SearchParameters;
 import uk.gov.cshr.vcm.model.SearchResponse;
 import uk.gov.cshr.vcm.model.Vacancy;
@@ -31,10 +32,16 @@ public class SearchService {
 
         debug("staring search()");
 
+        HibernateSearchOptions hibernateSearchOptions = vacancySearchParameters.getHibernateSearchOptions();
+
+        if ( hibernateSearchOptions == null ) {
+            hibernateSearchOptions = HibernateSearchOptions.builder().build();
+        }
+
         SearchParameters searchParameters = SearchParameters.builder()
                 .vacancySearchParameters(vacancySearchParameters)
 				.vacancyEligibility(vacancySearchParameters.getVacancyEligibility())
-                .hibernateSearchOptions(vacancySearchParameters.getHibernateSearchOptions())
+                .hibernateSearchOptions(hibernateSearchOptions)
                 .build();
 
         boolean filterByLocation = vacancySearchParameters.getLocation() != null;
