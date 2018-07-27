@@ -11,8 +11,6 @@ info:
 host: 'localhost:8080'
 basePath: /
 tags:
-  - name: vacancy-tests-loader
-    description: Vacancy Tests Loader
   - name: notify-controller
     description: Notify Controller
   - name: vacancy-controller
@@ -377,21 +375,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/Vacancy'
-  /vacancytests:
-    get:
-      tags:
-        - vacancy-tests-loader
-      summary: loadTestData
-      operationId: loadTestDataUsingGET
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: OK
-          schema:
-            type: object
 definitions:
   CSHRServiceStatus:
     type: object
@@ -434,6 +417,64 @@ definitions:
         type: string
       name:
         type: string
+  HibernateSearchOptions:
+    type: object
+    properties:
+      closed:
+        type: boolean
+      open:
+        type: boolean
+      location:
+        type: boolean
+      salary:
+        type: boolean
+      department:
+        type: boolean
+      contractType:
+        type: boolean
+      workingPatterns:
+        type: boolean
+      active:
+        type: boolean
+      locationBoost:
+        type: number
+        format: float
+      titleFuzzyBoost:
+        type: number
+        format: float
+      titleEditDistance:
+        type: integer
+        format: int32
+      titlePrefixLength:
+        type: integer
+        format: int32
+      titleOriginalBoost:
+        type: number
+        format: float
+      titleOriginalPhraseBoost:
+        type: number
+        format: float
+      descriptionFuzzyBoost:
+        type: number
+        format: float
+      descriptionFuzzyPrefix:
+        type: integer
+        format: int32
+      descriptionFuzzyEditDistance:
+        type: integer
+        format: int32
+      titleFuzzyQuery:
+        type: boolean
+      titleQuery:
+        type: boolean
+      wildcardQuery:
+        type: boolean
+      titlePhraseQuery:
+        type: boolean
+      descriptionQuery:
+        type: boolean
+      descriptiopnPhraseQuery:
+        type: boolean
   Location:
     type: object
     required:
@@ -772,6 +813,8 @@ definitions:
         format: int32
       overseasJob:
         type: boolean
+      hibernateSearchOptions:
+        $ref: '#/definitions/HibernateSearchOptions'
     description: The parameters allowed for when searching for vacancies
   VerifyRequest:
     type: object
