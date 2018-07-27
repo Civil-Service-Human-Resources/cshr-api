@@ -1,5 +1,6 @@
 package uk.gov.cshr.vcm.repository;
 
+import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,4 +37,6 @@ public interface DepartmentRepository extends PagingAndSortingRepository<Departm
 	public Iterable<Department> findAll();
 
     public Department findByIdentifier(String idendifier);
+
+    public List<Department> findByParent(Department parent);
 }
