@@ -27,10 +27,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
+import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.model.SearchParameters;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancyEligibility;
 import uk.gov.cshr.vcm.model.VacancyLocation;
+import uk.gov.cshr.vcm.repository.DepartmentRepository;
 
 @Service
 public class HibernateSearchService {
@@ -40,6 +42,9 @@ public class HibernateSearchService {
 
     @Autowired
     private final EntityManager entityManager;
+
+    @Autowired
+    private DepartmentRepository departmentRepository;
 
     @Autowired
     public HibernateSearchService(EntityManager entityManager) {
@@ -306,16 +311,17 @@ public class HibernateSearchService {
 	private Query getOpenQuery(QueryBuilder qb, VacancyEligibility vacancyEligibility) {
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
+        Query publicQuery = qb
+                .range()
+                .onField("vacancy.publicOpeningDate")
+                .ignoreFieldBridge()
+                .below(sdf.format(new Date()))
+                .excludeLimit()
+                .createQuery();
 
 		if (vacancyEligibility.equals(VacancyEligibility.PUBLIC)) {
 
-			Query publicQuery = qb
-					.range()
-					.onField("vacancy.publicOpeningDate")
-					.ignoreFieldBridge()
-					.below(sdf.format(new Date()))
-					.excludeLimit()
-					.createQuery();
+
 
 			return qb.bool().must(publicQuery).createQuery();
 		}
@@ -329,24 +335,39 @@ public class HibernateSearchService {
 					.excludeLimit()
 					.createQuery();
 
+            Department department = departmentRepository.findById(vacancyEligibility.getDepartmentID()).get();
+
+            // include children
+            List<Department> eligibleDepartments = departmentRepository.findByParent(department);
+
+            // include children of parent
+            if ( department.getParent() != null ) {
+                eligibleDepartments.addAll(departmentRepository.findByParent(department.getParent()));
+            }
+
+            // include the department itself
+            eligibleDepartments.add(department);
+
+            // add the parent if there is one
+            if ( department.getParent() != null ) {
+                eligibleDepartments.add(department.getParent());
+            }
+
+            StringBuilder stringBuilder = new StringBuilder();
+            eligibleDepartments.forEach((department1) -> {
+                stringBuilder.append(department1.getId()).append(" ");
+            });
+
 			Query departmentQuery = qb
 					.keyword()
 					.onField("vacancy.departmentID")
-					.matching(vacancyEligibility.getDepartmentID().toString())
+					.matching(stringBuilder.toString())
 					.createQuery();
 
 			Query internalDepartmentQuery = qb.bool()
-					.must(internalQuery)
-					.must(departmentQuery)
-					.createQuery();
-
-			Query publicQuery = qb
-					.range()
-					.onField("vacancy.publicOpeningDate")
-					.ignoreFieldBridge()
-					.below(sdf.format(new Date()))
-					.excludeLimit()
-					.createQuery();
+                        .must(internalQuery)
+                        .must(departmentQuery)
+                        .createQuery();
 
 			Query governmentQuery = qb
 					.range()
