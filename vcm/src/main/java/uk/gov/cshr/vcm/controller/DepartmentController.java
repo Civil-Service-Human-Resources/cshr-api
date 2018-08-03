@@ -4,8 +4,11 @@ import io.swagger.annotations.ApiOperation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.text.ParseException;
 import java.util.Optional;
 import javax.annotation.security.RolesAllowed;
+
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,23 +28,20 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
-import uk.gov.cshr.vcm.service.LoadDepartmentEmailsService;
+import uk.gov.cshr.vcm.service.DepartmentService;
 
 @RestController
 @RequestMapping(value = "/department", produces = MediaType.APPLICATION_JSON_VALUE)
 @RolesAllowed("CRUD_ROLE")
+@Slf4j
 public class DepartmentController {
-
-    private static final Logger log = LoggerFactory.getLogger(DepartmentController.class);
-
     private final DepartmentRepository departmentRepository;
+    private DepartmentService departmentService;
 
     @Autowired
-    private LoadDepartmentEmailsService loadDepartmentEmailsService;
-
-    @Autowired
-    DepartmentController(DepartmentRepository departmentRepository) {
+    DepartmentController(DepartmentRepository departmentRepository, DepartmentService departmentService) {
         this.departmentRepository = departmentRepository;
+        this.departmentService = departmentService;
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -112,13 +112,14 @@ public class DepartmentController {
         return ResponseEntity.noContent().build();
     }
 
-	@CacheEvict(value = "emailAddresses", allEntries = true)
-    @RequestMapping(method = RequestMethod.POST, value = "/loademails")
+	@CacheEvict(value = "departments", allEntries = true)
+    @RequestMapping(method = RequestMethod.POST, value = "/loaddepartments")
     @ApiOperation(value = "load departments", nickname = "load")
-    public ResponseEntity<?> load(@RequestParam("file") MultipartFile file) throws IOException {
+    public ResponseEntity<?> load(@RequestParam("file") MultipartFile file) 
+            throws IOException, ParseException {
 
         try (InputStream inputStream = file.getInputStream()) {
-            loadDepartmentEmailsService.readEmails(inputStream);
+            departmentService.readDepartments(inputStream);
             return ResponseEntity.noContent().build();
         }
     }

@@ -11,8 +11,6 @@ info:
 host: 'localhost:8080'
 basePath: /
 tags:
-  - name: vacancy-tests-loader
-    description: Vacancy Tests Loader
   - name: notify-controller
     description: Notify Controller
   - name: vacancy-controller
@@ -60,7 +58,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/Department'
-  /department/loademails:
+  /department/loaddepartments:
     post:
       tags:
         - department-controller
@@ -377,21 +375,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/Vacancy'
-  /vacancytests:
-    get:
-      tags:
-        - vacancy-tests-loader
-      summary: loadTestData
-      operationId: loadTestDataUsingGET
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: OK
-          schema:
-            type: object
 definitions:
   CSHRServiceStatus:
     type: object
@@ -434,6 +417,8 @@ definitions:
         type: string
       name:
         type: string
+      parent:
+        $ref: '#/definitions/Department'
   Location:
     type: object
     required:
