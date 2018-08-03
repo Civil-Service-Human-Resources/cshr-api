@@ -1,9 +1,8 @@
 package uk.gov.cshr.vcm.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.annotations.ApiModel;
 import java.io.Serializable;
 import java.util.Objects;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,6 +13,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

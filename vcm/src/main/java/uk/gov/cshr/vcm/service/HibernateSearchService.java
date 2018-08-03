@@ -8,8 +8,10 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
+
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.Query;

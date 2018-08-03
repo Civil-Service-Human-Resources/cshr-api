@@ -1,8 +1,9 @@
 package uk.gov.cshr.vcm.model;
 
-import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

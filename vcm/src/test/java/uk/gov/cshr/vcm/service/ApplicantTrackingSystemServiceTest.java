@@ -7,8 +7,6 @@ import static org.hamcrest.junit.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;

@@ -1,5 +1,14 @@
 package uk.gov.cshr.vcm.service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.xml.bind.DatatypeConverter;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -7,13 +16,6 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-import javax.inject.Inject;
-import javax.xml.bind.DatatypeConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
