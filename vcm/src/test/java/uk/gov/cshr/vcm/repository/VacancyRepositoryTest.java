@@ -1,12 +1,15 @@
 package uk.gov.cshr.vcm.repository;
 
-import java.util.List;
-import javax.inject.Inject;
-import javax.validation.ConstraintViolationException;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.junit.MatcherAssert.assertThat;
+
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.validation.ConstraintViolationException;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
