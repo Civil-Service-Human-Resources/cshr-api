@@ -32,10 +32,10 @@ import uk.gov.cshr.vcm.model.fixture.VacancyFixture;
 @SpringBootTest(classes = VcmApplication.class)
 @ContextConfiguration
 public class VacancyRepositoryTest {
-    
+
     private static final String ATS_OO1 = "ATS_OO1";
     private static final String ATS_OO2 = "ATS_OO2";
-    
+
     public static final long JOB_REF_1234 = 1234L;
     public static final long JOB_REF_3234 = 3234L;
 

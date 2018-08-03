@@ -21,7 +21,7 @@ public class VacancyError implements Serializable {
     private HttpStatus status;
 
     private String message;
-    
+
     @Builder.Default
     private List<String> errors = new ArrayList<>();
 

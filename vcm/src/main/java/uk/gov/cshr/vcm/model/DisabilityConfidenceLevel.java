@@ -8,16 +8,13 @@ public enum DisabilityConfidenceLevel {
 
     public static DisabilityConfidenceLevel fromString(String value) {
 
-        if ( value.trim().equalsIgnoreCase("employer") ) {
+        if (value.trim().equalsIgnoreCase("employer")) {
             return DisabilityConfidenceLevel.EMPLOYER;
-        }
-        else if ( value.trim().equalsIgnoreCase("leader") ) {
+        } else if (value.trim().equalsIgnoreCase("leader")) {
             return DisabilityConfidenceLevel.LEADER;
-        }
-        else if ( value.trim().equalsIgnoreCase("committed") ) {
+        } else if (value.trim().equalsIgnoreCase("committed")) {
             return DisabilityConfidenceLevel.COMMITTED;
-        }
-        else {
+        } else {
             return null;
         }
     }

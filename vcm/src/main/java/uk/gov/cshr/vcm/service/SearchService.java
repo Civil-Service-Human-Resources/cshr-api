@@ -28,26 +28,25 @@ public class SearchService {
     private HibernateSearchService hibernateSearchService;
 
     public void search(VacancySearchParameters vacancySearchParameters,
-            SearchResponse searchResponse, Pageable pageable)
+                       SearchResponse searchResponse, Pageable pageable)
             throws LocationServiceException, IOException {
 
         debug("staring search()");
 
         SearchParameters searchParameters = SearchParameters.builder()
                 .vacancySearchParameters(vacancySearchParameters)
-				.vacancyEligibility(vacancySearchParameters.getVacancyEligibility())
+                .vacancyEligibility(vacancySearchParameters.getVacancyEligibility())
                 .build();
 
         boolean filterByLocation = vacancySearchParameters.getLocation() != null;
 
-        if ( filterByLocation ) {
+        if (filterByLocation) {
 
             Coordinates coordinates = locationService.find(vacancySearchParameters.getLocation().getPlace());
 
             if (coordinatesExist(coordinates)) {
                 searchParameters.setCoordinates(coordinates);
-            }
-            else {
+            } else {
                 debug("No Coordinates for %s with radius of %d exist",
                         vacancySearchParameters.getLocation().getPlace(),
                         vacancySearchParameters.getLocation().getRadius());

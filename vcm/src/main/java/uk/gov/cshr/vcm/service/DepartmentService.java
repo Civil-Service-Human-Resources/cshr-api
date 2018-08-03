@@ -31,8 +31,8 @@ public class DepartmentService {
     public final static SimpleDateFormat d_MMM_yyyy_dashed = new SimpleDateFormat("d-MMM-yyyy");
     public final static SimpleDateFormat d_MM_yy_slashed = new SimpleDateFormat("d/MM/yy");
 
-	@Inject
-	private DepartmentRepository departmentRepository;
+    @Inject
+    private DepartmentRepository departmentRepository;
 
     public void readDepartments(InputStream inputStream) throws IOException, ParseException {
 
@@ -43,8 +43,8 @@ public class DepartmentService {
 
         CSVReader csvReader = new CSVReader(bufferedReader);
 
-		// skip first line
-		csvReader.readNext();
+        // skip first line
+        csvReader.readNext();
 
         String[] nextRecord;
 
@@ -60,9 +60,9 @@ public class DepartmentService {
             String logoNeeded = nextRecord[6];
             String logoPath = nextRecord[7];
 
-			Department department = departmentRepository.findByIdentifier(identifier);
+            Department department = departmentRepository.findByIdentifier(identifier);
 
-            if ( department == null ) {
+            if (department == null) {
                 department = new Department();
                 department.setId(System.currentTimeMillis());
                 department.setIdentifier(identifier);
@@ -72,7 +72,7 @@ public class DepartmentService {
             department.setName(name);
             department.setDepartmentStatus(DepartmentStatus.fromString(departmentStatus));
             department.setDisabilityConfidenceLevel(DisabilityConfidenceLevel.fromString(disabilityConfidenceLevel));
-    
+
             department.setDisabilityConfidenceLevelLastUpdate(parseDate(disabilityConfidenceLevelLastUpdate));
             //department.setDisabilityLogo(null);
             department.setLogoNeeded(BooleanUtils.toBoolean(logoNeeded));
@@ -90,7 +90,7 @@ public class DepartmentService {
 
             departmentsMap.put(department.getName(), department);
 
-            if ( parent != null && ! parent.trim().isEmpty() ) {
+            if (parent != null && !parent.trim().isEmpty()) {
                 parentsMap.put(department, parent);
             }
 
@@ -110,29 +110,26 @@ public class DepartmentService {
 
     private Timestamp parseDate(String dateString) throws ParseException {
 
-        if ( dateString == null || dateString.trim().isEmpty() ) {
+        if (dateString == null || dateString.trim().isEmpty()) {
             return null;
         }
 
         try {
             Date date = d_MMM_yyyy.parse(dateString.trim());
             return new Timestamp(date.getTime());
-        }
-        catch(ParseException e) {            
+        } catch (ParseException e) {
         }
 
         try {
             Date date = d_MMM_yyyy_dashed.parse(dateString.trim());
             return new Timestamp(date.getTime());
-        }
-        catch(ParseException e) {
+        } catch (ParseException e) {
         }
 
         try {
             Date date = d_MM_yy_slashed.parse(dateString.trim());
             return new Timestamp(date.getTime());
-        }
-        catch(ParseException e) {
+        } catch (ParseException e) {
         }
 
         throw new ParseException(dateString, 0);

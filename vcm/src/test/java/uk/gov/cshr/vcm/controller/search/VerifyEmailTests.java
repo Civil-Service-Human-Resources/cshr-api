@@ -65,8 +65,8 @@ public class VerifyEmailTests extends AbstractTestNGSpringContextTests {
     @Inject
     private DepartmentRepository departmentRepository;
 
-	@Inject
-	private EmailExtensionRepository emailExtensionRepository;
+    @Inject
+    private EmailExtensionRepository emailExtensionRepository;
 
     private MockMvc mockMvc;
 
@@ -79,7 +79,7 @@ public class VerifyEmailTests extends AbstractTestNGSpringContextTests {
     @Before
     public void before() throws LocationServiceException {
 
-		emailExtensionRepository.deleteAll();
+        emailExtensionRepository.deleteAll();
         departmentRepository.deleteAll();
 
         this.mockMvc = MockMvcBuilders
@@ -88,14 +88,14 @@ public class VerifyEmailTests extends AbstractTestNGSpringContextTests {
                 .build();
 
         department1 = Department.builder()
-                        .name("Department One")
-                        .disabilityLogo("disabilityLogo")
-                        .build();
+                .name("Department One")
+                .disabilityLogo("disabilityLogo")
+                .build();
 
         EmailExtension emailExtension = EmailExtension.builder()
-                                    .department(department1)
-                                    .emailExtension("cabinetoffice.gov.uk")
-                                    .build();
+                .department(department1)
+                .emailExtension("cabinetoffice.gov.uk")
+                .build();
 
         department1.getAcceptedEmailExtensions().add(emailExtension);
         department1 = departmentRepository.save(department1);
@@ -118,7 +118,7 @@ public class VerifyEmailTests extends AbstractTestNGSpringContextTests {
         String json = objectMapper.writeValueAsString(verifyRequest);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/verifyemail")
-				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
+                .with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(json)
                 .accept(APPLICATION_JSON_UTF8))
@@ -130,14 +130,14 @@ public class VerifyEmailTests extends AbstractTestNGSpringContextTests {
     public void testVerifyEmailMultipleDepartments() throws Exception {
 
         department2 = Department.builder()
-                        .name("Department two")
-                        .disabilityLogo("disabilityLogo")
-                        .build();
+                .name("Department two")
+                .disabilityLogo("disabilityLogo")
+                .build();
 
         EmailExtension emailExtension = EmailExtension.builder()
-                                    .department(department2)
-                                    .emailExtension("cabinetoffice.gov.uk")
-                                    .build();
+                .department(department2)
+                .emailExtension("cabinetoffice.gov.uk")
+                .build();
 
         department2.getAcceptedEmailExtensions().add(emailExtension);
         department2 = departmentRepository.save(department2);
@@ -150,7 +150,7 @@ public class VerifyEmailTests extends AbstractTestNGSpringContextTests {
         String json = objectMapper.writeValueAsString(verifyRequest);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/verifyemail")
-				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
+                .with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(json)
                 .accept(APPLICATION_JSON_UTF8))
@@ -168,14 +168,14 @@ public class VerifyEmailTests extends AbstractTestNGSpringContextTests {
     public void testVerifyEmailChooseDepartment() throws Exception {
 
         department2 = Department.builder()
-                        .name("Department two")
-                        .disabilityLogo("disabilityLogo")
-                        .build();
+                .name("Department two")
+                .disabilityLogo("disabilityLogo")
+                .build();
 
         EmailExtension emailExtension = EmailExtension.builder()
-                                    .department(department2)
-                                    .emailExtension("cabinetoffice.gov.uk")
-                                    .build();
+                .department(department2)
+                .emailExtension("cabinetoffice.gov.uk")
+                .build();
 
         department2.getAcceptedEmailExtensions().add(emailExtension);
         department2 = departmentRepository.save(department2);
@@ -189,7 +189,7 @@ public class VerifyEmailTests extends AbstractTestNGSpringContextTests {
         String json = objectMapper.writeValueAsString(verifyRequest);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/verifyemail")
-				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
+                .with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(json)
                 .accept(APPLICATION_JSON_UTF8))

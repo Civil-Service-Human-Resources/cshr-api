@@ -24,7 +24,7 @@ import uk.gov.service.notify.NotificationClientException;
 @Api(value = "notifyservice")
 @RolesAllowed("NOTIFY_ROLE")
 public class NotifyController {
-    
+
     private static final Logger log = LoggerFactory.getLogger(NotifyController.class);
 
     @Autowired

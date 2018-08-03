@@ -551,7 +551,7 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         String json = mapper.writeValueAsString(vacancySearchParameters);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/search")
-				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
+                .with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(json)
                 .accept(APPLICATION_JSON_UTF8))

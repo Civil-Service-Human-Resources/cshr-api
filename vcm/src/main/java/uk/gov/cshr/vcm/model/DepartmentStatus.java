@@ -7,10 +7,9 @@ public enum DepartmentStatus {
 
     public static DepartmentStatus fromString(String value) {
 
-        if ( value.trim().equalsIgnoreCase("deactivated") ) {
+        if (value.trim().equalsIgnoreCase("deactivated")) {
             return DepartmentStatus.DEACTIVATED;
-        }
-        else {
+        } else {
             return DepartmentStatus.ACTIVE;
         }
     }

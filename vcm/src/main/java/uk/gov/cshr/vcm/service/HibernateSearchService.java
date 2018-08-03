@@ -102,8 +102,7 @@ public class HibernateSearchService {
                     .must(contractTypeQuery)
                     .must(workingPatternsQuery)
                     .must(activeQuery);
-        }
-        catch(EmptyQueryException e) {
+        } catch (EmptyQueryException e) {
             log.error(e.getMessage(), e);
             return new PageImpl<>(new ArrayList<>(), pageable, 0);
         }
@@ -131,8 +130,7 @@ public class HibernateSearchService {
         // limit resultset to page size
         if (uniqueVacancyIDs.size() < pageSize) {
             idList = Arrays.asList(uniqueVacancyIDs.toArray());
-        }
-        else {
+        } else {
 
             int max = pageNumber * pageSize + pageSize;
 
@@ -145,8 +143,7 @@ public class HibernateSearchService {
 
         if (idList.isEmpty()) {
             return new PageImpl<>(new ArrayList<>());
-        }
-        else {
+        } else {
             List<Vacancy> vacancies = entityManager
                     .createQuery("SELECT v FROM Vacancy v WHERE v.id IN (:ids)")
                     .setParameter("ids", idList)
@@ -162,8 +159,8 @@ public class HibernateSearchService {
 
     private Query getLocationQuery(SearchParameters searchParameters, QueryBuilder qb) {
 
-		boolean includeOverseasJobs = BooleanUtils.isTrue(
-			searchParameters.getVacancySearchParameters().getOverseasJob());
+        boolean includeOverseasJobs = BooleanUtils.isTrue(
+                searchParameters.getVacancySearchParameters().getOverseasJob());
 
         if (searchParameters.getCoordinates() != null) {
 
@@ -192,22 +189,19 @@ public class HibernateSearchService {
 
             if (!includeOverseasJobs) {
                 locationQuery.must(regionSpatialQuery);
-            }
-            else {
+            } else {
                 Query regionSpatialOverseas = qb.bool().should(regionSpatialQuery).should(overseasQuery).createQuery();
                 locationQuery.must(regionSpatialOverseas);
             }
 
             return locationQuery.createQuery();
-        }
-		else if ( ! includeOverseasJobs )  {
+        } else if (!includeOverseasJobs) {
 
-			return qb.keyword().onField("vacancy.overseasJob")
+            return qb.keyword().onField("vacancy.overseasJob")
                     .matching("false").createQuery();
+        } else {
+            return qb.all().createQuery();
         }
-		else {
-			return qb.all().createQuery();
-		}
     }
 
     private Query getSearchTermQuery(SearchParameters searchParameters, QueryBuilder qb) {
@@ -272,8 +266,7 @@ public class HibernateSearchService {
                     .createQuery();
 
             return keywordQuery;
-        }
-        else {
+        } else {
             return qb.all().createQuery();
         }
     }
@@ -310,9 +303,9 @@ public class HibernateSearchService {
         return salaryQuery;
     }
 
-	private Query getOpenQuery(QueryBuilder qb, VacancyEligibility vacancyEligibility) {
+    private Query getOpenQuery(QueryBuilder qb, VacancyEligibility vacancyEligibility) {
 
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
         Query publicQuery = qb
                 .range()
                 .onField("vacancy.publicOpeningDate")
@@ -321,21 +314,19 @@ public class HibernateSearchService {
                 .excludeLimit()
                 .createQuery();
 
-		if (vacancyEligibility.equals(VacancyEligibility.PUBLIC)) {
+        if (vacancyEligibility.equals(VacancyEligibility.PUBLIC)) {
 
 
+            return qb.bool().must(publicQuery).createQuery();
+        } else {
 
-			return qb.bool().must(publicQuery).createQuery();
-		}
-		else {
-
-			Query internalQuery = qb
-					.range()
-					.onField("vacancy.internalOpeningDate")
-					.ignoreFieldBridge()
-					.below(sdf.format(new Date()))
-					.excludeLimit()
-					.createQuery();
+            Query internalQuery = qb
+                    .range()
+                    .onField("vacancy.internalOpeningDate")
+                    .ignoreFieldBridge()
+                    .below(sdf.format(new Date()))
+                    .excludeLimit()
+                    .createQuery();
 
             Department department = departmentRepository.findById(vacancyEligibility.getDepartmentID()).get();
 
@@ -343,7 +334,7 @@ public class HibernateSearchService {
             List<Department> eligibleDepartments = departmentRepository.findByParent(department);
 
             // include children of parent
-            if ( department.getParent() != null ) {
+            if (department.getParent() != null) {
                 eligibleDepartments.addAll(departmentRepository.findByParent(department.getParent()));
             }
 
@@ -351,7 +342,7 @@ public class HibernateSearchService {
             eligibleDepartments.add(department);
 
             // add the parent if there is one
-            if ( department.getParent() != null ) {
+            if (department.getParent() != null) {
                 eligibleDepartments.add(department.getParent());
             }
 
@@ -360,32 +351,32 @@ public class HibernateSearchService {
                 stringBuilder.append(department1.getId()).append(" ");
             });
 
-			Query departmentQuery = qb
-					.keyword()
-					.onField("vacancy.departmentID")
-					.matching(stringBuilder.toString())
-					.createQuery();
+            Query departmentQuery = qb
+                    .keyword()
+                    .onField("vacancy.departmentID")
+                    .matching(stringBuilder.toString())
+                    .createQuery();
 
-			Query internalDepartmentQuery = qb.bool()
-                        .must(internalQuery)
-                        .must(departmentQuery)
-                        .createQuery();
+            Query internalDepartmentQuery = qb.bool()
+                    .must(internalQuery)
+                    .must(departmentQuery)
+                    .createQuery();
 
-			Query governmentQuery = qb
-					.range()
-					.onField("vacancy.governmentOpeningDate")
-					.ignoreFieldBridge()
-					.below(sdf.format(new Date()))
-					.excludeLimit()
-					.createQuery();
+            Query governmentQuery = qb
+                    .range()
+                    .onField("vacancy.governmentOpeningDate")
+                    .ignoreFieldBridge()
+                    .below(sdf.format(new Date()))
+                    .excludeLimit()
+                    .createQuery();
 
-			return qb.bool()
-					.should(internalDepartmentQuery)
-					.should(publicQuery)
+            return qb.bool()
+                    .should(internalDepartmentQuery)
+                    .should(publicQuery)
                     .should(governmentQuery)
-					.createQuery();
-		}
-	}
+                    .createQuery();
+        }
+    }
 
     private Query getClosedVacanciesQuery(QueryBuilder qb) {
 
@@ -419,9 +410,7 @@ public class HibernateSearchService {
                     .createQuery();
 
             return departmentQuery;
-        }
-
-        else {
+        } else {
             return qb.all().createQuery();
         }
     }
@@ -444,19 +433,19 @@ public class HibernateSearchService {
 
     private Query getActiveQuery(QueryBuilder qb) {
 
-            Query query = qb.keyword()
-                    .onField("vacancy.active")
-                    .matching("true")
-                    .createQuery();
+        Query query = qb.keyword()
+                .onField("vacancy.active")
+                .matching("true")
+                .createQuery();
 
-            return query;
+        return query;
     }
 
     private String getContractTypes(SearchParameters searchParameters) {
 
         StringBuilder stringBuilder = new StringBuilder();
 
-        if ( searchParameters.getVacancySearchParameters().getContractTypes() != null ) {
+        if (searchParameters.getVacancySearchParameters().getContractTypes() != null) {
             concatenateStringArray(searchParameters.getVacancySearchParameters().getContractTypes(), stringBuilder);
         }
 
@@ -467,7 +456,7 @@ public class HibernateSearchService {
 
         StringBuilder stringBuilder = new StringBuilder();
 
-        if ( searchParameters.getVacancySearchParameters().getWorkingPatterns() != null ) {
+        if (searchParameters.getVacancySearchParameters().getWorkingPatterns() != null) {
             concatenateStringArray(searchParameters.getVacancySearchParameters().getWorkingPatterns(), stringBuilder);
         }
 
@@ -476,7 +465,7 @@ public class HibernateSearchService {
 
     private void concatenateStringArray(String[] stringArray, StringBuilder stringBuilder) {
         for (String string : stringArray) {
-            if ( ! string.isEmpty() ) {
+            if (!string.isEmpty()) {
                 stringBuilder.append(string).append(" ");
             }
         }

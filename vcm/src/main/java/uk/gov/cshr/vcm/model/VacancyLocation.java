@@ -70,8 +70,7 @@ public class VacancyLocation implements Serializable {
     public Long getVacancyID() {
         if (vacancy != null) {
             return vacancy.getId();
-        }
-        else {
+        } else {
             return null;
         }
     }

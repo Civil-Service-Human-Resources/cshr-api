@@ -34,18 +34,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${spring.security.notify_password}")
     private String notifyPassword;
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
 
-		http.csrf().disable()
-				.authorizeRequests().anyRequest().authenticated()
-				.and().httpBasic();
-	}
+        http.csrf().disable()
+                .authorizeRequests().anyRequest().authenticated()
+                .and().httpBasic();
+    }
 
-	@Autowired
-	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 
-		auth.inMemoryAuthentication()
+        auth.inMemoryAuthentication()
                 .withUser(crudUsername)
                 .password(crudPassword)
                 .roles("CRUD_ROLE");
@@ -59,5 +59,5 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .withUser(notifyUsername)
                 .password(notifyPassword)
                 .roles("NOTIFY_ROLE");
-	}
+    }
 }

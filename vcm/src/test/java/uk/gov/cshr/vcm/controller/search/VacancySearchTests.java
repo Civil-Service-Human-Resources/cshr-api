@@ -99,11 +99,11 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     @Inject
     private DepartmentRepository departmentRepository;
 
-	@Inject
-	private SearchService searchService;
+    @Inject
+    private SearchService searchService;
 
-	@Inject
-	private CshrAuthenticationService cshrAuthenticationService;
+    @Inject
+    private CshrAuthenticationService cshrAuthenticationService;
 
     private MockMvc mockMvc;
 
@@ -151,10 +151,10 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
     private VacancyLocation createBristolLocationPrototype(String locationName) {
         return VacancyLocation.builder()
-            .latitude(BRISTOL_LATITUDE)
-            .longitude(BRISTOL_LONGITUDE)
-            .location(locationName)
-            .build();
+                .latitude(BRISTOL_LATITUDE)
+                .longitude(BRISTOL_LONGITUDE)
+                .location(locationName)
+                .build();
     }
 
     @Before
@@ -162,7 +162,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         hibernateSearchService.purge();
         vacancyRepository.deleteAll();
-        departmentRepository.deleteAll();;
+        departmentRepository.deleteAll();
+        ;
 
         this.mockMvc = MockMvcBuilders
                 .webAppContextSetup(webApplicationContext)
@@ -170,14 +171,14 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .build();
 
         department1 = Department.builder()
-                        .name("Department One")
-                        .disabilityLogo("disabilityLogo")
-                        .build();
+                .name("Department One")
+                .disabilityLogo("disabilityLogo")
+                .build();
 
         EmailExtension emailExtension = EmailExtension.builder()
-                                        .department(department1)
-                                        .emailExtension("cabinetoffice.gov.uk")
-                                        .build();
+                .department(department1)
+                .emailExtension("cabinetoffice.gov.uk")
+                .build();
 
         department1.getAcceptedEmailExtensions().add(emailExtension);
         department1 = departmentRepository.save(department1);
@@ -197,9 +198,9 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                         .build());
 
         EmailExtension parentDepartmentEmail = EmailExtension.builder()
-                                        .department(parentDepartment)
-                                        .emailExtension("parentdepartment@email.com")
-                                        .build();
+                .department(parentDepartment)
+                .emailExtension("parentdepartment@email.com")
+                .build();
         parentDepartment.getAcceptedEmailExtensions().add(parentDepartmentEmail);
         departmentRepository.save(parentDepartment);
 
@@ -217,9 +218,9 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                         .build());
 
         EmailExtension childDepartmentEmail = EmailExtension.builder()
-                                        .department(parentDepartment)
-                                        .emailExtension("childdepartment@email.com")
-                                        .build();
+                .department(parentDepartment)
+                .emailExtension("childdepartment@email.com")
+                .build();
         childDepartment.getAcceptedEmailExtensions().add(childDepartmentEmail);
         childDepartment.setParent(parentDepartment);
         departmentRepository.save(childDepartment);
@@ -233,7 +234,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     @Test
     public void testExcludeClosedVacancies() throws Exception {
 
-		Date now = new Date();
+        Date now = new Date();
 
         given(locationService.find(any()))
                 .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
@@ -290,14 +291,14 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     public void testExcludeInternalVacancy() throws Exception {
 
         Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
-		newcastleVacancy.setInternalOpeningDate(YESTERDAY);
-		newcastleVacancy.setPublicOpeningDate(YESTERDAY);
+        newcastleVacancy.setInternalOpeningDate(YESTERDAY);
+        newcastleVacancy.setPublicOpeningDate(YESTERDAY);
         newcastleVacancy.setTitle("Newcastle Job");
         saveVacancy(newcastleVacancy);
 
         Vacancy newcastleVacancy2 = createVacancyPrototype(newcastleLocation2);
-		newcastleVacancy2.setInternalOpeningDate(YESTERDAY);
-		newcastleVacancy2.setPublicOpeningDate(TOMORROW);
+        newcastleVacancy2.setInternalOpeningDate(YESTERDAY);
+        newcastleVacancy2.setPublicOpeningDate(TOMORROW);
         newcastleVacancy2.setTitle("Newcastle Job 2");
         saveVacancy(newcastleVacancy2);
 
@@ -313,24 +314,24 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
         newcastleVacancy.setDepartment(parentDepartment);
-		newcastleVacancy.setGovernmentOpeningDate(TOMORROW);
-		newcastleVacancy.setPublicOpeningDate(TOMORROW);
+        newcastleVacancy.setGovernmentOpeningDate(TOMORROW);
+        newcastleVacancy.setPublicOpeningDate(TOMORROW);
         newcastleVacancy.setInternalOpeningDate(YESTERDAY);
         newcastleVacancy.setTitle("Parent Vacancy");
         saveVacancy(newcastleVacancy);
 
         Vacancy newcastleVacancy2 = createVacancyPrototype(newcastleLocation2);
         newcastleVacancy2.setDepartment(childDepartment);
-		newcastleVacancy2.setGovernmentOpeningDate(TOMORROW);
-		newcastleVacancy2.setPublicOpeningDate(TOMORROW);
+        newcastleVacancy2.setGovernmentOpeningDate(TOMORROW);
+        newcastleVacancy2.setPublicOpeningDate(TOMORROW);
         newcastleVacancy2.setInternalOpeningDate(YESTERDAY);
         newcastleVacancy2.setTitle("Child Vacancy");
         saveVacancy(newcastleVacancy2);
 
         Vacancy newcastleVacancy3 = createVacancyPrototype(newcastleLocation3);
         newcastleVacancy3.setDepartment(siblingDepartment);
-		newcastleVacancy3.setGovernmentOpeningDate(TOMORROW);
-		newcastleVacancy3.setPublicOpeningDate(TOMORROW);
+        newcastleVacancy3.setGovernmentOpeningDate(TOMORROW);
+        newcastleVacancy3.setPublicOpeningDate(TOMORROW);
         newcastleVacancy3.setInternalOpeningDate(YESTERDAY);
         newcastleVacancy3.setTitle("Sibling Vacancy");
         saveVacancy(newcastleVacancy3);
@@ -352,24 +353,24 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
         newcastleVacancy.setDepartment(parentDepartment);
-		newcastleVacancy.setGovernmentOpeningDate(TOMORROW);
-		newcastleVacancy.setPublicOpeningDate(TOMORROW);
+        newcastleVacancy.setGovernmentOpeningDate(TOMORROW);
+        newcastleVacancy.setPublicOpeningDate(TOMORROW);
         newcastleVacancy.setInternalOpeningDate(YESTERDAY);
         newcastleVacancy.setTitle("Parent Vacancy");
         saveVacancy(newcastleVacancy);
 
         Vacancy newcastleVacancy2 = createVacancyPrototype(newcastleLocation2);
         newcastleVacancy2.setDepartment(childDepartment);
-		newcastleVacancy2.setGovernmentOpeningDate(TOMORROW);
-		newcastleVacancy2.setPublicOpeningDate(TOMORROW);
+        newcastleVacancy2.setGovernmentOpeningDate(TOMORROW);
+        newcastleVacancy2.setPublicOpeningDate(TOMORROW);
         newcastleVacancy2.setInternalOpeningDate(YESTERDAY);
         newcastleVacancy2.setTitle("Child Vacancy");
         saveVacancy(newcastleVacancy2);
 
         Vacancy newcastleVacancy3 = createVacancyPrototype(newcastleLocation3);
         newcastleVacancy3.setDepartment(siblingDepartment);
-		newcastleVacancy3.setGovernmentOpeningDate(TOMORROW);
-		newcastleVacancy3.setPublicOpeningDate(TOMORROW);
+        newcastleVacancy3.setGovernmentOpeningDate(TOMORROW);
+        newcastleVacancy3.setPublicOpeningDate(TOMORROW);
         newcastleVacancy3.setInternalOpeningDate(YESTERDAY);
         newcastleVacancy3.setTitle("Sibling Vacancy");
         saveVacancy(newcastleVacancy3);
@@ -390,19 +391,19 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     public void testIncludeAcrossGovernmentVacancy() throws Exception {
 
         Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
-		newcastleVacancy.setGovernmentOpeningDate(YESTERDAY);
-		newcastleVacancy.setPublicOpeningDate(TOMORROW);
+        newcastleVacancy.setGovernmentOpeningDate(YESTERDAY);
+        newcastleVacancy.setPublicOpeningDate(TOMORROW);
         newcastleVacancy.setTitle("Newcastle Job");
         saveVacancy(newcastleVacancy);
 
         Vacancy newcastleVacancy2 = createVacancyPrototype(newcastleLocation2);
-		newcastleVacancy2.setGovernmentOpeningDate(YESTERDAY);
-		newcastleVacancy2.setPublicOpeningDate(TOMORROW);
+        newcastleVacancy2.setGovernmentOpeningDate(YESTERDAY);
+        newcastleVacancy2.setPublicOpeningDate(TOMORROW);
         newcastleVacancy2.setTitle("Newcastle Job 2");
         saveVacancy(newcastleVacancy2);
 
-		String jwt = cshrAuthenticationService.createInternalJWT("cabinetoffice.gov.uk", department2);
-		System.out.println("JWT=" + jwt);
+        String jwt = cshrAuthenticationService.createInternalJWT("cabinetoffice.gov.uk", department2);
+        System.out.println("JWT=" + jwt);
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
                 .keyword("newcastle")
@@ -418,19 +419,19 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     public void testPublicDateBeforeAcrossGovernment() throws Exception {
 
         Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
-		newcastleVacancy.setGovernmentOpeningDate(YESTERDAY);
-		newcastleVacancy.setPublicOpeningDate(YESTERDAY);
+        newcastleVacancy.setGovernmentOpeningDate(YESTERDAY);
+        newcastleVacancy.setPublicOpeningDate(YESTERDAY);
         newcastleVacancy.setTitle("Newcastle Job");
         saveVacancy(newcastleVacancy);
 
         Vacancy newcastleVacancy2 = createVacancyPrototype(newcastleLocation2);
-		newcastleVacancy2.setGovernmentOpeningDate(YESTERDAY);
-		newcastleVacancy2.setPublicOpeningDate(TOMORROW);
+        newcastleVacancy2.setGovernmentOpeningDate(YESTERDAY);
+        newcastleVacancy2.setPublicOpeningDate(TOMORROW);
         newcastleVacancy2.setTitle("Newcastle Job 2");
         saveVacancy(newcastleVacancy2);
 
-		String jwt = cshrAuthenticationService.createInternalJWT("cabinetoffice.gov.uk", department1);
-		System.out.println("JWT=" + jwt);
+        String jwt = cshrAuthenticationService.createInternalJWT("cabinetoffice.gov.uk", department1);
+        System.out.println("JWT=" + jwt);
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
                 .keyword("newcastle")
@@ -446,19 +447,19 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     public void testPublicDateBeforeInternalGovernment() throws Exception {
 
         Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
-		newcastleVacancy.setPublicOpeningDate(YESTERDAY);
-		newcastleVacancy.setInternalOpeningDate(TOMORROW);
+        newcastleVacancy.setPublicOpeningDate(YESTERDAY);
+        newcastleVacancy.setInternalOpeningDate(TOMORROW);
         newcastleVacancy.setTitle("Newcastle Job");
         saveVacancy(newcastleVacancy);
 
         Vacancy newcastleVacancy2 = createVacancyPrototype(newcastleLocation2);
-		newcastleVacancy2.setPublicOpeningDate(YESTERDAY);
-		newcastleVacancy2.setInternalOpeningDate(TOMORROW);
+        newcastleVacancy2.setPublicOpeningDate(YESTERDAY);
+        newcastleVacancy2.setInternalOpeningDate(TOMORROW);
         newcastleVacancy2.setTitle("Newcastle Job 2");
         saveVacancy(newcastleVacancy2);
 
-		String jwt = cshrAuthenticationService.createInternalJWT("cabinetoffice.gov.uk", department1);
-		System.out.println("JWT=" + jwt);
+        String jwt = cshrAuthenticationService.createInternalJWT("cabinetoffice.gov.uk", department1);
+        System.out.println("JWT=" + jwt);
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
                 .keyword("newcastle")
@@ -475,22 +476,22 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
         newcastleVacancy.setDepartment(department1);
-		newcastleVacancy.setGovernmentOpeningDate(TOMORROW);
-		newcastleVacancy.setPublicOpeningDate(TOMORROW);
+        newcastleVacancy.setGovernmentOpeningDate(TOMORROW);
+        newcastleVacancy.setPublicOpeningDate(TOMORROW);
         newcastleVacancy.setInternalOpeningDate(YESTERDAY);
         newcastleVacancy.setTitle("Newcastle Job");
         saveVacancy(newcastleVacancy);
 
         Vacancy newcastleVacancy2 = createVacancyPrototype(newcastleLocation2);
         newcastleVacancy2.setDepartment(department2);
-		newcastleVacancy2.setGovernmentOpeningDate(TOMORROW);
-		newcastleVacancy2.setPublicOpeningDate(TOMORROW);
+        newcastleVacancy2.setGovernmentOpeningDate(TOMORROW);
+        newcastleVacancy2.setPublicOpeningDate(TOMORROW);
         newcastleVacancy2.setInternalOpeningDate(YESTERDAY);
         newcastleVacancy2.setTitle("Newcastle Job 2");
         saveVacancy(newcastleVacancy2);
 
-		String jwt = cshrAuthenticationService.createInternalJWT("cabinetoffice.gov.uk", department2);
-		System.out.println("JWT=" + jwt);
+        String jwt = cshrAuthenticationService.createInternalJWT("cabinetoffice.gov.uk", department2);
+        System.out.println("JWT=" + jwt);
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
                 .keyword("newcastle")
@@ -507,19 +508,19 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     public void testHandleInvalidJWTOnInternalVacancySearch() throws Exception {
 
         Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
-		newcastleVacancy.setInternalOpeningDate(YESTERDAY);
-		newcastleVacancy.setPublicOpeningDate(YESTERDAY);
+        newcastleVacancy.setInternalOpeningDate(YESTERDAY);
+        newcastleVacancy.setPublicOpeningDate(YESTERDAY);
         newcastleVacancy.setTitle("Newcastle Job");
         saveVacancy(newcastleVacancy);
 
         Vacancy newcastleVacancy2 = createVacancyPrototype(newcastleLocation2);
-		newcastleVacancy2.setInternalOpeningDate(YESTERDAY);
-		newcastleVacancy2.setPublicOpeningDate(TOMORROW);
+        newcastleVacancy2.setInternalOpeningDate(YESTERDAY);
+        newcastleVacancy2.setPublicOpeningDate(TOMORROW);
         newcastleVacancy2.setTitle("Newcastle Job 2");
         saveVacancy(newcastleVacancy2);
 
-		String jwt = cshrAuthenticationService.createInternalJWT("cabinetoffice.gov.uk", department1);
-		System.out.println("JWT=" + jwt);
+        String jwt = cshrAuthenticationService.createInternalJWT("cabinetoffice.gov.uk", department1);
+        System.out.println("JWT=" + jwt);
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
                 .keyword("newcastle")
@@ -542,7 +543,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         String requestBody = "{ \"emailAddress\": \"anyone@yahoo.co.uk\" }";
 
         MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/verifyemail")
-				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
+                .with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(requestBody)
                 .accept(APPLICATION_JSON_UTF8))
@@ -561,7 +562,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     public void testInvalidLocation() throws Exception {
 
         given(locationService.find(any()))
-            .willReturn(null);
+                .willReturn(null);
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
                 .keyword("any")
@@ -575,7 +576,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         String json = mapper.writeValueAsString(vacancySearchParameters);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/search")
-				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
+                .with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(json)
                 .accept(APPLICATION_JSON_UTF8))
@@ -594,7 +595,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         String json = mapper.writeValueAsString(vacancySearchParameters);
 
         this.mockMvc.perform(post("/vacancy/search")
-				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
+                .with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(json)
                 .accept(APPLICATION_JSON_UTF8))
@@ -606,17 +607,17 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     public void testFilterInactiveVacancies() throws Exception {
 
         Vacancy vacancy1 = createVacancyPrototype(newcastleLocation);
-		vacancy1.setActive(false);
+        vacancy1.setActive(false);
         vacancy1.setTitle("Newcastle Job");
         saveVacancy(vacancy1);
 
         Vacancy vacancy2 = createVacancyPrototype(newcastleLocation2);
-		vacancy2.setActive(false);
+        vacancy2.setActive(false);
         vacancy2.setTitle("Second Newcastle Job");
         saveVacancy(vacancy2);
 
         Vacancy vacancy3 = createVacancyPrototype(newcastleLocation3);
-		vacancy3.setActive(true);
+        vacancy3.setActive(true);
         vacancy3.setTitle("third Newcastle Job");
         saveVacancy(vacancy3);
 
@@ -626,8 +627,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         Assert.assertTrue("Results expected", resultsList.size() == 1);
 
         for (Vacancy vacancy : resultsList) {
-			Assert.assertTrue("Returned vacancy is active", vacancy.getActive());
-		}
+            Assert.assertTrue("Returned vacancy is active", vacancy.getActive());
+        }
     }
 
     @Test
@@ -647,8 +648,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         newcastleVacancy.setTitle("findthis");
         ResultActions sendRequest = this.mockMvc.perform(put("/vacancy/" + newcastleVacancy.getId())
-				.with(user("searchusername").password("searchpassword").roles("CRUD_ROLE"))
-				.contentType(APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(newcastleVacancy)));
+                .with(user("searchusername").password("searchpassword").roles("CRUD_ROLE"))
+                .contentType(APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(newcastleVacancy)));
 
         sendRequest.andExpect(status().isOk());
 
@@ -660,8 +661,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         newcastleVacancy.setTitle("newtitle");
         sendRequest = this.mockMvc.perform(post("/vacancy/save/")
-				.with(user("searchusername").password("searchpassword").roles("CRUD_ROLE"))
-				.contentType(APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(newcastleVacancy)));
+                .with(user("searchusername").password("searchpassword").roles("CRUD_ROLE"))
+                .contentType(APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(newcastleVacancy)));
 
         sendRequest.andExpect(status().isOk());
 
@@ -846,8 +847,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         Assert.assertEquals("Expected number results", 3, resultsList.size());
 
         vacancySearchParameters = VacancySearchParameters.builder()
-                .contractTypes(new String[] {
-                    ContractType.SEASONAL.toString(),
+                .contractTypes(new String[]{
+                        ContractType.SEASONAL.toString(),
                 })
                 .build();
 
@@ -857,8 +858,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         Assert.assertEquals("Expected number results", 0, resultsList.size());
 
         vacancySearchParameters = VacancySearchParameters.builder()
-                .contractTypes(new String[] {
-                    ContractType.INTERNSHIP.toString(),
+                .contractTypes(new String[]{
+                        ContractType.INTERNSHIP.toString(),
                 })
                 .build();
 
@@ -869,9 +870,9 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         Assert.assertTrue("Expected result", resultsList.get(0).getContractTypes().contains(ContractType.INTERNSHIP.toString()));
 
         vacancySearchParameters = VacancySearchParameters.builder()
-                .contractTypes(new String[] {
-                    ContractType.FULL_TIME.toString(),
-                    ContractType.PART_TIME.toString(),
+                .contractTypes(new String[]{
+                        ContractType.FULL_TIME.toString(),
+                        ContractType.PART_TIME.toString(),
                 })
                 .build();
 
@@ -883,7 +884,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         for (Vacancy vacancy : resultsList) {
             Assert.assertTrue(vacancy.getContractTypes().contains(ContractType.FULL_TIME.toString())
-            || vacancy.getContractTypes().contains(ContractType.PART_TIME.toString() ));
+                    || vacancy.getContractTypes().contains(ContractType.PART_TIME.toString()));
         }
     }
 
@@ -914,8 +915,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         Assert.assertEquals("Expected number results", 3, resultsList.size());
 
         vacancySearchParameters = VacancySearchParameters.builder()
-                .workingPatterns(new String[] {
-                    WorkingPattern.JOB_SHARE.toString(),
+                .workingPatterns(new String[]{
+                        WorkingPattern.JOB_SHARE.toString(),
                 })
                 .build();
 
@@ -925,8 +926,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         Assert.assertEquals("Expected number results", 0, resultsList.size());
 
         vacancySearchParameters = VacancySearchParameters.builder()
-                .workingPatterns(new String[] {
-                    WorkingPattern.FLEXIBLE_WORKING.toString(),
+                .workingPatterns(new String[]{
+                        WorkingPattern.FLEXIBLE_WORKING.toString(),
                 })
                 .build();
 
@@ -937,9 +938,9 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         Assert.assertTrue("Expected result", resultsList.get(0).getWorkingPatterns().contains(WorkingPattern.FLEXIBLE_WORKING.toString()));
 
         vacancySearchParameters = VacancySearchParameters.builder()
-                .workingPatterns(new String[] {
-                    WorkingPattern.FLEXIBLE_WORKING.toString(),
-                    WorkingPattern.FULL_TIME.toString(),
+                .workingPatterns(new String[]{
+                        WorkingPattern.FLEXIBLE_WORKING.toString(),
+                        WorkingPattern.FULL_TIME.toString(),
                 })
                 .build();
 
@@ -951,7 +952,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         for (Vacancy vacancy : resultsList) {
             Assert.assertTrue(vacancy.getWorkingPatterns().contains(WorkingPattern.FLEXIBLE_WORKING.toString())
-            || vacancy.getWorkingPatterns().contains(WorkingPattern.FULL_TIME.toString() ));
+                    || vacancy.getWorkingPatterns().contains(WorkingPattern.FULL_TIME.toString()));
         }
     }
 
@@ -979,7 +980,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         Vacancy closedVacancy = createVacancyWithClosingDate("yesterday", YESTERDAY, department1);
 
         MvcResult mvcResult = this.mockMvc.perform(get("/vacancy/" + closedVacancy.getId())
-				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
+                .with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .accept(APPLICATION_JSON_UTF8))
                 .andExpect(status().isGone())
@@ -1002,12 +1003,12 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
 
         Vacancy inactiveVacancy = createVacancyPrototype(newcastleLocation);
-		inactiveVacancy.setActive(false);
+        inactiveVacancy.setActive(false);
         inactiveVacancy.setTitle("Newcastle Job");
         saveVacancy(inactiveVacancy);
 
         MvcResult mvcResult = this.mockMvc.perform(get("/vacancy/" + inactiveVacancy.getId())
-				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
+                .with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .accept(APPLICATION_JSON_UTF8))
                 .andExpect(status().isGone())
@@ -1026,7 +1027,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         closedVacancy.setClosingDate(THIRTY_DAYS_FROM_NOW);
 
         MvcResult mvcUpdateResult = this.mockMvc.perform(put("/vacancy/" + closedVacancy.getId())
-				.with(user("searchusername").password("searchpassword").roles("CRUD_ROLE"))
+                .with(user("searchusername").password("searchpassword").roles("CRUD_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(objectMapper.writeValueAsString(closedVacancy))
                 .accept(APPLICATION_JSON_UTF8))
@@ -1034,7 +1035,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .andReturn();
 
         MvcResult mvcFindResult = this.mockMvc.perform(get("/vacancy/" + closedVacancy.getId())
-				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
+                .with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .accept(APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
@@ -1063,7 +1064,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         String json = mapper.writeValueAsString(vacancySearchParameters);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/search")
-				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
+                .with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(json)
                 .accept(APPLICATION_JSON_UTF8))
@@ -1098,7 +1099,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         String json = mapper.writeValueAsString(vacancySearchParameters);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/search")
-				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
+                .with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(json)
                 .accept(APPLICATION_JSON_UTF8))
@@ -1143,7 +1144,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         String json = mapper.writeValueAsString(vacancySearchParameters);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/search")
-				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
+                .with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(json)
                 .accept(APPLICATION_JSON_UTF8))
@@ -1158,16 +1159,16 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     }
 
     private SearchResponsePage findVancanciesByKeyword(VacancySearchParameters vacancySearchParameters, String jwt)
-			throws Exception {
+            throws Exception {
 
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(vacancySearchParameters);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/search")
-				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
+                .with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(json)
-				.header("cshr-authentication", jwt)
+                .header("cshr-authentication", jwt)
                 .accept(APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -1191,7 +1192,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         String json = mapper.writeValueAsString(vacancySearchParameters);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/search")
-				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
+                .with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(json)
                 .accept(APPLICATION_JSON_UTF8))
@@ -1220,7 +1221,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         String json = mapper.writeValueAsString(vacancySearchParameters);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/search")
-				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
+                .with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(json)
                 .accept(APPLICATION_JSON_UTF8))
@@ -1247,7 +1248,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         String json = objectMapper.writeValueAsString(vacancySearchParameters);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/search")
-				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
+                .with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(json)
                 .accept(APPLICATION_JSON_UTF8))

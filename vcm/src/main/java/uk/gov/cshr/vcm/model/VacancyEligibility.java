@@ -2,8 +2,8 @@ package uk.gov.cshr.vcm.model;
 
 public enum VacancyEligibility {
 
-	PUBLIC,
-	INTERNAL;
+    PUBLIC,
+    INTERNAL;
 
     private Long departmentID;
 
@@ -24,5 +24,5 @@ public enum VacancyEligibility {
     public void setDepartmentID(Long departmentID) {
         this.departmentID = departmentID;
     }
-    
+
 }

@@ -11,7 +11,8 @@ public final class VacancyFixture {
 
     private static final VacancyFixture INSTANCE = new VacancyFixture();
 
-    private VacancyFixture() {}
+    private VacancyFixture() {
+    }
 
     public static VacancyFixture getInstance() {
         return INSTANCE;

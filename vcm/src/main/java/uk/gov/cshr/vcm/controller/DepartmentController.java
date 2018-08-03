@@ -46,7 +46,7 @@ public class DepartmentController {
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     @ApiOperation(value = "Find all departments", nickname = "findAll")
-	@RolesAllowed({"CRUD_ROLE", "SEARCH_ROLE"})
+    @RolesAllowed({"CRUD_ROLE", "SEARCH_ROLE"})
     public ResponseEntity<Page<Department>> findAll(Pageable pageable) {
         Page<Department> departments = departmentRepository.findAllByOrderByNameAsc(pageable);
         return ResponseEntity.ok().body(departments);
@@ -94,7 +94,7 @@ public class DepartmentController {
         return foundDepartment.map((Department department) -> {
             // Attention, mutable state on the argument
             departmentUpdate.setId(department.getId());
-            if ( departmentUpdate.getAcceptedEmailExtensions() == null ) {
+            if (departmentUpdate.getAcceptedEmailExtensions() == null) {
                 departmentUpdate.setAcceptedEmailExtensions(department.getAcceptedEmailExtensions());
             }
             departmentRepository.save(departmentUpdate);
@@ -111,10 +111,10 @@ public class DepartmentController {
         return ResponseEntity.noContent().build();
     }
 
-	@CacheEvict(value = "departments", allEntries = true)
+    @CacheEvict(value = "departments", allEntries = true)
     @RequestMapping(method = RequestMethod.POST, value = "/loaddepartments")
     @ApiOperation(value = "load departments", nickname = "load")
-    public ResponseEntity<?> load(@RequestParam("file") MultipartFile file) 
+    public ResponseEntity<?> load(@RequestParam("file") MultipartFile file)
             throws IOException, ParseException {
 
         try (InputStream inputStream = file.getInputStream()) {

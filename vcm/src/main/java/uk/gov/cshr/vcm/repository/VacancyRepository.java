@@ -14,17 +14,17 @@ import uk.gov.cshr.vcm.model.Vacancy;
 @Repository
 @Transactional
 public interface VacancyRepository extends PagingAndSortingRepository<Vacancy, Long> {
-    
+
     default Optional<Vacancy> findById(Long id) {
         return Optional.ofNullable(this.findOne(id));
     }
 
     /**
      * Finds a vacancy using the jobRef and vendorIdentifier as search criteria.
-     *
+     * <p>
      * jobRef and vendorIdentifier should be a unique combination in the vacancies table.
      *
-     * @param jobRef Applicant Tracking System id to the vacancy
+     * @param jobRef           Applicant Tracking System id to the vacancy
      * @param vendorIdentifier identifies which Applicant Tracking System is the source of the vacancy
      * @return list of vacancies that match the given search criteria. There should be 0 or 1 Vacancies in the list.
      */

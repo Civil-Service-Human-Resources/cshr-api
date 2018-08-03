@@ -39,7 +39,7 @@ import uk.gov.cshr.vcm.service.HibernateSearchService;
 @Api(value = "vacancyservice")
 @RolesAllowed("CRUD_ROLE")
 public class VacancyController {
-    
+
     private static final Logger log = LoggerFactory.getLogger(VacancyController.class);
 
     private final ApplicantTrackingSystemService applicantTrackingSystemService;
@@ -58,7 +58,7 @@ public class VacancyController {
     @ApiOperation(value = "Create a Vacancy", nickname = "create")
     public ResponseEntity<Vacancy> create(@RequestBody Vacancy vacancy) {
 
-        if ( vacancy.getActive() == null ) {
+        if (vacancy.getActive() == null) {
             vacancy.setActive(Boolean.TRUE);
         }
 
@@ -90,8 +90,7 @@ public class VacancyController {
         if (foundVacancy.isPresent()) {
             Vacancy updatedVacancy = updateVacancy(vacancyUpdate, foundVacancy.get());
             return ResponseEntity.ok().body(updatedVacancy);
-        }
-        else {
+        } else {
             return ResponseEntity.notFound().build();
         }
     }
@@ -122,10 +121,10 @@ public class VacancyController {
 
     /**
      * This method is responsible for saving a vacancy.
-     *
+     * <p>
      * The method will validate that the Applicant Tracking System Vendor identifier supplied in the vacancy is one
      * that is recognised by CSHR.  If the identifier is not valid an InvalidApplicantTrackingSystemException will be thrown.
-     *
+     * <p>
      * The method will check if the vacancy already exists (based on Vacancy.identifier and Vacancy.atsVendorIdentifier).
      * If the vacancy does not exist a new one will be created otherwise the existing one will be updated.
      *
@@ -155,18 +154,18 @@ public class VacancyController {
             code = StatusCode.RECORD_UPDATED.getCode();
         }
 
-    return ResponseEntity.ok()
-        .body(
-            CSHRServiceStatus.builder()
-                .code(code)
-                .summary(message)
-                .detail(Collections.emptyList())
-                .build());
+        return ResponseEntity.ok()
+                .body(
+                        CSHRServiceStatus.builder()
+                                .code(code)
+                                .summary(message)
+                                .detail(Collections.emptyList())
+                                .build());
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/refresh")
     public ResponseEntity<?> refresh() throws InterruptedException {
-        
+
         hibernateSearchService.initializeHibernateSearch();
         return ResponseEntity.noContent().build();
     }
@@ -174,16 +173,16 @@ public class VacancyController {
     private void sanitiseApplyURL(Vacancy vacancy) {
 
         String originalURL = vacancy.getApplyURL();
-        
+
         String url = vacancy.getApplyURL();
-        
-        if (  url != null &&  !url.toLowerCase().matches("^\\w+://.*")) {
-            url = "https://" + url;            
+
+        if (url != null && !url.toLowerCase().matches("^\\w+://.*")) {
+            url = "https://" + url;
         }
-        
-        String[] schemes = {"http","https"};
+
+        String[] schemes = {"http", "https"};
         UrlValidator urlValidator = new UrlValidator(schemes);
-        if (! urlValidator.isValid(url)) {
+        if (!urlValidator.isValid(url)) {
             url = null;
         }
 
