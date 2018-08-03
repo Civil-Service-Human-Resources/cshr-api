@@ -25,6 +25,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -134,16 +135,19 @@ public class Vacancy implements Serializable {
     @NonNull
     private String eligibility;
 
-    @Field(store = Store.YES)
+    @Field(store = Store.YES, analyze = Analyze.NO)
+    @DateBridge(resolution = Resolution.MINUTE, encoding = EncodingType.STRING)
+    @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT+0")
     @Column(name = "government_opening_date")
-    private Timestamp governmentOpeningDate;
+    private Date governmentOpeningDate;
 
-    @Field(store = Store.YES)
-    @DateBridge(resolution = Resolution.MILLISECOND)
+    @Field(store = Store.YES, analyze = Analyze.NO)
+    @DateBridge(resolution = Resolution.MINUTE, encoding = EncodingType.STRING)
+    @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT+0")
     @Column(name = "internal_opening_date")
-    private Timestamp internalOpeningDate;
+    private Date internalOpeningDate;
 
     @Field(store = Store.YES, analyze = Analyze.NO)
     @DateBridge(resolution = Resolution.MINUTE, encoding = EncodingType.STRING)
@@ -161,6 +165,7 @@ public class Vacancy implements Serializable {
 
     private Integer numberVacancies;
 
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "dept_id")
     private Department department;
@@ -236,5 +241,8 @@ public class Vacancy implements Serializable {
 	@Column(name = "active")
 	@Builder.Default
     private Boolean active = Boolean.TRUE;
+
+	@Column(name = "lengthofemployment")
+    private String lengthOfEmployment;
 }
 

@@ -28,6 +28,10 @@ COPY    --chown=appuser:appuser entrypoint.sh /usr/local/bin/entrypoint.sh
 
 RUN     chmod 755 /usr/local/bin/entrypoint.sh
 
+COPY    --chown=appuser:appuser entrypoint.sh /usr/local/bin/entrypoint.sh
+
+RUN     chmod 755 /usr/local/bin/entrypoint.sh
+
 USER 	appuser
 
 ENTRYPOINT [  "/usr/local/bin/entrypoint.sh" ]

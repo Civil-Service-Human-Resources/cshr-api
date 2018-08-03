@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
 import uk.gov.cshr.vcm.model.Coordinates;
 import uk.gov.cshr.vcm.model.SearchParameters;
+import uk.gov.cshr.vcm.model.SearchResponse;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
 
@@ -24,34 +25,35 @@ public class SearchService {
     @Inject
     private HibernateSearchService hibernateSearchService;
 
-    public Page<Vacancy> search(VacancySearchParameters vacancySearchParameters, Pageable pageable)
+    public void search(VacancySearchParameters vacancySearchParameters,
+            SearchResponse searchResponse, Pageable pageable)
             throws LocationServiceException, IOException {
-		
+
         debug("staring search()");
 
         SearchParameters searchParameters = SearchParameters.builder()
                 .vacancySearchParameters(vacancySearchParameters)
+				.vacancyEligibility(vacancySearchParameters.getVacancyEligibility())
                 .build();
 
         boolean filterByLocation = vacancySearchParameters.getLocation() != null;
-        boolean locationFound = false;
 
         if ( filterByLocation ) {
 
             Coordinates coordinates = locationService.find(vacancySearchParameters.getLocation().getPlace());
 
             if (coordinatesExist(coordinates)) {
-                locationFound = true;
                 searchParameters.setCoordinates(coordinates);
             }
             else {
-                debug("No Coordinates for %s with radius of %d exist", 
+                debug("No Coordinates for %s with radius of %d exist",
                         vacancySearchParameters.getLocation().getPlace(),
                         vacancySearchParameters.getLocation().getRadius());
             }
         }
 
-        return hibernateSearchService.search(searchParameters, pageable);
+        Page<Vacancy> vacancies = hibernateSearchService.search(searchParameters, pageable);
+        searchResponse.setVacancies(vacancies);
     }
 
     private boolean coordinatesExist(Coordinates coordinates) {

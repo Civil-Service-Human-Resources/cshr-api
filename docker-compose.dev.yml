@@ -14,7 +14,7 @@ services:
       - cshr-net
 
   test:
-    image: maven:3.5-jdk-8
+    image: cshrrpg.azurecr.io/maven-3-base 
     working_dir: "/usr/src/app"
     volumes:
       - "~/.m2:/root/.m2"

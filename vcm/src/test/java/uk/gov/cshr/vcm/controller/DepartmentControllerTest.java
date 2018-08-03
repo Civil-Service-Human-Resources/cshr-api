@@ -180,7 +180,7 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
 
         Department storedDepartment = departmentRepository.findOne(createdDepartmentId);
 
-        Assertions.assertThat(storedDepartment).isEqualToIgnoringGivenFields(requestBodyDepartment, "id");
+        Assertions.assertThat(storedDepartment).isEqualToIgnoringGivenFields(requestBodyDepartment, "id", "acceptedEmailExtensions");
     }
 
 
@@ -228,7 +228,7 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
     @Test
     public void testDelete() throws Exception {
 
-        List<Department> departments = createDepartments(departmentOneName, departmentTwoName);
+        List<Department> departments = createDepartments(departmentOneName);
 
         // Given
         String path = "/department/" + departments.get(0).getId();
@@ -237,12 +237,11 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
         ResultActions sendRequest = mvc.perform(delete(path)
 			.with(user("crudusername").password("crudpassword").roles("CRUD_ROLE")));
 
-        Iterable<Department> vacancies = departmentRepository.findAll();
+        Iterable<Department> foundDepartments = departmentRepository.findAll();
 
         // Then
         sendRequest.andExpect(status().isNoContent());
-        Assertions.assertThat(vacancies).hasSize(1);
-        Assertions.assertThat(vacancies.iterator().next()).isEqualToComparingFieldByField(departments.get(1));
+        Assertions.assertThat(foundDepartments).hasSize(0);
 
     }
 

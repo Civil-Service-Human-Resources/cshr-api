@@ -23,6 +23,14 @@ spring:
     search_password: searchpassword
     crud_username: crudusername
     crud_password: crudpassword
+    notify_username: notifyusername
+    notify_password: notifypassword
+  notifyservice:
+    templateid:
+    notifyApiKey: 
+    accountEnableURL: http://localhost:3000/verifyemail/%s
+  cshrAuthenticationService:
+    secret: f0fb2106-a5c6-4b06-9300-e954a31efcf9
 server:
   port: 8080
 liquibase:

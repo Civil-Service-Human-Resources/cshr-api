@@ -9,6 +9,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.security.RolesAllowed;
+import org.apache.commons.validator.UrlValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -25,6 +29,7 @@ import uk.gov.cshr.status.StatusCode;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
 import uk.gov.cshr.vcm.service.ApplicantTrackingSystemService;
+import uk.gov.cshr.vcm.service.HibernateSearchService;
 
 @RestController
 @RequestMapping(value = "/vacancy", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -32,8 +37,14 @@ import uk.gov.cshr.vcm.service.ApplicantTrackingSystemService;
 @Api(value = "vacancyservice")
 @RolesAllowed("CRUD_ROLE")
 public class VacancyController {
+    
+    private static final Logger log = LoggerFactory.getLogger(VacancyController.class);
+
     private final ApplicantTrackingSystemService applicantTrackingSystemService;
     private final VacancyRepository vacancyRepository;
+
+    @Autowired
+    private HibernateSearchService hibernateSearchService;
 
     VacancyController(ApplicantTrackingSystemService applicantTrackingSystemService,
                       VacancyRepository vacancyRepository) {
@@ -59,10 +70,12 @@ public class VacancyController {
     }
 
     private Vacancy createVacancy(Vacancy vacancy) {
+
         if (vacancy.getVacancyLocations() != null) {
             vacancy.getVacancyLocations().forEach(vacancyLocation -> vacancyLocation.setVacancy(vacancy));
         }
 
+        sanitiseApplyURL(vacancy);
         return vacancyRepository.save(vacancy);
     }
 
@@ -82,10 +95,10 @@ public class VacancyController {
     }
 
     private Vacancy updateVacancy(@RequestBody Vacancy vacancyUpdate, Vacancy foundVacancy) {
+
         vacancyUpdate.getVacancyLocations().forEach(vacancyLocation -> vacancyLocation.setVacancy(vacancyUpdate));
-
         vacancyUpdate.setId(foundVacancy.getId());
-
+        sanitiseApplyURL(vacancyUpdate);
         return vacancyRepository.save(vacancyUpdate);
     }
 
@@ -147,5 +160,32 @@ public class VacancyController {
                 .summary(message)
                 .detail(Collections.emptyList())
                 .build());
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/refresh")
+    public ResponseEntity<?> refresh() throws InterruptedException {
+        
+        hibernateSearchService.initializeHibernateSearch();
+        return ResponseEntity.noContent().build();
+    }
+
+    private void sanitiseApplyURL(Vacancy vacancy) {
+
+        String originalURL = vacancy.getApplyURL();
+        
+        String url = vacancy.getApplyURL();
+        
+        if (  url != null &&  !url.toLowerCase().matches("^\\w+://.*")) {
+            url = "https://" + url;            
+        }
+        
+        String[] schemes = {"http","https"};
+        UrlValidator urlValidator = new UrlValidator(schemes);
+        if (! urlValidator.isValid(url)) {
+            url = null;
+        }
+
+        log.debug("setting applyurl '" + originalURL + "' to: " + url);
+        vacancy.setApplyURL(url);
     }
 }
