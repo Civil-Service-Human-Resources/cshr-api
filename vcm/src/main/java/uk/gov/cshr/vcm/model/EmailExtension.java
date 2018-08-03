@@ -32,7 +32,7 @@ import lombok.NoArgsConstructor;
 public class EmailExtension implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO,  generator="acceptedemailextensions_id_seq")
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "acceptedemailextensions_id_seq")
     @Column(name = "id")
     private Long id;
 
@@ -51,7 +51,6 @@ public class EmailExtension implements Serializable {
         hash = 41 * hash + Objects.hashCode(this.id);
         return hash;
     }
-
 
 
     @Override

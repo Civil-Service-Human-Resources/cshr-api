@@ -33,9 +33,9 @@ public interface DepartmentRepository extends PagingAndSortingRepository<Departm
     @CacheEvict(value = "departments", allEntries = true)
     public void delete(Department department);
 
-	@Override
-	@Cacheable(value = "departments")
-	public Iterable<Department> findAll();
+    @Override
+    @Cacheable(value = "departments")
+    public Iterable<Department> findAll();
 
     public Department findByIdentifier(String idendifier);
 

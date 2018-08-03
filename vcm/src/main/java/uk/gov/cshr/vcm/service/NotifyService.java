@@ -22,7 +22,7 @@ public class NotifyService {
     private String accountEnableURL;
 
     public void emailInternalJWT(String emailAddress, String jwt, String name)
-			throws NotificationClientException {
+            throws NotificationClientException {
 
         NotificationClient client = new NotificationClient(notifyApiKey);
 
@@ -32,7 +32,7 @@ public class NotifyService {
         Map<String, String> personalisation = new HashMap<>();
         personalisation.put("message", stringBuilder.toString());
         client.sendEmail(templateId, emailAddress, personalisation, "verifiedEmailJWT");
-	}
+    }
 
     public boolean notify(Notification notification) throws NotificationClientException {
 
@@ -43,5 +43,5 @@ public class NotifyService {
         client.sendEmail(notification.getTemplateID(), notification.getEmail(), personalisation, "notifyCode");
 
         return true;
-	}
+    }
 }

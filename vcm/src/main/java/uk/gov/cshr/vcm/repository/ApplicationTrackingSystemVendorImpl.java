@@ -22,7 +22,7 @@ public class ApplicationTrackingSystemVendorImpl implements ApplicationTrackingS
     public Optional<ApplicantTrackingSystemVendor> findByClientIdentifier(String clientIdentifier) {
         return findOrEmpty(() ->
                 (ApplicantTrackingSystemVendor) em.createQuery("select atsv from ApplicantTrackingSystemVendor atsv where atsv.clientIdentifier = :clientIdentifier")
-                .setParameter("clientIdentifier", clientIdentifier)
-                .getSingleResult());
+                        .setParameter("clientIdentifier", clientIdentifier)
+                        .getSingleResult());
     }
 }

@@ -27,7 +27,7 @@ public class VacancyRestResponseExceptionHandler extends ResponseEntityException
 
     @ExceptionHandler({VacancyException.class})
     public ResponseEntity<Object> handleLocationServiceException(VacancyException ex, WebRequest request) {
-        if (  ex.getMessage() != null ) {
+        if (ex.getMessage() != null) {
             log.error(ex.getMessage(), ex);
         }
         return handleExceptionInternal(ex, ex.getVacancyError(), new HttpHeaders(), ex.getVacancyError().getStatus(), request);
@@ -80,14 +80,13 @@ public class VacancyRestResponseExceptionHandler extends ResponseEntityException
 
     @ExceptionHandler({NotificationClientException.class})
     public ResponseEntity<Object> handleNotificationClientException(NotificationClientException ex, WebRequest request) {
-        
+
         log.error(ex.getMessage(), ex);
         HttpStatus httpStatus;
 
         try {
             httpStatus = HttpStatus.valueOf(ex.getHttpResult());
-        }
-        catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             httpStatus = HttpStatus.NOT_FOUND;
         }
 

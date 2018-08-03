@@ -42,7 +42,7 @@ public class Department implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO,  generator="departments_id_seq")
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "departments_id_seq")
     private Long id;
 
     @Column(name = "identifier")
@@ -73,11 +73,11 @@ public class Department implements Serializable {
     @Column(name = "logopath")
     private String logoPath;
 
-	@Builder.Default
-	@OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE},
-               mappedBy = "department", fetch = FetchType.EAGER, orphanRemoval = true)
+    @Builder.Default
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE},
+            mappedBy = "department", fetch = FetchType.EAGER, orphanRemoval = true)
     @JsonIgnore
-	private Set<EmailExtension> acceptedEmailExtensions = new HashSet<>();
+    private Set<EmailExtension> acceptedEmailExtensions = new HashSet<>();
 
     @Override
     public int hashCode() {

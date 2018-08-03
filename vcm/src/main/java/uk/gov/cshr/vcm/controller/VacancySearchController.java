@@ -57,11 +57,11 @@ public class VacancySearchController {
     @Inject
     private SearchService searchService;
 
-	@Inject
-	private NotifyService notifyService;
+    @Inject
+    private NotifyService notifyService;
 
-	@Inject
-	private CshrAuthenticationService cshrAuthenticationService;
+    @Inject
+    private CshrAuthenticationService cshrAuthenticationService;
 
     private final VacancyRepository vacancyRepository;
 
@@ -72,53 +72,52 @@ public class VacancySearchController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/{vacancyId}")
     @ApiOperation(value = "Find a specific vacancy", nickname = "findById")
-	@ApiResponses(value = {
-		@ApiResponse(
-				code = 410,
-				message = VacancyClosedException.CLOSED_MESSAGE,
-				response = VacancyError.class)
-	})
-	@RolesAllowed({"SEARCH_ROLE", "CRUD_ROLE"})
+    @ApiResponses(value = {
+            @ApiResponse(
+                    code = 410,
+                    message = VacancyClosedException.CLOSED_MESSAGE,
+                    response = VacancyError.class)
+    })
+    @RolesAllowed({"SEARCH_ROLE", "CRUD_ROLE"})
     public ResponseEntity<Vacancy> findById(@PathVariable Long vacancyId)
-			throws VacancyClosedException {
+            throws VacancyClosedException {
 
         Optional<Vacancy> foundVacancy = vacancyRepository.findById(vacancyId);
 
-        if ( ! foundVacancy.isPresent() && log.isDebugEnabled()) {
+        if (!foundVacancy.isPresent() && log.isDebugEnabled()) {
             log.debug("No vacancy found for id " + vacancyId);
         }
 
-		if ( foundVacancy.isPresent() && (foundVacancy.get().getActive() == false
-                || foundVacancy.get().getClosingDate().before(new Date()) ) ) {
-			throw new VacancyClosedException(vacancyId);
-		}
-        else {
+        if (foundVacancy.isPresent() && (foundVacancy.get().getActive() == false
+                || foundVacancy.get().getClosingDate().before(new Date()))) {
+            throw new VacancyClosedException(vacancyId);
+        } else {
             return foundVacancy.map(ResponseEntity.ok()::body).orElse(ResponseEntity.notFound().build());
         }
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/search")
     @ApiOperation(value = "Search for vacancies by location and keyword with support for pagination")
-	@ApiResponses(value = {
-		@ApiResponse(
-				code = 503,
-				message = LocationServiceException.SERVICE_UNAVAILABLE_MESSAGE,
-				response = VacancyError.class)
-	})
+    @ApiResponses(value = {
+            @ApiResponse(
+                    code = 503,
+                    message = LocationServiceException.SERVICE_UNAVAILABLE_MESSAGE,
+                    response = VacancyError.class)
+    })
     public ResponseEntity<SearchResponse> search(
-			@ApiParam(name = "searchParameters", value = "The values supplied to perform the search", required = true)
+            @ApiParam(name = "searchParameters", value = "The values supplied to perform the search", required = true)
             @RequestBody VacancySearchParameters vacancySearchParameters,
-			@RequestHeader(value = "cshr-authentication", required = false) String jwt,
-			Pageable pageable)
+            @RequestHeader(value = "cshr-authentication", required = false) String jwt,
+            Pageable pageable)
             throws LocationServiceException, IOException {
 
         SearchResponse searchResponse = SearchResponse.builder().build();
 
-		VacancyEligibility vacancyEligibility = cshrAuthenticationService.parseVacancyEligibility(jwt, searchResponse);
-		vacancySearchParameters.setVacancyEligibility(vacancyEligibility);
+        VacancyEligibility vacancyEligibility = cshrAuthenticationService.parseVacancyEligibility(jwt, searchResponse);
+        vacancySearchParameters.setVacancyEligibility(vacancyEligibility);
 
-		searchService.search(vacancySearchParameters, searchResponse, pageable);
-		return ResponseEntity.ok().body(searchResponse);
+        searchService.search(vacancySearchParameters, searchResponse, pageable);
+        return ResponseEntity.ok().body(searchResponse);
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/verifyemail")
@@ -134,15 +133,13 @@ public class VacancySearchController {
         }
 
         Set<Department> departments = cshrAuthenticationService.verifyEmailAddress(emailAddress);
-        
+
         if (departments.size() == 1) {
 
             String jwt = cshrAuthenticationService.createInternalJWT(emailAddress, departments.iterator().next());
             notifyService.emailInternalJWT(emailAddress, jwt, "name");
             return ResponseEntity.noContent().build();
-        }
-
-        else if (departments.size() > 1) {
+        } else if (departments.size() > 1) {
 
             if (departmentID == null) {
 
@@ -165,15 +162,12 @@ public class VacancySearchController {
                 return ResponseEntity.ok().body(VerifyResponse.builder()
                         .vacancyError(vacancyError)
                         .build());
-            }
-            else {
+            } else {
                 String jwt = cshrAuthenticationService.createInternalJWT(emailAddress, findDepartment(departmentID, departments));
                 notifyService.emailInternalJWT(emailAddress, jwt, "name");
                 return ResponseEntity.noContent().build();
             }
-        }
-
-        else {
+        } else {
 
             VacancyError vacancyError = VacancyError.builder()
                     .status(HttpStatus.UNAUTHORIZED)
@@ -184,7 +178,7 @@ public class VacancySearchController {
 
     private Department findDepartment(Long id, Set<Department> departments) {
         for (Department department : departments) {
-            if ( department.getId().equals(id) ) {
+            if (department.getId().equals(id)) {
                 return department;
             }
         }

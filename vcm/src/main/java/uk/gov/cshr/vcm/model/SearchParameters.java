@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * This class is responsible for aggregating input search parameters with the supplied location as a coordinate represented by a longitude and latitude.
- *
+ * <p>
  * This required so that validation marshalling and unmarshalling VacancySearchParameters works correctly.
  */
 @Builder
@@ -18,5 +18,5 @@ public class SearchParameters {
 
     private VacancySearchParameters vacancySearchParameters;
     private Coordinates coordinates;
-	private VacancyEligibility vacancyEligibility;
+    private VacancyEligibility vacancyEligibility;
 }

@@ -43,7 +43,7 @@ import uk.gov.service.notify.NotificationClientException;
 @WebAppConfiguration
 @TestExecutionListeners(MockitoTestExecutionListener.class)
 public class NotifyControllerTest extends AbstractTestNGSpringContextTests {
-    
+
     final private MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(),
             Charset.forName("utf8"));
@@ -81,7 +81,7 @@ public class NotifyControllerTest extends AbstractTestNGSpringContextTests {
         String json = objectMapper.writeValueAsString(notification);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/notify")
-				.with(user("notifyusername").password("notifypassword").roles("NOTIFY_ROLE"))
+                .with(user("notifyusername").password("notifypassword").roles("NOTIFY_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(json)
                 .accept(APPLICATION_JSON_UTF8))
@@ -100,7 +100,7 @@ public class NotifyControllerTest extends AbstractTestNGSpringContextTests {
         String json = objectMapper.writeValueAsString(notification);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/notify")
-				.with(user("notifyusername").password("notifypassword").roles("NOTIFY_ROLE"))
+                .with(user("notifyusername").password("notifypassword").roles("NOTIFY_ROLE"))
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(json)
                 .accept(APPLICATION_JSON_UTF8))

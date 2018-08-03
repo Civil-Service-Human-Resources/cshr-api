@@ -87,9 +87,9 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
         List<Department> departments = new ArrayList<>();
 
         for (String departmentName : departmentNames) {
-             Department department = departmentRepository.save(
-                     Department.builder().name(departmentName).build());
-             departments.add(department);
+            Department department = departmentRepository.save(
+                    Department.builder().name(departmentName).build());
+            departments.add(department);
         }
         return departments;
     }
@@ -100,7 +100,7 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
         List<Department> departments = createDepartments(
                 "xx",
                 "zz",
-                "yy",                
+                "yy",
                 departmentTwoName,
                 departmentOneName);
 
@@ -109,7 +109,7 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
 
         // When
         ResultActions sendRequest = mvc.perform(get(path)
-			.with(user("crudusername").password("crudpassword").roles("CRUD_ROLE")));
+                .with(user("crudusername").password("crudpassword").roles("CRUD_ROLE")));
 
         // Then
         sendRequest
@@ -122,7 +122,7 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
 
 
         sendRequest = mvc.perform(get(path)
-			.with(user("crudusername").password("crudpassword").roles("CRUD_ROLE")));
+                .with(user("crudusername").password("crudpassword").roles("CRUD_ROLE")));
     }
 
     @Test
@@ -135,7 +135,7 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
 
         // When
         ResultActions sendRequest = mvc.perform(get(path)
-			.with(user("crudusername").password("crudpassword").roles("CRUD_ROLE")));
+                .with(user("crudusername").password("crudpassword").roles("CRUD_ROLE")));
 
         MvcResult mvcResult = sendRequest.andReturn();
 
@@ -157,7 +157,7 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
 
         // When
         ResultActions sendRequest = mvc.perform(get(path)
-			.with(user("crudusername").password("crudpassword").roles("CRUD_ROLE")));
+                .with(user("crudusername").password("crudpassword").roles("CRUD_ROLE")));
 
         // Then
         sendRequest.andExpect(status().isNotFound());
@@ -171,8 +171,8 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
 
         // When
         ResultActions sendRequest = mvc.perform(post(path)
-				.with(user("crudusername").password("crudpassword").roles("CRUD_ROLE"))
-				.contentType(APPLICATION_JSON_UTF8).content(requestBody));
+                .with(user("crudusername").password("crudpassword").roles("CRUD_ROLE"))
+                .contentType(APPLICATION_JSON_UTF8).content(requestBody));
 
         MvcResult sendRequestResult = sendRequest.andReturn();
 
@@ -201,8 +201,8 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
 
         // When
         ResultActions sendRequest = mvc.perform(put(path)
-				.with(user("crudusername").password("crudpassword").roles("CRUD_ROLE"))
-				.contentType(APPLICATION_JSON_UTF8).content(requestBody));
+                .with(user("crudusername").password("crudpassword").roles("CRUD_ROLE"))
+                .contentType(APPLICATION_JSON_UTF8).content(requestBody));
 
         // Then
         sendRequest
@@ -219,8 +219,8 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
 
         // When
         ResultActions sendRequest = mvc.perform(put(path)
-				.with(user("crudusername").password("crudpassword").roles("CRUD_ROLE"))
-				.contentType(APPLICATION_JSON_UTF8).content(requestBody));
+                .with(user("crudusername").password("crudpassword").roles("CRUD_ROLE"))
+                .contentType(APPLICATION_JSON_UTF8).content(requestBody));
 
         // Then
         sendRequest.andExpect(status().isNotFound());
@@ -242,7 +242,7 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
 
         // When
         ResultActions sendRequest = mvc.perform(delete(path)
-			.with(user("crudusername").password("crudpassword").roles("CRUD_ROLE")));
+                .with(user("crudusername").password("crudpassword").roles("CRUD_ROLE")));
 
         Iterable<Department> foundDepartments = departmentRepository.findAll();
 
@@ -262,7 +262,7 @@ public class DepartmentControllerTest extends AbstractTestNGSpringContextTests {
 
         // When
         ResultActions sendRequest = mvc.perform(get(path)
-			.with(user("crudusername").password("crudpassword").roles("CRUD_ROLE")));
+                .with(user("crudusername").password("crudpassword").roles("CRUD_ROLE")));
 
         // Then
         sendRequest
