@@ -31,3 +31,4 @@ server:
 liquibase:
     enabled: true
     change-log: classpath:/changelog.xml
+    contexts: test

@@ -23,10 +23,11 @@
     </parent>
 
     <properties>
-        <cshr.common.version>0.0.5</cshr.common.version>
+        <cshr.common.version>1.0.0</cshr.common.version>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <postgres.version>9.4-1206-jdbc42</postgres.version>
     </properties>
 
         <dependencies>
@@ -93,7 +94,7 @@
             <dependency>
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
-                <version>9.4-1206-jdbc42</version>
+                <version>${postgres.version}</version>
             </dependency>
 
             <dependency>

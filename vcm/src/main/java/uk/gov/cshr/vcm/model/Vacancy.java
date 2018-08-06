@@ -158,6 +158,11 @@ public class Vacancy implements Serializable {
     @Column(name = "public_opening_date")
     private Date publicOpeningDate;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT+0")
+    @Column(name = "modified")
+    private Date lastModified;
+
     @Field(store = Store.YES)
     @NonNull
     private Integer salaryMin;
