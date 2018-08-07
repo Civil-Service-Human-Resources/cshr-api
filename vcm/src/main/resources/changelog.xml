@@ -313,6 +313,13 @@
         <addColumn tableName="vacancylocations">
             <column name="modified" type="TIMESTAMP WITH TIME ZONE"/>
         </addColumn>
+        <rollback>
+            ALTER TABLE vacancies DROP COLUMN IF EXISTS created;
+            ALTER TABLE vacancies DROP COLUMN IF EXISTS modified;
+
+            ALTER TABLE vacancylocations DROP COLUMN IF EXISTS created;
+            ALTER TABLE vacancylocations DROP COLUMN IF EXISTS modified;
+        </rollback>
     </changeSet>
     <changeSet author="Seamus Singh" id="38" context="!test">
         <createProcedure>
@@ -376,12 +383,6 @@
             DROP TRIGGER IF EXISTS update_vacancylocation_modified ON vacancylocations CASCADE;
 
             DROP TRIGGER IF EXISTS update_vacancies_modified_locations ON vacancylocations CASCADE;
-
-            ALTER TABLE vacancies DROP COLUMN IF EXISTS created;
-            ALTER TABLE vacancies DROP COLUMN IF EXISTS modified;
-
-            ALTER TABLE vacancylocations DROP COLUMN IF EXISTS created;
-            ALTER TABLE vacancylocations DROP COLUMN IF EXISTS modified;
 
             DROP FUNCTION IF EXISTS add_row_created() CASCADE;
             DROP FUNCTION IF EXISTS add_row_modified() CASCADE;
