@@ -1,11 +1,10 @@
 package uk.gov.cshr.vcm.service;
 
-import java.io.IOException;
+import java.util.List;
 
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,22 +13,20 @@ import uk.gov.cshr.vcm.model.Coordinates;
 import uk.gov.cshr.vcm.model.SearchParameters;
 import uk.gov.cshr.vcm.model.SearchResponse;
 import uk.gov.cshr.vcm.model.Vacancy;
+import uk.gov.cshr.vcm.model.VacancyMetadata;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
 
 @Service
+@Slf4j
 public class SearchService {
-
-    private static final Logger log = LoggerFactory.getLogger(SearchService.class);
-
     @Inject
     private LocationService locationService;
 
     @Inject
     private HibernateSearchService hibernateSearchService;
 
-    public void search(VacancySearchParameters vacancySearchParameters,
-                       SearchResponse searchResponse, Pageable pageable)
-            throws LocationServiceException, IOException {
+    public void search(VacancySearchParameters vacancySearchParameters, SearchResponse searchResponse,
+                       Pageable pageable) throws LocationServiceException {
 
         debug("staring search()");
 
@@ -65,5 +62,15 @@ public class SearchService {
         if (log.isDebugEnabled()) {
             log.debug(String.format(message, params));
         }
+    }
+
+    /**
+     * This method delegates responsibility or retrieving a collection of ids and dates last modified for public facing
+     * vacancies.
+     *
+     * @return a collection of ids and dates last modified for public facing vacancies
+     */
+    public List<VacancyMetadata> getVacancyMetadata() {
+        return hibernateSearchService.getVacancyMetadata();
     }
 }

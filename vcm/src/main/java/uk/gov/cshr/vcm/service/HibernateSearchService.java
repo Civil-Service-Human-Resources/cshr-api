@@ -1,6 +1,5 @@
 package uk.gov.cshr.vcm.service;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +11,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.Query;
@@ -21,26 +21,29 @@ import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.Unit;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
 import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.model.SearchParameters;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancyEligibility;
 import uk.gov.cshr.vcm.model.VacancyLocation;
+import uk.gov.cshr.vcm.model.VacancyMetadata;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
 
 @Service
+@Slf4j
 public class HibernateSearchService {
-
-    private static final Logger log = LoggerFactory.getLogger(HibernateSearchService.class);
+    private static final String METADATA_QUERY = "select new uk.gov.cshr.vcm.model.VacancyMetadata(v.id, v.lastModified) " +
+            "from Vacancy v " +
+            "where v.publicOpeningDate is not null " +
+            "and v.publicOpeningDate <= current_timestamp " +
+            "and v.closingDate > current_timestamp";
     private static final double MILES_KM_MULTIPLIER = 1.609343502101154;
+    public static final String VACANCY_DESCRIPTION = "vacancy.description";
 
     @Autowired
     private final EntityManager entityManager;
@@ -67,8 +70,7 @@ public class HibernateSearchService {
     }
 
     @Transactional
-    public Page<Vacancy> search(SearchParameters searchParameters, Pageable pageable)
-            throws LocationServiceException, IOException {
+    public Page<Vacancy> search(SearchParameters searchParameters, Pageable pageable)  {
 
         FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
         QueryBuilder qb = fullTextEntityManager.getSearchFactory().buildQueryBuilder().forEntity(VacancyLocation.class).get();
@@ -118,9 +120,7 @@ public class HibernateSearchService {
         LinkedHashSet<Long> uniqueVacancyIDs = new LinkedHashSet<>();
 
         // remove any duplicate results
-        vacancyIDs.forEach((vacancyID) -> {
-            uniqueVacancyIDs.add(Long.valueOf(vacancyID[0].toString()));
-        });
+        vacancyIDs.forEach(vacancyID -> uniqueVacancyIDs.add(Long.valueOf(vacancyID[0].toString())));
 
         int pageSize = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
@@ -152,8 +152,7 @@ public class HibernateSearchService {
             // rearrange the db results to match the lucene relevance order
             vacancies.sort(Comparator.comparingLong(item -> idList.indexOf(item.getId())));
 
-            PageImpl<Vacancy> page = new PageImpl<>(vacancies, pageable, uniqueVacancyIDs.size());
-            return page;
+            return new PageImpl<>(vacancies, pageable, uniqueVacancyIDs.size());
         }
     }
 
@@ -236,7 +235,7 @@ public class HibernateSearchService {
                     .createQuery();
 
             Query descriptiopnPhraseQuery = qb.phrase()
-                    .onField("vacancy.description")
+                    .onField(VACANCY_DESCRIPTION)
                     .ignoreAnalyzer()
                     .sentence(searchTerm)
                     .createQuery();
@@ -246,17 +245,17 @@ public class HibernateSearchService {
                     .withEditDistanceUpTo(1)
                     .boostedTo(1.2f)
                     .withPrefixLength(1)
-                    .onField("vacancy.description")
+                    .onField(VACANCY_DESCRIPTION)
                     .matching(searchTerm)
                     .createQuery();
 
             Query wildcardQuery = qb.keyword()
                     .wildcard()
-                    .onFields("vacancy.title", "vacancy.description")
+                    .onFields("vacancy.title", VACANCY_DESCRIPTION)
                     .matching(searchTerm.replaceAll(" ", "* ") + "*")
                     .createQuery();
 
-            Query keywordQuery = qb.bool()
+            return qb.bool()
                     .should(titleFuzzyQuery)
                     .should(descriptionQuery)
                     .should(titleQuery)
@@ -264,8 +263,6 @@ public class HibernateSearchService {
                     .should(descriptiopnPhraseQuery)
                     .should(wildcardQuery)
                     .createQuery();
-
-            return keywordQuery;
         } else {
             return qb.all().createQuery();
         }
@@ -294,13 +291,11 @@ public class HibernateSearchService {
                 .below(maxSalary)
                 .createQuery();
 
-        Query salaryQuery = qb
+        return qb
                 .bool()
                 .must(minQuery)
                 .must(maxQuery).boostedTo(0.1f)
                 .createQuery();
-
-        return salaryQuery;
     }
 
     private Query getOpenQuery(QueryBuilder qb, VacancyEligibility vacancyEligibility) {
@@ -347,9 +342,7 @@ public class HibernateSearchService {
             }
 
             StringBuilder stringBuilder = new StringBuilder();
-            eligibleDepartments.forEach((department1) -> {
-                stringBuilder.append(department1.getId()).append(" ");
-            });
+            eligibleDepartments.forEach(department1 -> stringBuilder.append(department1.getId()).append(" "));
 
             Query departmentQuery = qb
                     .keyword()
@@ -382,15 +375,13 @@ public class HibernateSearchService {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
 
-        Query closedQuery = qb
+        return qb
                 .range()
                 .onField("vacancy.closingDate")
                 .ignoreFieldBridge()
                 .below(sdf.format(new Date()))
                 .excludeLimit()
                 .createQuery();
-
-        return closedQuery;
     }
 
     private Query getDepartmentQuery(SearchParameters searchParameters, QueryBuilder qb) {
@@ -404,41 +395,29 @@ public class HibernateSearchService {
                 stringBuilder.append(string).append(" ");
             }
 
-            Query departmentQuery = qb.keyword()
+            return qb.keyword()
                     .onField("vacancy.departmentID")
                     .matching(stringBuilder.toString())
                     .createQuery();
-
-            return departmentQuery;
         } else {
             return qb.all().createQuery();
         }
     }
 
     private Query getFieldQuery(String field, String searchTerm, QueryBuilder qb) {
-
-        if (StringUtils.isNotBlank(searchTerm)) {
-
-            Query query = qb.keyword()
+         return StringUtils.isNotBlank(searchTerm)
+                 ? qb.keyword()
                     .onField(field)
                     .matching(searchTerm)
-                    .createQuery();
-
-            return query;
-
-        }
-
-        return qb.all().createQuery();
+                    .createQuery()
+                 : qb.all().createQuery();
     }
 
     private Query getActiveQuery(QueryBuilder qb) {
-
-        Query query = qb.keyword()
+        return qb.keyword()
                 .onField("vacancy.active")
                 .matching("true")
                 .createQuery();
-
-        return query;
     }
 
     private String getContractTypes(SearchParameters searchParameters) {
@@ -469,5 +448,16 @@ public class HibernateSearchService {
                 stringBuilder.append(string).append(" ");
             }
         }
+    }
+
+    /**
+     * This method is responsible for retrieving a collection of ids and dates last modified for public facing vacancies.
+     *
+     * The id and last modified date for each vacancy is contained in an instance of VacancyMetadata.
+     *
+     * @return a collection of ids and dates last modified for public facing vacancies
+     */
+    public List<VacancyMetadata> getVacancyMetadata() {
+        return entityManager.createQuery(METADATA_QUERY).getResultList();
     }
 }

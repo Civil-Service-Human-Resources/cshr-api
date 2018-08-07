@@ -45,7 +45,7 @@ public class DepartmentController {
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
-    @ApiOperation(value = "Find all departments", nickname = "findAll")
+    @ApiOperation(value = "Find all departments", nickname = "findAllDepartments")
     @RolesAllowed({"CRUD_ROLE", "SEARCH_ROLE"})
     public ResponseEntity<Page<Department>> findAll(Pageable pageable) {
         Page<Department> departments = departmentRepository.findAllByOrderByNameAsc(pageable);
@@ -53,7 +53,7 @@ public class DepartmentController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{departmentId}")
-    @ApiOperation(value = "Find a specific department", nickname = "findById")
+    @ApiOperation(value = "Find a specific department", nickname = "findDepartmentById")
     public ResponseEntity<Department> findById(@PathVariable Long departmentId) {
 
         Optional<Department> foundDepartment = departmentRepository.findById(departmentId);
@@ -67,7 +67,7 @@ public class DepartmentController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    @ApiOperation(value = "Create a department", nickname = "create")
+    @ApiOperation(value = "Create a department", nickname = "createDepartment")
     public ResponseEntity<Department> create(@RequestBody Department department) {
 
         Department savedDepartment = departmentRepository.save(department);
@@ -80,7 +80,7 @@ public class DepartmentController {
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/{departmentId}")
-    @ApiOperation(value = "Update a department", nickname = "update")
+    @ApiOperation(value = "Update a department", nickname = "updateDepartment")
     public ResponseEntity<Department> update(@PathVariable Long departmentId, @RequestBody Department departmentUpdate) {
 
         Optional<Department> foundDepartment = departmentRepository.findById(departmentId);
@@ -104,7 +104,7 @@ public class DepartmentController {
 
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/{departmentId}")
-    @ApiOperation(value = "Delete a department", nickname = "deleteById")
+    @ApiOperation(value = "Delete a department", nickname = "deleteDepartmentById")
     public ResponseEntity<Department> deleteById(@PathVariable Long departmentId) {
 
         departmentRepository.delete(departmentId);

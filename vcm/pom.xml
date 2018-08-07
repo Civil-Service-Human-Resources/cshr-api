@@ -21,7 +21,6 @@
         <database-url>jdbc:postgresql://localhost:5432/cshr</database-url>
         <database-user>postgres</database-user>
         <database-password>qwerty</database-password>
-        <postgres.version>9.4-1206-jdbc42</postgres.version>
         <testng.version>6.10</testng.version>
     </properties>
 
@@ -33,12 +32,6 @@
 
 
 	<dependencies>
-
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>${postgres.version}</version>
-		</dependency>
 
         <dependency>
             <groupId>org.liquibase</groupId>

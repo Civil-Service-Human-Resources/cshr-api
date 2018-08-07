@@ -11,10 +11,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.validator.UrlValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -38,24 +36,21 @@ import uk.gov.cshr.vcm.service.HibernateSearchService;
 @ResponseBody
 @Api(value = "vacancyservice")
 @RolesAllowed("CRUD_ROLE")
+@Slf4j
 public class VacancyController {
-
-    private static final Logger log = LoggerFactory.getLogger(VacancyController.class);
-
     private final ApplicantTrackingSystemService applicantTrackingSystemService;
+    private HibernateSearchService hibernateSearchService;
     private final VacancyRepository vacancyRepository;
 
-    @Autowired
-    private HibernateSearchService hibernateSearchService;
-
     VacancyController(ApplicantTrackingSystemService applicantTrackingSystemService,
-                      VacancyRepository vacancyRepository) {
+                      VacancyRepository vacancyRepository, HibernateSearchService hibernateSearchService) {
         this.applicantTrackingSystemService = applicantTrackingSystemService;
         this.vacancyRepository = vacancyRepository;
+        this.hibernateSearchService = hibernateSearchService;
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    @ApiOperation(value = "Create a Vacancy", nickname = "create")
+    @ApiOperation(value = "Create a Vacancy", nickname = "createVacancy")
     public ResponseEntity<Vacancy> create(@RequestBody Vacancy vacancy) {
 
         if (vacancy.getActive() == null) {
