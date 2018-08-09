@@ -21,9 +21,9 @@ public class SearchResponsePage extends SearchResponse {
     public SearchResponsePage(
             @JsonProperty("vacancies") VacancyPage vacancyPage,
             @JsonProperty("vacanyErrors") List<VacancyError> vacanyErrors,
-            @JsonProperty("cshrServiceStatuses") List<CSHRServiceStatus> cshrServiceStatuses,
+            @JsonProperty("cshrServiceStatus") CSHRServiceStatus cshrServiceStatus,
             @JsonProperty("authenticatedEmail") String authenticatedEmail) {
 
-        super(vacancyPage, vacanyErrors, cshrServiceStatuses, authenticatedEmail);
+        super(vacancyPage, vacanyErrors, cshrServiceStatus, authenticatedEmail);
     }
 }

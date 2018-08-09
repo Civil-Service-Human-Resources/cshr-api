@@ -531,11 +531,9 @@ definitions:
       authenticatedEmail:
         type: string
         description: The email which was verified to give access to non-public jobs
-      cshrServiceStatuses:
-        type: array
-        description: A list of statuses indicating the system status
-        items:
-          $ref: '#/definitions/CSHRServiceStatus'
+      cshrServiceStatus:
+        description: Business status code associated with the request
+        $ref: '#/definitions/CSHRServiceStatus'
       vacancies:
         description: 'The search results '
         $ref: '#/definitions/Page«Vacancy»'
@@ -593,6 +591,9 @@ definitions:
         type: integer
         format: int64
       internalOpeningDate:
+        type: string
+        example: 'yyyy-MM-dd''T''HH:mm:ss.SSSZ'
+      lastModified:
         type: string
         example: 'yyyy-MM-dd''T''HH:mm:ss.SSSZ'
       lengthOfEmployment:
@@ -748,7 +749,7 @@ definitions:
   VacancyMetadata:
     type: object
     properties:
-      identifer:
+      identifier:
         type: integer
         format: int64
       lastModified:
