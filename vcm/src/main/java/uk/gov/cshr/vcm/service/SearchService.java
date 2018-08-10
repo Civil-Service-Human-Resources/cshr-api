@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import uk.gov.cshr.status.CSHRServiceStatus;
+import uk.gov.cshr.status.StatusCode;
 import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
 import uk.gov.cshr.vcm.model.Coordinates;
 import uk.gov.cshr.vcm.model.SearchParameters;
@@ -44,6 +46,10 @@ public class SearchService {
             if (coordinatesExist(coordinates)) {
                 searchParameters.setCoordinates(coordinates);
             } else {
+                searchResponse.setCshrServiceStatus(CSHRServiceStatus.builder()
+                        .code(StatusCode.NO_RESULTS_FOR_LOCATION.getCode())
+                        .summary("The location service was unable to match the location supplied.")
+                        .build());
                 debug("No Coordinates for %s with radius of %d exist",
                         vacancySearchParameters.getLocation().getPlace(),
                         vacancySearchParameters.getLocation().getRadius());
