@@ -28,7 +28,8 @@ if [[ ${#} -eq 0 ]]; then
             --spring.notifyService.templateid=${NOTIFY_SERVICE_TEMPLATE_ID} \
             --spring.notifyservice.notifyApiKey=${NOTIFY_SERVICE_NOTIFY_API_KEY} \
             --spring.security.notify_username=${NOTIFY_USERNAME} \
-            --spring.security.notify_password=${NOTIFY_PASSWORD}
+            --spring.security.notify_password=${NOTIFY_PASSWORD} \
+            --spring.cshrAuthenticationService.secret=${AUTHENTICATION_SERVICE_SECRET}
 else
     echo "Running command:"
     exec "$@"
