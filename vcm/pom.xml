@@ -10,7 +10,6 @@
 	<name>vcm</name>
 
     <properties>
-
         <database-driver>org.postgresql.Driver</database-driver>
 
         <admin-url>jdbc:postgresql://localhost:5432/</admin-url>
@@ -21,18 +20,63 @@
         <database-url>jdbc:postgresql://localhost:5432/cshr</database-url>
         <database-user>postgres</database-user>
         <database-password>qwerty</database-password>
-        <testng.version>6.10</testng.version>
+
+        <commons.validator.version>1.3.1</commons.validator.version>
+        <hibernate.search.version>5.6.1.Final</hibernate.search.version>
+        <jsonwebtoken.version>0.9.0</jsonwebtoken.version>
+        <notifications.java.client.version>3.9.1-RELEASE</notifications.java.client.version>
+        <oro.version>2.0.8</oro.version>
     </properties>
 
 	<parent>
 		<groupId>uk.gov.cshr</groupId>
 		<artifactId>cshr</artifactId>
-		<version>0.0.1</version>
+		<version>1.0.0</version>
 	</parent>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-search-engine</artifactId>
+                <version>${hibernate.search.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-search-orm</artifactId>
+                <version>${hibernate.search.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt</artifactId>
+                <version>${jsonwebtoken.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>uk.gov.service.notify</groupId>
+                <artifactId>notifications-java-client</artifactId>
+                <version>${notifications.java.client.version}</version>
+                <type>jar</type>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-validator</groupId>
+                <artifactId>commons-validator</artifactId>
+                <version>${commons.validator.version}</version>
+                <type>jar</type>
+            </dependency>
+
+            <dependency>
+                <groupId>oro</groupId>
+                <artifactId>oro</artifactId>
+                <version>${oro.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 	<dependencies>
-
         <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
@@ -41,7 +85,6 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-engine</artifactId>
-            <version>5.6.1.Final</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.jboss.logging</groupId>
@@ -54,7 +97,6 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-orm</artifactId>
-            <version>5.6.1.Final</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.jboss.logging</groupId>
@@ -68,45 +110,39 @@
 			<artifactId>httpcore</artifactId>
 			<type>jar</type>
 		</dependency>
+
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 			<type>jar</type>
 		</dependency>
+
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt</artifactId>
-			<version>0.9.0</version>
 		</dependency>
+
         <!-- Testing -->
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>${testng.version}</version>
-            <scope>test</scope>
-        </dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 			<type>jar</type>
 		</dependency>
+
 		<dependency>
 			<groupId>uk.gov.service.notify</groupId>
 			<artifactId>notifications-java-client</artifactId>
-			<version>3.9.1-RELEASE</version>
-			<type>jar</type>
 		</dependency>
+
 		<dependency>
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
-            <version>1.3.1</version>
-			<type>jar</type>
 		</dependency>
+
         <dependency>
             <groupId>oro</groupId>
             <artifactId>oro</artifactId>
-            <version>2.0.8</version>
         </dependency>
 	</dependencies>
 

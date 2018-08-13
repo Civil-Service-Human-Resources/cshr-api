@@ -22,7 +22,7 @@ RUN 	mvn -f /usr/src/myapp/pom.xml -s /usr/share/maven/ref/settings.xml clean pa
 
 FROM 	cshrrpg.azurecr.io/java-8-base-filebeat
 
-COPY 	--from=build --chown=appuser:appuser /usr/src/myapp/vcm/target/vcm-0.0.1.jar /app/vcm-0.0.1.jar
+COPY 	--from=build --chown=appuser:appuser /usr/src/myapp/vcm/target/vcm.jar /app/vcm.jar
 
 COPY    --chown=appuser:appuser entrypoint.sh /usr/local/bin/entrypoint.sh
 
