@@ -5,6 +5,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -37,9 +38,7 @@ public class SearchService {
                 .vacancyEligibility(vacancySearchParameters.getVacancyEligibility())
                 .build();
 
-        boolean filterByLocation = vacancySearchParameters.getLocation() != null;
-
-        if (filterByLocation) {
+        if (filterByLocation(vacancySearchParameters)) {
 
             Coordinates coordinates = locationService.find(vacancySearchParameters.getLocation().getPlace());
 
@@ -58,6 +57,10 @@ public class SearchService {
 
         Page<Vacancy> vacancies = hibernateSearchService.search(searchParameters, pageable);
         searchResponse.setVacancies(vacancies);
+    }
+
+    private boolean filterByLocation(VacancySearchParameters vacancySearchParameters) {
+        return vacancySearchParameters.getLocation() != null && StringUtils.isNotEmpty(vacancySearchParameters.getLocation().getPlace());
     }
 
     private boolean coordinatesExist(Coordinates coordinates) {
