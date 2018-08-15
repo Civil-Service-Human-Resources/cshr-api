@@ -390,9 +390,10 @@
         </rollback>
     </changeSet>
     <changeSet  author="Seamus Singh" id="39">
-        <comment>CHSRCP-356 - departments.identifier column has values that contain trailing spaces. This query trims leading and trailing spaces.</comment>
+        <comment>CHSRCP-356 - departments.identifier column has values that contain trailing spaces. Removes all spaces from column.</comment>
         <sql>
             UPDATE departments SET identifier = TRIM (identifier);
+            UPDATE departments SET identifier = REPLACE (identifier, ' ', '');
         </sql>
     </changeSet>
     <changeSet  author="Seamus Singh" id="40">
