@@ -72,8 +72,17 @@ public class VacancyController {
             vacancy.getVacancyLocations().forEach(vacancyLocation -> vacancyLocation.setVacancy(vacancy));
         }
 
-        sanitiseApplyURL(vacancy);
+        applyRules(vacancy);
+
         return vacancyRepository.save(vacancy);
+    }
+
+    private void applyRules(Vacancy vacancy) {
+        sanitiseApplyURL(vacancy);
+
+        if (vacancy.getSalaryMax() == null) {
+            vacancy.setSalaryMax(0);
+        }
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/{vacancyId}")
@@ -94,7 +103,9 @@ public class VacancyController {
 
         vacancyUpdate.getVacancyLocations().forEach(vacancyLocation -> vacancyLocation.setVacancy(vacancyUpdate));
         vacancyUpdate.setId(foundVacancy.getId());
-        sanitiseApplyURL(vacancyUpdate);
+
+        applyRules(vacancyUpdate);
+
         return vacancyRepository.save(vacancyUpdate);
     }
 
