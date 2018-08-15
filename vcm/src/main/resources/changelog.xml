@@ -389,4 +389,10 @@
             DROP FUNCTION IF EXISTS update_vacancies_modified_from_vacancylocations() CASCADE;
         </rollback>
     </changeSet>
+    <changeSet  author="Seamus Singh" id="39">
+        <comment>CHSRCP-356 - departments.identifier column has values that contain trailing spaces. This query trims leading and trailing spaces.</comment>
+        <sql>
+            UPDATE departments SET identifier = TRIM (identifier);
+        </sql>
+    </changeSet>
 </databaseChangeLog>
