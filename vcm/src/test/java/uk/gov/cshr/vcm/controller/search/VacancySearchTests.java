@@ -83,8 +83,8 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     public static final double BRISTOL_LATITUDE = 51.4549291;
     public static final double BRISTOL_LONGITUDE = -2.6278111;
 
-    public static final double NEWCASTLE_LATITUDE = 54.9806308;
-    public static final double NEWCASTLE_LONGITUDE = -1.6167437;
+    private static final double NEWCASTLE_LATITUDE = 54.9806308;
+    private static final double NEWCASTLE_LONGITUDE = -1.6167437;
 
     final private MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(),
@@ -1335,5 +1335,60 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         vacancy.setVacancyLocations(new ArrayList<>());
         vacancy.getVacancyLocations().add(vacancyLocation);
         return vacancy;
+    }
+
+    @Test
+    public void search_maxSalaryIsNullAndNoMaxSupplied() throws Exception {
+        prepareMaxSalaryVacancy();
+
+        SearchResponsePage result = findVancanciesByKeyword("NullSalaryVacancyTitle", null);
+        List<Vacancy> resultsList = result.getVacancies().getContent();
+
+        doMaxSalaryVacancyAsserts(resultsList);
+    }
+
+    private void doMaxSalaryVacancyAsserts(List<Vacancy> resultsList) {
+        Vacancy actual = resultsList.get(0);
+        Assert.assertEquals("1", 1, resultsList.size());
+        Assert.assertEquals("NullSalaryVacancyTitle", actual.getTitle());
+        Assert.assertNull(actual.getSalaryMax());
+        Assert.assertEquals(Long.valueOf(12345678l), actual.getIdentifier());
+    }
+
+    private void prepareMaxSalaryVacancy() {
+        Vacancy vacancy = createVacancyPrototype(newcastleLocation);
+        vacancy.setTitle("NullSalaryVacancyTitle");
+        vacancy.setSalaryMax(null);
+        vacancy.setIdentifier(12345678L);
+        saveVacancy(vacancy);
+    }
+
+    @Test
+    public void search_maxSalaryIsNullAndMaxSalarySupplied() throws Exception {
+        prepareMaxSalaryVacancy();
+
+        VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
+                .keyword("NullSalaryVacancyTitle")
+                .minSalary(15000)
+                .maxSalary(22000)
+                .overseasJob(Boolean.FALSE)
+                .build();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(vacancySearchParameters);
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/search")
+                .with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(json)
+                .accept(APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String searchResponse = mvcResult.getResponse().getContentAsString();
+
+        SearchResponsePage result = objectMapper.readValue(searchResponse, SearchResponsePage.class);
+        List<Vacancy> resultsList = result.getVacancies().getContent();
+
+        doMaxSalaryVacancyAsserts(resultsList);
     }
 }

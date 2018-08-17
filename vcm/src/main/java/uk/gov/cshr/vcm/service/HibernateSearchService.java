@@ -70,7 +70,7 @@ public class HibernateSearchService {
     }
 
     @Transactional
-    public Page<Vacancy> search(SearchParameters searchParameters, Pageable pageable)  {
+    public Page<Vacancy> search(SearchParameters searchParameters, Pageable pageable) {
 
         FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
         QueryBuilder qb = fullTextEntityManager.getSearchFactory().buildQueryBuilder().forEntity(VacancyLocation.class).get();
@@ -78,7 +78,6 @@ public class HibernateSearchService {
         BooleanJunction combinedQuery;
 
         try {
-
             Query searchtermQuery = getSearchTermQuery(searchParameters, qb);
             Query salaryQuery = getSalaryQuery(searchParameters, qb);
             Query closedQuery = getClosedVacanciesQuery(qb);
@@ -405,12 +404,12 @@ public class HibernateSearchService {
     }
 
     private Query getFieldQuery(String field, String searchTerm, QueryBuilder qb) {
-         return StringUtils.isNotBlank(searchTerm)
-                 ? qb.keyword()
-                    .onField(field)
-                    .matching(searchTerm)
-                    .createQuery()
-                 : qb.all().createQuery();
+        return StringUtils.isNotBlank(searchTerm)
+                ? qb.keyword()
+                .onField(field)
+                .matching(searchTerm)
+                .createQuery()
+                : qb.all().createQuery();
     }
 
     private Query getActiveQuery(QueryBuilder qb) {
@@ -452,7 +451,7 @@ public class HibernateSearchService {
 
     /**
      * This method is responsible for retrieving a collection of ids and dates last modified for public facing vacancies.
-     *
+     * <p>
      * The id and last modified date for each vacancy is contained in an instance of VacancyMetadata.
      *
      * @return a collection of ids and dates last modified for public facing vacancies
