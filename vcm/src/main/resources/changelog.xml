@@ -396,10 +396,4 @@
             UPDATE departments SET identifier = REPLACE (identifier, ' ', '');
         </sql>
     </changeSet>
-    <changeSet  author="Seamus Singh" id="40">
-        <comment>CHSRCP-1355 - Vacancies with null salary_max not being selected in search. These need to be set to a value of 0 (zero).</comment>
-        <sql>
-            update vacancies set salary_max = 0 where salary_max is null;
-        </sql>
-    </changeSet>
 </databaseChangeLog>
