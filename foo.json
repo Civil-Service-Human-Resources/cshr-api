@@ -1,0 +1,32 @@
+{
+  "vacancies": {
+    "content": [
+      {
+        "id": 423,
+        "identifier": 1588145,
+        "title": "Qualified Lawyers (London)",
+        "salaryMin": 40001,
+        "salaryMax": 50000,
+        "overseasJob": false
+      }
+    ],
+    "last": false,
+    "totalElements": 208,
+    "totalPages": 208,
+    "sort": null,
+    "first": true,
+    "numberOfElements": 1,
+    "size": 1,
+    "number": 0
+  },
+  "vacancyErrors": [
+    {
+      "status": null,
+      "message": null,
+      "errors": [],
+      "searchStatusCode": "NULL_JWT"
+    }
+  ],
+  "cshrServiceStatus": null,
+  "authenticatedEmail": null
+}

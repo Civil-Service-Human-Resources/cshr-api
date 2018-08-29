@@ -167,7 +167,7 @@ public class Vacancy implements Serializable {
     @NonNull
     private Integer salaryMin;
 
-    @Field(indexNullAs="2147483647", store = Store.YES)
+    @Field(store = Store.YES)
     private Integer salaryMax;
 
     private Integer numberVacancies;
