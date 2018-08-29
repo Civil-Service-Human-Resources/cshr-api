@@ -396,4 +396,10 @@
             UPDATE departments SET identifier = REPLACE (identifier, ' ', '');
         </sql>
     </changeSet>
+    <changeSet  author="Seamus Singh" id="40">
+        <comment>CHSRCP-1691 - Set all rows where salary_max is null equal to salary-min</comment>
+        <sql>
+            UPDATE vacancies SET salary_max = salary_min where salary_max is null;
+        </sql>
+    </changeSet>
 </databaseChangeLog>
