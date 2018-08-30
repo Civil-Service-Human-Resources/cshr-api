@@ -26,6 +26,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.cshr.status.CSHRServiceStatus;
 import uk.gov.cshr.status.StatusCode;
+import uk.gov.cshr.vcm.model.ApplyURLSanitiser;
+import uk.gov.cshr.vcm.model.MaxSalaryDerivator;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
 import uk.gov.cshr.vcm.service.ApplicantTrackingSystemService;
@@ -72,9 +74,15 @@ public class VacancyController {
             vacancy.getVacancyLocations().forEach(vacancyLocation -> vacancyLocation.setVacancy(vacancy));
         }
 
-        sanitiseApplyURL(vacancy);
+        applyCommonRules(vacancy);
 
-        return vacancyRepository.save(vacancy);
+        return vacancyRepository.save(applyCommonRules(vacancy));
+    }
+
+    private Vacancy applyCommonRules(Vacancy vacancy) {
+        vacancy = ApplyURLSanitiser.sanitise(vacancy);
+
+        return MaxSalaryDerivator.deriveMaxSalary(vacancy);
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/{vacancyId}")
@@ -92,13 +100,11 @@ public class VacancyController {
     }
 
     private Vacancy updateVacancy(@RequestBody Vacancy vacancyUpdate, Vacancy foundVacancy) {
-
         vacancyUpdate.getVacancyLocations().forEach(vacancyLocation -> vacancyLocation.setVacancy(vacancyUpdate));
+
         vacancyUpdate.setId(foundVacancy.getId());
 
-        sanitiseApplyURL(vacancyUpdate);
-
-        return vacancyRepository.save(vacancyUpdate);
+        return vacancyRepository.save(applyCommonRules(vacancyUpdate));
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/{vacancyId}")
@@ -166,25 +172,5 @@ public class VacancyController {
 
         hibernateSearchService.initializeHibernateSearch();
         return ResponseEntity.noContent().build();
-    }
-
-    private void sanitiseApplyURL(Vacancy vacancy) {
-
-        String originalURL = vacancy.getApplyURL();
-
-        String url = vacancy.getApplyURL();
-
-        if (url != null && !url.toLowerCase().matches("^\\w+://.*")) {
-            url = "https://" + url;
-        }
-
-        String[] schemes = {"http", "https"};
-        UrlValidator urlValidator = new UrlValidator(schemes);
-        if (!urlValidator.isValid(url)) {
-            url = null;
-        }
-
-        log.debug("setting applyurl '" + originalURL + "' to: " + url);
-        vacancy.setApplyURL(url);
     }
 }

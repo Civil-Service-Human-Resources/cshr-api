@@ -1,9 +1,11 @@
 package uk.gov.cshr.vcm.controller.search;
 
+import static java.lang.Math.toIntExact;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
@@ -11,22 +13,27 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.nio.charset.Charset;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.inject.Inject;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -80,11 +87,17 @@ import uk.gov.cshr.vcm.service.SearchService;
 @TestExecutionListeners(MockitoTestExecutionListener.class)
 public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
-    public static final double BRISTOL_LATITUDE = 51.4549291;
-    public static final double BRISTOL_LONGITUDE = -2.6278111;
-
+    private static final double BRISTOL_LATITUDE = 51.4549291;
+    private static final double BRISTOL_LONGITUDE = -2.6278111;
+    private static final SimpleDateFormat ISO_DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
     private static final double NEWCASTLE_LATITUDE = 54.9806308;
     private static final double NEWCASTLE_LONGITUDE = -1.6167437;
+    private static final int TEN_DAYS_AGO = -10;
+    private static final int TWENTY_DAYS_AGO = -20;
+
+    static {
+        ISO_DATEFORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
+    }
 
     final private MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(),
@@ -129,6 +142,26 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     private Department parentDepartment;
     private Department childDepartment;
     private Department siblingDepartment;
+
+    private Vacancy vacancy = Vacancy.builder()
+            .id(3L)
+            .identifier(398457347L)
+            .title("testTitle3")
+            .description("testDescription3")
+            .grade("testGrade3")
+            .responsibilities("testResponsibilities3")
+            .workingHours("testWorkingHours2")
+            .closingDate(THIRTY_DAYS_FROM_NOW)
+            .contactName("testContactName3")
+            .contactDepartment("testContactDepartment3")
+            .contactEmail("testContactEmail3")
+            .contactTelephone("testContactTelephone3")
+            .eligibility("testEligibility3")
+            .salaryMin(0)
+            .salaryMax(10)
+            .numberVacancies(2)
+            .build();
+
 
 
     private final VacancyLocation newcastleLocation = VacancyLocation.builder()
@@ -224,6 +257,9 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         childDepartment.setParent(parentDepartment);
         departmentRepository.save(childDepartment);
 
+        Department department3 = departmentRepository.save(Department.builder().id(3L).name("Department Three").build());
+        vacancy.setDepartment(department3);
+        vacancy = this.vacancyRepository.save(vacancy);
     }
 
     @After
@@ -411,7 +447,10 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
     @Test
     public void testIncludeAcrossGovernmentVacancy() throws Exception {
+        doAcrossGovernmentTest(department2);
+    }
 
+    private void doAcrossGovernmentTest(Department department) throws Exception {
         Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
         newcastleVacancy.setGovernmentOpeningDate(YESTERDAY);
         newcastleVacancy.setPublicOpeningDate(TOMORROW);
@@ -424,7 +463,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         newcastleVacancy2.setTitle("Newcastle Job 2");
         saveVacancy(newcastleVacancy2);
 
-        String jwt = cshrAuthenticationService.createInternalJWT("cabinetoffice.gov.uk", department2);
+        String jwt = cshrAuthenticationService.createInternalJWT("cabinetoffice.gov.uk", department);
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
                 .keyword("newcastle")
@@ -438,29 +477,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
     @Test
     public void testPublicDateBeforeAcrossGovernment() throws Exception {
-
-        Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
-        newcastleVacancy.setGovernmentOpeningDate(YESTERDAY);
-        newcastleVacancy.setPublicOpeningDate(YESTERDAY);
-        newcastleVacancy.setTitle("Newcastle Job");
-        saveVacancy(newcastleVacancy);
-
-        Vacancy newcastleVacancy2 = createVacancyPrototype(newcastleLocation2);
-        newcastleVacancy2.setGovernmentOpeningDate(YESTERDAY);
-        newcastleVacancy2.setPublicOpeningDate(TOMORROW);
-        newcastleVacancy2.setTitle("Newcastle Job 2");
-        saveVacancy(newcastleVacancy2);
-
-        String jwt = cshrAuthenticationService.createInternalJWT("cabinetoffice.gov.uk", department1);
-
-        VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
-                .keyword("newcastle")
-                .build();
-
-        SearchResponsePage result = findVancanciesByKeyword(vacancySearchParameters, jwt);
-        List<Vacancy> resultsList = result.getVacancies().getContent();
-
-        Assert.assertEquals("internal vacancy included", 2, resultsList.size());
+        doAcrossGovernmentTest(department1);
     }
 
     @Test
@@ -806,7 +823,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
 
         // return both departments
-        SearchResponsePage result = findVancanciesByDpartmentInPlace("bristol",
+        SearchResponsePage result = findVancanciesByDepartmentInPlace("bristol",
                 department1.getId().toString(),
                 department2.getId().toString());
 
@@ -815,24 +832,24 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         Assert.assertEquals("Expected number results", 2, resultsList.size());
 
         // dont filter by any departments
-        result = findVancanciesByDpartmentInPlace("bristol");
+        result = findVancanciesByDepartmentInPlace();
         resultsList = result.getVacancies().getContent();
         Assert.assertEquals("Expected number results", 2, resultsList.size());
 
         // filter by  department 1
-        result = findVancanciesByDpartmentInPlace("bristol", department1.getId().toString());
+        result = findVancanciesByDepartmentInPlace(department1.getId().toString());
         resultsList = result.getVacancies().getContent();
         Assert.assertEquals("Expected number results", 1, resultsList.size());
         Assert.assertEquals("Department1.id", resultsList.get(0).getDepartment().getId(), department1.getId());
 
         // filter by  department 2
-        result = findVancanciesByDpartmentInPlace("bristol", department2.getId().toString());
+        result = findVancanciesByDepartmentInPlace(department2.getId().toString());
         resultsList = result.getVacancies().getContent();
         Assert.assertEquals("Expected number results", 1, resultsList.size());
         Assert.assertEquals("Department1.id", resultsList.get(0).getDepartment().getId(), department2.getId());
 
         // filter by  unknown departent
-        result = findVancanciesByDpartmentInPlace("bristol", "-1");
+        result = findVancanciesByDepartmentInPlace("-1");
         resultsList = result.getVacancies().getContent();
         Assert.assertEquals("Expected number results", 0, resultsList.size());
     }
@@ -1221,7 +1238,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         return objectMapper.readValue(searchResponse, SearchResponsePage.class);
     }
 
-    private SearchResponsePage findVancanciesByDpartmentInPlace(String place, String... departmentIDs) throws Exception {
+    private SearchResponsePage findVancanciesByDepartmentInPlace(String... departmentIDs) throws Exception {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -1229,7 +1246,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .keyword("SearchQueryDescription")
                 .overseasJob(Boolean.TRUE)
                 .department(departmentIDs)
-                .location(new Location(place, 30))
+                .location(new Location("bristol", 30))
                 .build();
 
         ObjectMapper mapper = new ObjectMapper();
@@ -1352,7 +1369,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         Assert.assertEquals("1", 1, resultsList.size());
         Assert.assertEquals("NullSalaryVacancyTitle", actual.getTitle());
         Assert.assertNull(actual.getSalaryMax());
-        Assert.assertEquals(Long.valueOf(12345678l), actual.getIdentifier());
+        Assert.assertEquals(Long.valueOf(12345678L), actual.getIdentifier());
     }
 
     private void prepareMaxSalaryVacancy() {
@@ -1390,5 +1407,61 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         List<Vacancy> resultsList = result.getVacancies().getContent();
 
         doMaxSalaryVacancyAsserts(resultsList);
+    }
+
+    @Ignore
+    @Test
+    public void search_publicSearchesAllowedYesterday() throws Exception {
+        doOpenPublicSearchTests(-1);
+    }
+
+    private void doOpenPublicSearchTests(int publicDateNumDaysFromNow) throws Exception {
+        vacancy.setGovernmentOpeningDate(getTime(TEN_DAYS_AGO));
+        vacancy.setInternalOpeningDate(getTime(TWENTY_DAYS_AGO));
+        vacancy.setPublicOpeningDate(getTime(publicDateNumDaysFromNow));
+        this.vacancyRepository.save(vacancy);
+
+        // Given
+        String path = "/vacancy/search?page=0&size=1";
+
+        String requestBody = "{\n" +
+                "  \"department\": [\n" +
+                "    \"3\"\n" +
+                "  ],\n" +
+                "  \"keyword\": \"search\",\n" +
+                "  \"location\": {\n" +
+                "    \"place\": \"testLocation\",\n" +
+                "    \"radius\": \"30\"\n" +
+                "  }\n" +
+                "}";
+        ResultActions sendRequest = mockMvc.perform(post(path).contentType(APPLICATION_JSON_UTF8).content(requestBody));
+
+        // Then
+        sendRequest
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.totalElements", Matchers.is(1)))
+                .andExpect(jsonPath("$.content[0].id", Matchers.is(toIntExact(this.vacancy.getId()))))
+                .andExpect(jsonPath("$.content[0].identifier", Matchers.is(toIntExact(this.vacancy.getIdentifier()))))
+                .andExpect(jsonPath("$.content[0].description", Matchers.is(this.vacancy.getDescription())))
+                //                .andExpect(jsonPath("$.content[0].location", is(this.vacancy.getLocation())))
+                .andExpect(jsonPath("$.content[0].grade", Matchers.is(this.vacancy.getGrade())))
+                .andExpect(jsonPath("$.content[0].responsibilities", Matchers.is(this.vacancy.getResponsibilities())))
+                .andExpect(jsonPath("$.content[0].workingHours", Matchers.is(this.vacancy.getWorkingHours())))
+                .andExpect(jsonPath("$.content[0].closingDate", Matchers.is(ISO_DATEFORMAT.format(vacancy.getClosingDate()))))
+                .andExpect(jsonPath("$.content[0].contactName", Matchers.is(this.vacancy.getContactName())))
+                .andExpect(jsonPath("$.content[0].contactDepartment", Matchers.is(this.vacancy.getContactDepartment())))
+                .andExpect(jsonPath("$.content[0].contactEmail", Matchers.is(this.vacancy.getContactEmail())))
+                .andExpect(jsonPath("$.content[0].contactTelephone", Matchers.is(this.vacancy.getContactTelephone())))
+                .andExpect(jsonPath("$.content[0].eligibility", Matchers.is(this.vacancy.getEligibility())))
+                .andExpect(jsonPath("$.content[0].salaryMin", Matchers.is(this.vacancy.getSalaryMin())))
+                .andExpect(jsonPath("$.content[0].salaryMax", Matchers.is(this.vacancy.getSalaryMax())))
+                .andExpect(jsonPath("$.content[0].numberVacancies", Matchers.is(this.vacancy.getNumberVacancies())))
+                .andExpect(jsonPath("$.content[0].department.id", Matchers.is(this.vacancy.getDepartment().getId())))
+                .andExpect(jsonPath("$.content[0].department.name", Matchers.is(this.vacancy.getDepartment().getName())));
+    }
+
+    @Ignore
+    public void search_publicSearchesAllowedToday() throws Exception {
+        doOpenPublicSearchTests(0);
     }
 }
