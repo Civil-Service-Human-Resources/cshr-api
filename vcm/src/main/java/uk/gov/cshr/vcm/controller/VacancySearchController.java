@@ -32,8 +32,10 @@ import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
 import uk.gov.cshr.vcm.controller.exception.VacancyClosedException;
 import uk.gov.cshr.vcm.controller.exception.VacancyError;
 import uk.gov.cshr.vcm.model.Department;
+import uk.gov.cshr.vcm.model.PublicVacancyAccessAuthenticator;
 import uk.gov.cshr.vcm.model.SearchResponse;
 import uk.gov.cshr.vcm.model.Vacancy;
+import uk.gov.cshr.vcm.model.VacancyAuthenticationStatus;
 import uk.gov.cshr.vcm.model.VacancyEligibility;
 import uk.gov.cshr.vcm.model.VacancyMetadata;
 import uk.gov.cshr.vcm.model.VacancyMetadataResponse;
@@ -91,6 +93,39 @@ public class VacancySearchController {
         } else {
             return foundVacancy.map(ResponseEntity.ok()::body).orElse(ResponseEntity.notFound().build());
         }
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/{atsVendorIdentifier}/{atsReferenceIdentifier}")
+    @ApiOperation(value = "Find a specific public vacancy", nickname = "find")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    code = 410,
+                    message = VacancyClosedException.CLOSED_MESSAGE,
+                    response = VacancyError.class)
+    })
+    @RolesAllowed({"SEARCH_ROLE"})
+    public ResponseEntity<Vacancy> find(@PathVariable String atsVendorIdentifier, @PathVariable Long atsReferenceIdentifier)
+            throws VacancyClosedException {
+        ResponseEntity<Vacancy> response;
+        Vacancy vacancy = vacancyRepository.findVacancy(atsReferenceIdentifier, atsVendorIdentifier);
+
+        if (vacancy != null) {
+            VacancyAuthenticationStatus status = new PublicVacancyAccessAuthenticator().authenticate(vacancy);
+
+            if (VacancyAuthenticationStatus.CLOSED.equals(status)) {
+                throw new VacancyClosedException(atsReferenceIdentifier);
+            } else if (VacancyAuthenticationStatus.NOT_AUTHENTICATED.equals(status)) {
+                response = ResponseEntity.notFound().build();
+            } else if (VacancyAuthenticationStatus.NOT_OPEN.equals(status)) {
+                response = ResponseEntity.notFound().build();
+            } else {
+                response = ResponseEntity.ok(vacancy);
+            }
+        } else {
+            response = ResponseEntity.notFound().build();
+        }
+
+        return response;
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/search")

@@ -1,7 +1,9 @@
 package uk.gov.cshr.vcm.repository;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.junit.MatcherAssert.assertThat;
 
@@ -97,22 +99,21 @@ public class VacancyRepositoryTest {
 
     @Test
     public void testFindVacancy_noMatchingJobRef() {
-        assertThat(vacancyRepository.findVacancy(JOB_REF_3234, ATS_OO1), is(empty()));
+        assertThat(vacancyRepository.findVacancy(JOB_REF_3234, ATS_OO1), is(nullValue()));
     }
 
     @Test
     public void testFindVacancy_noMatchingVendorId() {
-        assertThat(vacancyRepository.findVacancy(JOB_REF_1234, "DUMMY"), is(empty()));
+        assertThat(vacancyRepository.findVacancy(JOB_REF_1234, "DUMMY"), is(nullValue()));
 
     }
 
     @Test
     public void testFindVacancy() {
-        List<Vacancy> vacancies = vacancyRepository.findVacancy(JOB_REF_1234, ATS_OO1);
+        Vacancy vacancy = vacancyRepository.findVacancy(JOB_REF_1234, ATS_OO1);
 
-        assertThat(vacancies.size(), is(equalTo(1)));
-        assertThat(vacancies.get(0).getId(), is(equalTo(vacancy1.getId())));
-        assertThat(vacancies.get(0).getIdentifier(), is(equalTo(JOB_REF_1234)));
-        assertThat(vacancies.get(0).getAtsVendorIdentifier(), is(equalTo(ATS_OO1)));
+        assertThat(vacancy.getId(), is(equalTo(vacancy1.getId())));
+        assertThat(vacancy.getIdentifier(), is(equalTo(JOB_REF_1234)));
+        assertThat(vacancy.getAtsVendorIdentifier(), is(equalTo(ATS_OO1)));
     }
 }
