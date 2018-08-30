@@ -37,13 +37,13 @@ import uk.gov.cshr.vcm.repository.DepartmentRepository;
 @Service
 @Slf4j
 public class HibernateSearchService {
-    private static final String METADATA_QUERY = "select new uk.gov.cshr.vcm.model.VacancyMetadata(v.id, v.lastModified) " +
+    private static final String METADATA_QUERY = "select new uk.gov.cshr.vcm.model.VacancyMetadata(v.identifier, v.atsVendorIdentifier, v.lastModified) " +
             "from Vacancy v " +
             "where v.publicOpeningDate is not null " +
             "and v.publicOpeningDate <= current_timestamp " +
             "and v.closingDate > current_timestamp";
     private static final double MILES_KM_MULTIPLIER = 1.609343502101154;
-    public static final String VACANCY_DESCRIPTION = "vacancy.description";
+    private static final String VACANCY_DESCRIPTION = "vacancy.description";
 
     @Autowired
     private final EntityManager entityManager;

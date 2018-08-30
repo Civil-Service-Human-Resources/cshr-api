@@ -15,13 +15,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.cshr.vcm.controller.search.VacancySearchTests.BRISTOL_LATITUDE;
 import static uk.gov.cshr.vcm.controller.search.VacancySearchTests.BRISTOL_LONGITUDE;
+import static uk.gov.cshr.vcm.util.TestUtils.getTime;
 
 import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -562,11 +560,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.readValue(content, SearchResponsePage.class);
         Assertions.assertThat(content).contains("\"numberOfElements\":0");
-    }
-
-    private static Timestamp getTime(int numberOfDaysFromNow) {
-        Date date = Date.from(LocalDateTime.now().plusDays(numberOfDaysFromNow).atZone(ZoneId.systemDefault()).toInstant());
-        return new Timestamp(date.getTime());
     }
 
     @Test(enabled = false)
