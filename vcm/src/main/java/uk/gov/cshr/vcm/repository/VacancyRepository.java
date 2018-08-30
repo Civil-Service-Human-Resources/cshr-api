@@ -29,7 +29,7 @@ public interface VacancyRepository extends PagingAndSortingRepository<Vacancy, L
      * @return list of vacancies that match the given search criteria. There should be 0 or 1 Vacancies in the list.
      */
     @Query("select v from Vacancy v where v.identifier = :jobRef and v.atsVendorIdentifier = :vendorIdentifier")
-    List<Vacancy> findVacancy(@Param("jobRef") Long jobRef, @Param("vendorIdentifier") String vendorIdentifier);
+    Vacancy findVacancy(@Param("jobRef") Long jobRef, @Param("vendorIdentifier") String vendorIdentifier);
 
     @Override
     public <S extends Vacancy> S save(S entity);

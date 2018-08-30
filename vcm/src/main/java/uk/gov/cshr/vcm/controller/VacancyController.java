@@ -137,17 +137,16 @@ public class VacancyController {
     public ResponseEntity<CSHRServiceStatus> save(@RequestBody Vacancy vacancyToSave) {
         applicantTrackingSystemService.validateClientIdentifier(vacancyToSave.getAtsVendorIdentifier());
 
-        List<Vacancy> vacancies = vacancyRepository.findVacancy(vacancyToSave.getIdentifier(), vacancyToSave.getAtsVendorIdentifier());
+        Vacancy vacancy = vacancyRepository.findVacancy(vacancyToSave.getIdentifier(), vacancyToSave.getAtsVendorIdentifier());
 
         String message;
         String code;
-        Vacancy vacancy;
-        if (vacancies.isEmpty()) {
+        if (vacancy == null) {
             vacancy = createVacancy(vacancyToSave);
             message = "Vacancy created for jobRef " + vacancy.getIdentifier().toString();
             code = StatusCode.RECORD_CREATED.getCode();
         } else {
-            vacancy = updateVacancy(vacancyToSave, vacancies.get(0));
+            vacancy = updateVacancy(vacancyToSave, vacancy);
             message = "Vacancy updated for jobRef " + vacancy.getIdentifier().toString();
             code = StatusCode.RECORD_UPDATED.getCode();
         }
