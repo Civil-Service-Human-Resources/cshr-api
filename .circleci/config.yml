@@ -17,7 +17,7 @@ jobs:
           name: Build image
           command: |
             cp .env_dev .env
-            export DOCKER_SERVICE_TAG="$CIRCLE_WORKFLOW_ID"
+            export DOCKER_SERVICE_TAG="${CIRCLE_WORKFLOW_ID}"
             docker-compose build api
 
       - run:
