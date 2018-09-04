@@ -45,6 +45,9 @@ public class VacancySearchParameters implements Serializable {
     @ApiModelProperty
     private VacancyEligibility vacancyEligibility;
 
+    @ApiModelProperty
+    private VacancySortMethod vacancySortMethod;
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
