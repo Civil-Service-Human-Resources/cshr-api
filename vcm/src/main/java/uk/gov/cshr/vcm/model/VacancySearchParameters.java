@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 @Builder
@@ -44,6 +45,10 @@ public class VacancySearchParameters implements Serializable {
 
     @ApiModelProperty
     private VacancyEligibility vacancyEligibility;
+
+    @ApiModelProperty
+    @NonNull
+    private VacancySortMethod vacancySortMethod;
 
     @Override
     public String toString() {

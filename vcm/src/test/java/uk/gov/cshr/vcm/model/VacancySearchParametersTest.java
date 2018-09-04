@@ -34,7 +34,10 @@ public class VacancySearchParametersTest {
     @Test
     public void build_locationSupplied() {
 
-        VacancySearchParameters params = VacancySearchParameters.builder().location(location).build();
+        VacancySearchParameters params = VacancySearchParameters.builder()
+                .location(location)
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
+                .build();
 
         assertThat(params.getLocation().getPlace(), equalTo(PLACE));
         assertThat(params.getLocation().getRadius(), equalTo(30));
@@ -44,7 +47,11 @@ public class VacancySearchParametersTest {
 
     @Test
     public void build_locationAndKeywordSupplied() {
-        VacancySearchParameters params = VacancySearchParameters.builder().location(location).keyword(KEYWORD).build();
+        VacancySearchParameters params = VacancySearchParameters.builder()
+                .location(location)
+                .keyword(KEYWORD)
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
+                .build();
 
         assertThat(params.getLocation().getPlace(), equalTo(PLACE));
         assertThat(params.getLocation().getRadius(), equalTo(30));
@@ -57,6 +64,7 @@ public class VacancySearchParametersTest {
         VacancySearchParameters params = VacancySearchParameters.builder()
                 .location(location)
                 .department(new String[0])
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
                 .build();
 
         assertThat(params.getLocation().getPlace(), equalTo(PLACE));
@@ -71,6 +79,7 @@ public class VacancySearchParametersTest {
         VacancySearchParameters params = VacancySearchParameters.builder()
                 .location(location)
                 .department(new String[]{DEPT1, DEPT2})
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
                 .build();
 
         assertThat(params.getLocation().getPlace(), equalTo(PLACE));
@@ -87,6 +96,7 @@ public class VacancySearchParametersTest {
                 .location(location)
                 .keyword(KEYWORD)
                 .department(new String[]{DEPT1, DEPT2})
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
                 .build();
 
         assertThat(params.getLocation().getPlace(), equalTo(PLACE));

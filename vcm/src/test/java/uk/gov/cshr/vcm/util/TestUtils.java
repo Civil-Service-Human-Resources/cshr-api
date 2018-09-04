@@ -1,6 +1,7 @@
 package uk.gov.cshr.vcm.util;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -19,6 +20,12 @@ public final class TestUtils {
      */
     public static Timestamp getTime(int numberOfDaysFromNow) {
         Date date = Date.from(LocalDateTime.now().plusDays(numberOfDaysFromNow).atZone(ZoneId.systemDefault()).toInstant());
+        return new Timestamp(date.getTime());
+    }
+
+    public static Timestamp getTimeAtStartOfDay(int numberOfDaysFromNow) {
+        Date date = Date.from(LocalDate.now().atTime(6, 0).plusDays(numberOfDaysFromNow).atZone(ZoneId.systemDefault()).toInstant());
+
         return new Timestamp(date.getTime());
     }
 }

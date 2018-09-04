@@ -36,6 +36,7 @@ import uk.gov.cshr.vcm.model.Location;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancyLocation;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
+import uk.gov.cshr.vcm.model.VacancySortMethod;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
 import uk.gov.cshr.vcm.service.LocationService;
 
@@ -81,6 +82,7 @@ public class ControllerSecurityTests extends AbstractTestNGSpringContextTests {
                 .keyword("SearchQueryDescription")
                 .overseasJob(Boolean.TRUE)
                 .location(new Location("anywhere", 30))
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
                 .build();
 
         ObjectMapper mapper = new ObjectMapper();
@@ -174,7 +176,7 @@ public class ControllerSecurityTests extends AbstractTestNGSpringContextTests {
                 .grade("testGrade1 SearchQueryGrade")
                 .responsibilities("testResponsibilities1")
                 .workingHours("testWorkingHours1")
-                .closingDate(new Timestamp(0l))
+                .closingDate(new Timestamp(0L))
                 .publicOpeningDate(new Date())
                 .contactName("testContactName1")
                 .contactDepartment("testContactDepartment1")
