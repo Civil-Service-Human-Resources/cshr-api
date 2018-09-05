@@ -22,7 +22,18 @@ jobs:
 
       - run:
           name: Push the images to Acr
-          command: docker push ${AZURE_URL}/cshr-api:${CIRCLE_WORKFLOW_ID}
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              # If this is a merge develop branch build, and successful, push to bintray as latest.
+              # Release versions will be tagged as such
+              docker tag ${AZURE_URL}/cshr-api:${CIRCLE_WORKFLOW_ID} ${AZURE_URL}/cshr-api:latest
+              docker push ${AZURE_URL}/cshr-api:latest
+            else
+              docker tag ${AZURE_URL}/cshr-api:${CIRCLE_WORKFLOW_ID} ${AZURE_URL}/cshr-api:${CIRCLE_BRANCH}
+              docker push ${AZURE_URL}/cshr-api:${CIRCLE_BRANCH}
+            fi
+            docker push ${AZURE_URL}/cshr-api:${CIRCLE_WORKFLOW_ID}
+
 
 
   ship:
