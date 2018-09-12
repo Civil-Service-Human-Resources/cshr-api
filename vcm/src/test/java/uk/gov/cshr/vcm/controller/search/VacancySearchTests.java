@@ -68,6 +68,7 @@ import uk.gov.cshr.vcm.model.Location;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancyLocation;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
+import uk.gov.cshr.vcm.model.VacancySortMethod;
 import uk.gov.cshr.vcm.model.VerifyResponse;
 import uk.gov.cshr.vcm.model.WorkingPattern;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
@@ -93,7 +94,12 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     private static final double NEWCASTLE_LATITUDE = 54.9806308;
     private static final double NEWCASTLE_LONGITUDE = -1.6167437;
     private static final int TEN_DAYS_AGO = -10;
+    private static final int TEN_DAYS_FROM_NOW = 10;
+    private static final Timestamp THIRTY_DAYS_FROM_NOW = getTime(30);
+    private static final Timestamp TOMORROW = getTime(+1);
     private static final int TWENTY_DAYS_AGO = -20;
+    private static final int TWENTY_DAYS_FROM_NOW = 20;
+    private static final Timestamp YESTERDAY = getTime(-1);
 
     static {
         ISO_DATEFORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -132,11 +138,6 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     @Inject
     private HibernateSearchService hibernateSearchService;
 
-    private static final Timestamp YESTERDAY = getTime(-1);
-    private static final Timestamp TODAY = getTime(0);
-    private static final Timestamp TOMORROW = getTime(+1);
-    private static final Timestamp THIRTY_DAYS_FROM_NOW = getTime(30);
-
     private Department department1;
     private Department department2;
     private Department parentDepartment;
@@ -161,7 +162,6 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
             .salaryMax(10)
             .numberVacancies(2)
             .build();
-
 
 
     private final VacancyLocation newcastleLocation = VacancyLocation.builder()
@@ -398,6 +398,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         String jwt = cshrAuthenticationService.createInternalJWT("parentdepartment@email.com", parentDepartment);
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
                 .build();
 
         SearchResponsePage result = findVancanciesByKeyword(vacancySearchParameters, jwt);
@@ -437,6 +438,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         String jwt = cshrAuthenticationService.createInternalJWT("childdepartment@email.com", childDepartment);
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
                 .build();
 
         SearchResponsePage result = findVancanciesByKeyword(vacancySearchParameters, jwt);
@@ -467,6 +469,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
                 .keyword("newcastle")
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
                 .build();
 
         SearchResponsePage result = findVancanciesByKeyword(vacancySearchParameters, jwt);
@@ -499,6 +502,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
                 .keyword("newcastle")
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
                 .build();
 
         SearchResponsePage result = findVancanciesByKeyword(vacancySearchParameters, jwt);
@@ -530,6 +534,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
                 .keyword("newcastle")
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
                 .build();
 
         SearchResponsePage result = findVancanciesByKeyword(vacancySearchParameters, jwt);
@@ -558,6 +563,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
                 .keyword("newcastle")
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
                 .build();
 
         SearchResponsePage result = findVancanciesByKeyword(vacancySearchParameters, "jwt");
@@ -604,6 +610,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                         .place("london/?hgff8987")
                         .radius(30)
                         .build())
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
                 .build();
 
         ObjectMapper mapper = new ObjectMapper();
@@ -623,6 +630,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
                 .keyword("£%^&*")
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
                 .build();
 
         ObjectMapper mapper = new ObjectMapper();
@@ -750,27 +758,6 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void testTitleMoreRelevantThanDescription() throws Exception {
-
-        Vacancy newcastleVacancy = createVacancyPrototype(newcastleLocation);
-        newcastleVacancy.setTitle("any old title");
-        newcastleVacancy.setDescription("jobs in newcastle are great");
-        saveVacancy(newcastleVacancy);
-
-        Vacancy newcastleVacancy2 = createVacancyPrototype(newcastleLocation2);
-        newcastleVacancy2.setTitle("Newcastle Vacancy");
-        newcastleVacancy2.setDescription("jobs in are great");
-        saveVacancy(newcastleVacancy2);
-
-        SearchResponsePage result = findVancanciesByKeyword("newcastle", null);
-        List<Vacancy> resultsList = result.getVacancies().getContent();
-
-        Assert.assertEquals("Expect two results", 2, resultsList.size());
-        Assert.assertEquals("title match is first", newcastleVacancy2.getId(),
-                resultsList.get(0).getId());
-    }
-
-    @Test
     public void testFindMultipleLocations() throws Exception {
 
         given(locationService.find("bristol"))
@@ -873,6 +860,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         saveVacancy(internshipVacancy);
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
                 .build();
 
         // return all three
@@ -884,6 +872,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .contractTypes(new String[]{
                         ContractType.SEASONAL.toString(),
                 })
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
                 .build();
 
         // no vacancies should exist matching seasonal
@@ -895,6 +884,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .contractTypes(new String[]{
                         ContractType.INTERNSHIP.toString(),
                 })
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
                 .build();
 
         // One vacancy sholud match internship
@@ -908,6 +898,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                         ContractType.FULL_TIME.toString(),
                         ContractType.PART_TIME.toString(),
                 })
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
                 .build();
 
         // two vacancies should exist matching full/parttime
@@ -941,6 +932,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         saveVacancy(homeWorkingVacancy);
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
                 .build();
 
         // return all three
@@ -952,6 +944,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .workingPatterns(new String[]{
                         WorkingPattern.JOB_SHARE.toString(),
                 })
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
                 .build();
 
         // no vacancies should exist matching JOB_SHARE
@@ -963,6 +956,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .workingPatterns(new String[]{
                         WorkingPattern.FLEXIBLE_WORKING.toString(),
                 })
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
                 .build();
 
         // One vacancy should exist matching FLEXIBLE_WORKING
@@ -976,6 +970,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                         WorkingPattern.FLEXIBLE_WORKING.toString(),
                         WorkingPattern.FULL_TIME.toString(),
                 })
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
                 .build();
 
         // two vacancies should exist matching full/parttime
@@ -1092,6 +1087,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
                 .keyword("SearchQueryDescription")
                 .location(new Location("bristol", 30))
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
                 .build();
 
         ObjectMapper mapper = new ObjectMapper();
@@ -1127,6 +1123,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
                 .keyword("SearchQueryDescription")
                 .location(new Location("bristol", 30))
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
                 .build();
 
         ObjectMapper mapper = new ObjectMapper();
@@ -1216,6 +1213,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
 
         VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
                 .keyword(keyword)
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
                 .build();
 
         if (place != null) {
@@ -1247,6 +1245,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .overseasJob(Boolean.TRUE)
                 .department(departmentIDs)
                 .location(new Location("bristol", 30))
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
                 .build();
 
         ObjectMapper mapper = new ObjectMapper();
@@ -1273,6 +1272,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .keyword("SearchQueryDescription")
                 .overseasJob(Boolean.TRUE)
                 .location(new Location(place, 30))
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
                 .build();
 
         String json = objectMapper.writeValueAsString(vacancySearchParameters);
@@ -1390,6 +1390,7 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
                 .minSalary(15000)
                 .maxSalary(22000)
                 .overseasJob(Boolean.FALSE)
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
                 .build();
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(vacancySearchParameters);
@@ -1464,5 +1465,96 @@ public class VacancySearchTests extends AbstractTestNGSpringContextTests {
     @Ignore
     public void search_publicSearchesAllowedToday() throws Exception {
         doOpenPublicSearchTests(0);
+    }
+
+    @Test
+    public void search_sortByClosingDate() throws Exception {
+        Vacancy v1 = addVacancy("This is a Technical job", "The description", null, THIRTY_DAYS_FROM_NOW);
+        Vacancy v2 = addVacancy("This is another Technical job", "The description", null, getTime(TEN_DAYS_FROM_NOW));
+        addVacancy("This is a Entertainment job", "The description", null, getTime(TEN_DAYS_FROM_NOW));
+        Vacancy v3 = addVacancy("This is a more than a different job", "The technical description", null, getTime(TWENTY_DAYS_FROM_NOW));
+        Vacancy v4 = addVacancy("This is a more than a technical job", "The description", null, getTime(TWENTY_DAYS_FROM_NOW));
+
+        VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
+                .keyword("Technical")
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
+                .build();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(vacancySearchParameters);
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/search")
+                .with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(json)
+                .accept(APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String searchResponse = mvcResult.getResponse().getContentAsString();
+
+        SearchResponsePage result = mapper.readValue(searchResponse, SearchResponsePage.class);
+
+        assertThat(result.getVacancies().getTotalElements(), is(equalTo(4L)));
+        assertThat(result.getVacancies().getNumberOfElements(), is(equalTo(4)));
+        assertThat(result.getVacancies().getContent().get(0).getId(), is(equalTo(v2.getId())));
+        assertThat(result.getVacancies().getContent().get(1).getId(), is(equalTo(v3.getId())));
+        assertThat(result.getVacancies().getContent().get(2).getId(), is(equalTo(v4.getId())));
+        assertThat(result.getVacancies().getContent().get(3).getId(), is(equalTo(v1.getId())));
+    }
+
+    private Vacancy addVacancy(String title, String description, Timestamp publicOpeningDate, Timestamp closingDate) {
+        Vacancy vacancy = createVacancyPrototype(newcastleLocation);
+
+        vacancy.setTitle(title);
+        vacancy.setClosingDate(closingDate);
+        vacancy.setPublicOpeningDate(YESTERDAY);
+        vacancy.setDescription(description);
+
+        if (publicOpeningDate != null) {
+            vacancy.setPublicOpeningDate(publicOpeningDate);
+        }
+
+        VacancyLocation loc = VacancyLocation.builder().vacancy(vacancy).location("").build();
+        vacancy.getVacancyLocations().clear();
+        vacancy.getVacancyLocations().add(loc);
+
+        return saveVacancy(vacancy);
+    }
+
+    @Test
+    public void search_sortByRecentlyAdded() throws Exception {
+        Vacancy v1 = addVacancy("This is a Technical job", "The description", getTime(0), THIRTY_DAYS_FROM_NOW);
+        Vacancy v2 = addVacancy("This is another Technical job", "The description", getTime(-30), getTime(TEN_DAYS_FROM_NOW));
+        addVacancy("This is a Entertainment job", "The description", null, getTime(TEN_DAYS_FROM_NOW));
+        Vacancy v3 = addVacancy("This is a more than a different job", "The technical description", getTime(TEN_DAYS_AGO), getTime(TWENTY_DAYS_FROM_NOW));
+        Vacancy v4 = addVacancy("This is a more than a technical job", "The description", getTime(-1), getTime(TWENTY_DAYS_FROM_NOW));
+
+        VacancySearchParameters vacancySearchParameters = VacancySearchParameters.builder()
+                .keyword("Technical")
+                .vacancySortMethod(VacancySortMethod.RECENTLY_ADDED)
+                .build();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(vacancySearchParameters);
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/vacancy/search")
+                .with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(json)
+                .accept(APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String searchResponse = mvcResult.getResponse().getContentAsString();
+
+        SearchResponsePage result = mapper.readValue(searchResponse, SearchResponsePage.class);
+
+        assertThat(result.getVacancies().getTotalElements(), is(equalTo(4L)));
+        assertThat(result.getVacancies().getNumberOfElements(), is(equalTo(4)));
+        assertThat(result.getVacancies().getContent().get(0).getId(), is(equalTo(v1.getId())));
+        assertThat(result.getVacancies().getContent().get(1).getId(), is(equalTo(v4.getId())));
+        assertThat(result.getVacancies().getContent().get(2).getId(), is(equalTo(v3.getId())));
+        assertThat(result.getVacancies().getContent().get(3).getId(), is(equalTo(v2.getId())));
     }
 }

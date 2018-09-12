@@ -113,6 +113,7 @@ public class HibernateSearchService {
         // projection means we only return IDs from search, not hitting the database
         javax.persistence.Query jpaQuery = fullTextEntityManager.createFullTextQuery(
                 combinedQuery.createQuery(), VacancyLocation.class)
+                .setSort(searchParameters.getVacancySearchParameters().getVacancySortMethod().getSort())
                 .setProjection("vacancyid");
 
         List<Object[]> vacancyIDs = jpaQuery.getResultList();
