@@ -822,6 +822,11 @@ definitions:
         enum:
           - PUBLIC
           - INTERNAL
+      vacancySortMethod:
+        type: string
+        enum:
+          - CLOSING_DATE
+          - RECENTLY_ADDED
       workingPatterns:
         type: array
         example: FLEXIBLE_WORKING FULL_TIME PART_TIME JOB_SHARE HOME_WORKING

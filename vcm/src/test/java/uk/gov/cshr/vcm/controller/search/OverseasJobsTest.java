@@ -44,6 +44,7 @@ import uk.gov.cshr.vcm.model.SearchResponse;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancyLocation;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
+import uk.gov.cshr.vcm.model.VacancySortMethod;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
 import uk.gov.cshr.vcm.service.HibernateSearchService;
@@ -56,24 +57,22 @@ import uk.gov.cshr.vcm.service.LocationService;
 @TestExecutionListeners(MockitoTestExecutionListener.class)
 public class OverseasJobsTest extends AbstractTestNGSpringContextTests {
 
-    public static final double BRISTOL_LATITUDE = 51.4549291;
-    public static final double BRISTOL_LONGITUDE = -2.6278111;
+    private static final double BRISTOL_LATITUDE = 51.4549291;
+    private static final double BRISTOL_LONGITUDE = -2.6278111;
 
-    public static final double NEWCASTLE_LATITUDE = 54.9806308;
-    public static final double NEWCASTLE_LONGITUDE = -1.6167437;
+    private static final double NEWCASTLE_LATITUDE = 54.9806308;
+    private static final double NEWCASTLE_LONGITUDE = -1.6167437;
 
-    public static final Coordinates BRISTOL_COORDINATES = new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West");
-    public static final Coordinates NEWCASTLE_COORDINATES = new Coordinates(NEWCASTLE_LONGITUDE, NEWCASTLE_LATITUDE, "North East");
     private static final String BRISTOL_JOB_TITLE = "bristol job";
     private static final String NEWCASTLE_JOB_TITLE = "newcastle job";
 
-    VacancyLocation bristolLocation = VacancyLocation.builder()
+    private VacancyLocation bristolLocation = VacancyLocation.builder()
             .latitude(BRISTOL_LATITUDE)
             .longitude(BRISTOL_LONGITUDE)
             .location("bristol")
             .build();
 
-    VacancyLocation newcastleLocation = VacancyLocation.builder()
+    private VacancyLocation newcastleLocation = VacancyLocation.builder()
             .latitude(NEWCASTLE_LATITUDE)
             .longitude(NEWCASTLE_LONGITUDE)
             .location("newcastle")
@@ -192,6 +191,7 @@ public class OverseasJobsTest extends AbstractTestNGSpringContextTests {
                 .keyword("SearchQueryDescription")
                 .location(new Location(place, 30))
                 .overseasJob(includeOverseas)
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
                 .build();
 
         ObjectMapper mapper = new ObjectMapper();

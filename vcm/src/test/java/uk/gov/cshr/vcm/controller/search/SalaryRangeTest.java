@@ -52,6 +52,7 @@ import uk.gov.cshr.vcm.model.SearchResponse;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancyLocation;
 import uk.gov.cshr.vcm.model.VacancySearchParameters;
+import uk.gov.cshr.vcm.model.VacancySortMethod;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
 import uk.gov.cshr.vcm.repository.VacancyRepository;
 import uk.gov.cshr.vcm.service.HibernateSearchService;
@@ -64,14 +65,14 @@ import uk.gov.cshr.vcm.service.LocationService;
 @TestExecutionListeners(MockitoTestExecutionListener.class)
 public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
 
-    public static final double BRISTOL_LATITUDE = 51.4549291;
-    public static final double BRISTOL_LONGITUDE = -2.6278111;
+    private static final double BRISTOL_LATITUDE = 51.4549291;
+    private static final double BRISTOL_LONGITUDE = -2.6278111;
 
-    public static final double NEWCASTLE_LATITUDE = 54.9806308;
-    public static final double NEWCASTLE_LONGITUDE = -1.6167437;
+    private static final double NEWCASTLE_LATITUDE = 54.9806308;
+    private static final double NEWCASTLE_LONGITUDE = -1.6167437;
 
-    public static final Coordinates BRISTOL = new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West");
-    public static final Coordinates NEWCASTLE = new Coordinates(NEWCASTLE_LONGITUDE, NEWCASTLE_LATITUDE, "North East");
+    private static final Coordinates BRISTOL = new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West");
+    private static final Coordinates NEWCASTLE = new Coordinates(NEWCASTLE_LONGITUDE, NEWCASTLE_LATITUDE, "North East");
 
     final private MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(),
@@ -276,9 +277,7 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         Assert.assertTrue(resultsList.size() == 5);
 
         List<Long> results = new ArrayList<>();
-        resultsList.forEach((vacancy) -> {
-            results.add(vacancy.getId());
-        });
+        resultsList.forEach((vacancy) -> results.add(vacancy.getId()));
 
         Assert.assertThat(results, Matchers.containsInAnyOrder(
                 v1.getId(),
@@ -303,9 +302,7 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         Assert.assertTrue(resultsList.size() == 4);
 
         List<Long> results = new ArrayList<>();
-        resultsList.forEach((vacancy) -> {
-            results.add(vacancy.getId());
-        });
+        resultsList.forEach((vacancy) -> results.add(vacancy.getId()));
 
         Assert.assertThat(results, Matchers.containsInAnyOrder(v2.getId(),
                 v3.getId(),
@@ -326,9 +323,7 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         List<Vacancy> resultsList = result.getVacancies().getContent();
 
         List<Long> results = new ArrayList<>();
-        resultsList.forEach((vacancy) -> {
-            results.add(vacancy.getId());
-        });
+        resultsList.forEach((vacancy) -> results.add(vacancy.getId()));
 
         Assert.assertTrue(resultsList.size() == 4);
         Assert.assertThat(results, Matchers.containsInAnyOrder(v2.getId(),
@@ -350,9 +345,7 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         List<Vacancy> resultsList = result.getVacancies().getContent();
 
         List<Long> results = new ArrayList<>();
-        resultsList.forEach((vacancy) -> {
-            results.add(vacancy.getId());
-        });
+        resultsList.forEach((vacancy) -> results.add(vacancy.getId()));
 
         Assert.assertTrue(resultsList.size() == 3);
         Assert.assertThat(results, Matchers.containsInAnyOrder(v3.getId(),
@@ -422,9 +415,7 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         Assert.assertTrue(resultsList.size() == 3);
 
         List<Long> results = new ArrayList<>();
-        resultsList.forEach((vacancy) -> {
-            results.add(vacancy.getId());
-        });
+        resultsList.forEach((vacancy) -> results.add(vacancy.getId()));
 
         Assert.assertThat(results, not(contains(
                 v4.getId(),
@@ -449,9 +440,7 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         List<Vacancy> resultsList = result.getVacancies().getContent();
 
         List<Long> results = new ArrayList<>();
-        resultsList.forEach((vacancy) -> {
-            results.add(vacancy.getId());
-        });
+        resultsList.forEach((vacancy) -> results.add(vacancy.getId()));
 
         Assert.assertTrue(resultsList.size() == 2);
 
@@ -477,9 +466,7 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         SearchResponse result = findVancancies(50000, 60000, "bristol");
         List<Vacancy> resultsList = result.getVacancies().getContent();
         List<Long> results = new ArrayList<>();
-        resultsList.forEach((vacancy) -> {
-            results.add(vacancy.getId());
-        });
+        resultsList.forEach((vacancy) -> results.add(vacancy.getId()));
 
         Assert.assertTrue(resultsList.size() == 4);
 
@@ -505,9 +492,7 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
         SearchResponse result = findVancancies(60000, 60000, "bristol");
         List<Vacancy> resultsList = result.getVacancies().getContent();
         List<Long> results = new ArrayList<>();
-        resultsList.forEach((vacancy) -> {
-            results.add(vacancy.getId());
-        });
+        resultsList.forEach((vacancy) -> results.add(vacancy.getId()));
 
         Assert.assertTrue(resultsList.size() == 3);
 
@@ -545,6 +530,7 @@ public class SalaryRangeTest extends AbstractTestNGSpringContextTests {
                 .location(new Location(place, 30))
                 .maxSalary(maxSalary)
                 .minSalary(minSalary)
+                .vacancySortMethod(VacancySortMethod.CLOSING_DATE)
                 .build();
 
         ObjectMapper mapper = new ObjectMapper();

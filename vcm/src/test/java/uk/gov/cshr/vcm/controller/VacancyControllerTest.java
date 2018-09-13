@@ -553,7 +553,8 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 "  \"location\": {\n" +
                 "    \"place\": \"Humpty\",\n" +
                 "    \"radius\": \"30\"\n" +
-                "  }\n" +
+                "  },\n" +
+                "  \"vacancySortMethod\": \"CLOSING_DATE\"" +
                 "}";
 
         ResultActions sendRequest = mvc.perform(post(path)
