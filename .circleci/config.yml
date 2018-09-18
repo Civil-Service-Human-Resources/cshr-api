@@ -23,7 +23,7 @@ jobs:
       - run:
           name: Push the images to Acr
           command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+            if [ "${CIRCLE_BRANCH}" == "develop" ]; then
               # If this is a merge develop branch build, and successful, push to bintray as latest.
               # Release versions will be tagged as such
               docker tag ${AZURE_URL}/cshr-api:${CIRCLE_WORKFLOW_ID} ${AZURE_URL}/cshr-api:latest
