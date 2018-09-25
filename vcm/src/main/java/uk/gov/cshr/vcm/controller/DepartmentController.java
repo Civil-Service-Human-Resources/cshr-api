@@ -1,13 +1,15 @@
 package uk.gov.cshr.vcm.controller;
 
-import io.swagger.annotations.ApiOperation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.text.ParseException;
 import java.util.Optional;
+
 import javax.annotation.security.RolesAllowed;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
@@ -25,36 +27,33 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.repository.DepartmentRepository;
-import uk.gov.cshr.vcm.service.LoadDepartmentEmailsService;
+import uk.gov.cshr.vcm.service.DepartmentService;
 
 @RestController
 @RequestMapping(value = "/department", produces = MediaType.APPLICATION_JSON_VALUE)
 @RolesAllowed("CRUD_ROLE")
+@Slf4j
 public class DepartmentController {
-
-    private static final Logger log = LoggerFactory.getLogger(DepartmentController.class);
-
     private final DepartmentRepository departmentRepository;
+    private DepartmentService departmentService;
 
     @Autowired
-    private LoadDepartmentEmailsService loadDepartmentEmailsService;
-
-    @Autowired
-    DepartmentController(DepartmentRepository departmentRepository) {
+    DepartmentController(DepartmentRepository departmentRepository, DepartmentService departmentService) {
         this.departmentRepository = departmentRepository;
+        this.departmentService = departmentService;
     }
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
-    @ApiOperation(value = "Find all departments", nickname = "findAll")
-	@RolesAllowed({"CRUD_ROLE", "SEARCH_ROLE"})
+    @ApiOperation(value = "Find all departments", nickname = "findAllDepartments")
+    @RolesAllowed({"CRUD_ROLE", "SEARCH_ROLE"})
     public ResponseEntity<Page<Department>> findAll(Pageable pageable) {
         Page<Department> departments = departmentRepository.findAllByOrderByNameAsc(pageable);
         return ResponseEntity.ok().body(departments);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{departmentId}")
-    @ApiOperation(value = "Find a specific department", nickname = "findById")
+    @ApiOperation(value = "Find a specific department", nickname = "findDepartmentById")
     public ResponseEntity<Department> findById(@PathVariable Long departmentId) {
 
         Optional<Department> foundDepartment = departmentRepository.findById(departmentId);
@@ -68,7 +67,7 @@ public class DepartmentController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    @ApiOperation(value = "Create a department", nickname = "create")
+    @ApiOperation(value = "Create a department", nickname = "createDepartment")
     public ResponseEntity<Department> create(@RequestBody Department department) {
 
         Department savedDepartment = departmentRepository.save(department);
@@ -81,7 +80,7 @@ public class DepartmentController {
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/{departmentId}")
-    @ApiOperation(value = "Update a department", nickname = "update")
+    @ApiOperation(value = "Update a department", nickname = "updateDepartment")
     public ResponseEntity<Department> update(@PathVariable Long departmentId, @RequestBody Department departmentUpdate) {
 
         Optional<Department> foundDepartment = departmentRepository.findById(departmentId);
@@ -95,7 +94,7 @@ public class DepartmentController {
         return foundDepartment.map((Department department) -> {
             // Attention, mutable state on the argument
             departmentUpdate.setId(department.getId());
-            if ( departmentUpdate.getAcceptedEmailExtensions() == null ) {
+            if (departmentUpdate.getAcceptedEmailExtensions() == null) {
                 departmentUpdate.setAcceptedEmailExtensions(department.getAcceptedEmailExtensions());
             }
             departmentRepository.save(departmentUpdate);
@@ -105,20 +104,21 @@ public class DepartmentController {
 
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/{departmentId}")
-    @ApiOperation(value = "Delete a department", nickname = "deleteById")
+    @ApiOperation(value = "Delete a department", nickname = "deleteDepartmentById")
     public ResponseEntity<Department> deleteById(@PathVariable Long departmentId) {
 
         departmentRepository.delete(departmentId);
         return ResponseEntity.noContent().build();
     }
 
-	@CacheEvict(value = "emailAddresses", allEntries = true)
-    @RequestMapping(method = RequestMethod.POST, value = "/loademails")
+    @CacheEvict(value = "departments", allEntries = true)
+    @RequestMapping(method = RequestMethod.POST, value = "/loaddepartments")
     @ApiOperation(value = "load departments", nickname = "load")
-    public ResponseEntity<?> load(@RequestParam("file") MultipartFile file) throws IOException {
+    public ResponseEntity<?> load(@RequestParam("file") MultipartFile file)
+            throws IOException, ParseException {
 
         try (InputStream inputStream = file.getInputStream()) {
-            loadDepartmentEmailsService.readEmails(inputStream);
+            departmentService.readDepartments(inputStream);
             return ResponseEntity.noContent().build();
         }
     }

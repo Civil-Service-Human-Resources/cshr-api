@@ -1,8 +1,9 @@
 package uk.gov.cshr.vcm.model;
 
+import java.io.Serializable;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,15 +35,15 @@ public class VacancySearchParameters implements Serializable {
     private Boolean overseasJob;
 
     @ApiModelProperty(notes = "A string array of contract types",
-                      example = "FULL_TIME PART_TIME CONTRACT TEMPORARY SEASONAL INTERNSHIP")
+            example = "FULL_TIME PART_TIME CONTRACT TEMPORARY SEASONAL INTERNSHIP")
     private String[] contractTypes;
 
     @ApiModelProperty(notes = "A string array of working patterns",
-                      example = "FLEXIBLE_WORKING FULL_TIME PART_TIME JOB_SHARE HOME_WORKING")
-	private String[] workingPatterns;
+            example = "FLEXIBLE_WORKING FULL_TIME PART_TIME JOB_SHARE HOME_WORKING")
+    private String[] workingPatterns;
 
-	@ApiModelProperty
-	private VacancyEligibility vacancyEligibility;
+    @ApiModelProperty
+    private VacancyEligibility vacancyEligibility;
 
     @Override
     public String toString() {

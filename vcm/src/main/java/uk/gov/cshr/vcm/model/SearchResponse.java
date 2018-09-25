@@ -1,8 +1,9 @@
 package uk.gov.cshr.vcm.model;
 
-import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,9 +25,8 @@ public class SearchResponse {
     @Builder.Default
     private List<VacancyError> vacancyErrors = new ArrayList<>();
 
-    @ApiModelProperty(notes = "A list of statuses indicating the system status")
-    @Builder.Default
-    private List<CSHRServiceStatus> cshrServiceStatuses = new ArrayList<>();
+    @ApiModelProperty(notes = "Business status code associated with the request")
+    private CSHRServiceStatus cshrServiceStatus;
 
     @ApiModelProperty(notes = "The email which was verified to give access to non-public jobs")
     private String authenticatedEmail;

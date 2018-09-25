@@ -1,12 +1,11 @@
 package uk.gov.cshr.vcm.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,10 +15,15 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,7 +42,7 @@ public class Department implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO,  generator="departments_id_seq")
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "departments_id_seq")
     private Long id;
 
     @Column(name = "identifier")
@@ -69,11 +73,11 @@ public class Department implements Serializable {
     @Column(name = "logopath")
     private String logoPath;
 
-	@Builder.Default
-	@OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE},
-               mappedBy = "department", fetch = FetchType.EAGER, orphanRemoval = true)
+    @Builder.Default
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE},
+            mappedBy = "department", fetch = FetchType.EAGER, orphanRemoval = true)
     @JsonIgnore
-	private Set<EmailExtension> acceptedEmailExtensions = new HashSet<>();
+    private Set<EmailExtension> acceptedEmailExtensions = new HashSet<>();
 
     @Override
     public int hashCode() {
@@ -100,4 +104,14 @@ public class Department implements Serializable {
         }
         return true;
     }
+
+    @ManyToOne
+    @JoinColumn(name = "parentdepartmentid")
+    private Department parent;
+
+    @Override
+    public String toString() {
+        return "Department{" + "id=" + id + ", name=" + name + '}';
+    }
+
 }

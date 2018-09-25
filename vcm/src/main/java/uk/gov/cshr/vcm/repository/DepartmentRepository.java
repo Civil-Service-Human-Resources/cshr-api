@@ -1,6 +1,8 @@
 package uk.gov.cshr.vcm.repository;
 
+import java.util.List;
 import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
@@ -31,9 +33,11 @@ public interface DepartmentRepository extends PagingAndSortingRepository<Departm
     @CacheEvict(value = "departments", allEntries = true)
     public void delete(Department department);
 
-	@Override
-	@Cacheable(value = "departments")
-	public Iterable<Department> findAll();
+    @Override
+    @Cacheable(value = "departments")
+    public Iterable<Department> findAll();
 
     public Department findByIdentifier(String idendifier);
+
+    public List<Department> findByParent(Department parent);
 }

@@ -1,13 +1,11 @@
 package uk.gov.cshr.vcm.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,6 +24,10 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -53,17 +55,17 @@ import org.hibernate.search.annotations.TokenFilterDef;
 import org.hibernate.search.annotations.TokenizerDef;
 
 @AnalyzerDefs({
-    @AnalyzerDef(
-            name = "synonymn",
-            tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
-            filters = {
-                @TokenFilterDef(factory = SynonymFilterFactory.class, params = {
-                    @Parameter(name = "synonyms", value = "synonyms.txt"),
-                    @Parameter(name = "ignoreCase", value = "true")
-                }),
-                @TokenFilterDef(factory = LowerCaseFilterFactory.class),
-                @TokenFilterDef(factory = StopFilterFactory.class)
-            })
+        @AnalyzerDef(
+                name = "synonymn",
+                tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+                filters = {
+                        @TokenFilterDef(factory = SynonymFilterFactory.class, params = {
+                                @Parameter(name = "synonyms", value = "synonyms.txt"),
+                                @Parameter(name = "ignoreCase", value = "true")
+                        }),
+                        @TokenFilterDef(factory = LowerCaseFilterFactory.class),
+                        @TokenFilterDef(factory = StopFilterFactory.class)
+                })
 })
 
 @Entity
@@ -89,8 +91,8 @@ public class Vacancy implements Serializable {
     private Long identifier;
 
     @Fields({
-        @Field(name = "title", store = Store.YES, analyzer = @Analyzer(definition = "synonymn")),
-        @Field(name = "titleOriginal", store = Store.YES, analyze = Analyze.YES)
+            @Field(name = "title", store = Store.YES, analyzer = @Analyzer(definition = "synonymn")),
+            @Field(name = "titleOriginal", store = Store.YES, analyze = Analyze.YES)
     })
     @Field(store = Store.YES)
     @NonNull
@@ -156,6 +158,11 @@ public class Vacancy implements Serializable {
     @Column(name = "public_opening_date")
     private Date publicOpeningDate;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "GMT+0")
+    @Column(name = "modified")
+    private Date lastModified;
+
     @Field(store = Store.YES)
     @NonNull
     private Integer salaryMin;
@@ -179,8 +186,7 @@ public class Vacancy implements Serializable {
     public String getDepartmentID() {
         if (department != null) {
             return department.getId().toString();
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -208,7 +214,7 @@ public class Vacancy implements Serializable {
     private NationalityStatement nationalityStatement;
 
     @OneToMany(mappedBy = "vacancy", fetch = FetchType.EAGER, cascade = {
-        CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE}, orphanRemoval = true)
+            CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE}, orphanRemoval = true)
     @Builder.Default
     @ContainedIn
     private List<VacancyLocation> vacancyLocations = new ArrayList<>();
@@ -217,14 +223,14 @@ public class Vacancy implements Serializable {
     private String salaryOverrideDescription;
 
     @ApiModelProperty(notes = "A comma separated list of contract types",
-                      example = "FULL_TIME, PART_TIME, CONTRACT, TEMPORARY, SEASONAL, INTERNSHIP")
+            example = "FULL_TIME, PART_TIME, CONTRACT, TEMPORARY, SEASONAL, INTERNSHIP")
     @Field(store = Store.YES)
     @Column(name = "contracttype")
     private String contractTypes;
 
     @ApiModelProperty(notes = "A comma separated list of working patterns",
-                      example = "FLEXIBLE_WORKING, FULL_TIME, PART_TIME, JOB_SHARE, HOME_WORKING")
-	@Field(store = Store.YES)
+            example = "FLEXIBLE_WORKING, FULL_TIME, PART_TIME, JOB_SHARE, HOME_WORKING")
+    @Field(store = Store.YES)
     @Column(name = "workingpattern")
     private String workingPatterns;
 
@@ -237,12 +243,12 @@ public class Vacancy implements Serializable {
     @Column(name = "personalspecification")
     private String personalSpecification;
 
-	@Field(store = Store.YES, indexNullAs = "true")
-	@Column(name = "active")
-	@Builder.Default
+    @Field(store = Store.YES, indexNullAs = "true")
+    @Column(name = "active")
+    @Builder.Default
     private Boolean active = Boolean.TRUE;
 
-	@Column(name = "lengthofemployment")
+    @Column(name = "lengthofemployment")
     private String lengthOfEmployment;
 }
 

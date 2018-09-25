@@ -1,10 +1,7 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext
-                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
-                            http://www.liquibase.org/xml/ns/dbchangelog
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd"
                             logicalFilePath="changelog.xml">
 
@@ -284,18 +281,125 @@
             <column name="emailextension" type="TEXT"/>
             <column name="department_id" type="BIGINT"/>
         </createTable>
-        <addPrimaryKey columnNames="id" constraintName="acceptedemailextensions_pkey" tableName="acceptedemailextensions"/>
-        <addForeignKeyConstraint baseColumnNames="department_id"
-                                 baseTableName="acceptedemailextensions"
-                                 constraintName="fk_acceptedemailextensions_departments"
-                                 onDelete="NO ACTION"
-                                 onUpdate="NO ACTION"
-                                 referencedColumnNames="id"
-                                 referencedTableName="departments"/>
+         <addPrimaryKey columnNames="id" constraintName="acceptedemailextensions_pkey" tableName="acceptedemailextensions"/>
+    <addForeignKeyConstraint baseColumnNames="department_id"
+                             baseTableName="acceptedemailextensions"
+                             constraintName="fk_acceptedemailextensions_departments"
+                             onDelete="NO ACTION"
+                             onUpdate="NO ACTION"
+                             referencedColumnNames="id"
+                             referencedTableName="departments"/>
     </changeSet>
     <changeSet author="gordon" id="35">
         <addColumn tableName="vacancies">
             <column name="lengthofemployment" type="TEXT" />
         </addColumn>
+    </changeSet>
+    <changeSet author="Gordon" id="36">
+        <addColumn tableName="departments">
+            <column name="parentdepartmentid" type="BIGINT" />
+        </addColumn>
+    </changeSet>
+    <changeSet author="Seamus Singh" id="37">
+        <addColumn tableName="vacancies">
+            <column name="created" type="TIMESTAMP WITH TIME ZONE"/>
+        </addColumn>
+        <addColumn tableName="vacancies">
+            <column name="modified" type="TIMESTAMP WITH TIME ZONE"/>
+        </addColumn>
+        <addColumn tableName="vacancylocations">
+            <column name="created" type="TIMESTAMP WITH TIME ZONE"/>
+        </addColumn>
+        <addColumn tableName="vacancylocations">
+            <column name="modified" type="TIMESTAMP WITH TIME ZONE"/>
+        </addColumn>
+        <rollback>
+            ALTER TABLE vacancies DROP COLUMN IF EXISTS created;
+            ALTER TABLE vacancies DROP COLUMN IF EXISTS modified;
+
+            ALTER TABLE vacancylocations DROP COLUMN IF EXISTS created;
+            ALTER TABLE vacancylocations DROP COLUMN IF EXISTS modified;
+        </rollback>
+    </changeSet>
+    <changeSet author="Seamus Singh" id="38" context="!test">
+        <createProcedure>
+            DROP FUNCTION IF EXISTS add_row_created();
+            CREATE OR REPLACE FUNCTION add_row_created()
+            RETURNS TRIGGER AS $$
+            BEGIN
+                NEW.created = now();
+                NEW.modified = NEW.created;
+                RETURN NEW;
+            END;
+            $$ language 'plpgsql';
+        </createProcedure>
+        <createProcedure>
+            DROP FUNCTION IF EXISTS add_row_modified();
+            CREATE OR REPLACE FUNCTION update_row_modified()
+            RETURNS TRIGGER AS $$
+            BEGIN
+                NEW.modified = now();
+                RETURN NEW;
+            END;
+            $$ language 'plpgsql';
+        </createProcedure>
+        <createProcedure>
+            DROP FUNCTION IF EXISTS update_vacancies_modified_from_vacancylocations();
+            CREATE OR REPLACE FUNCTION update_vacancies_modified_from_vacancylocations()
+            RETURNS TRIGGER AS $$
+            BEGIN
+                UPDATE vacancies SET modified = now() WHERE id = NEW.vacancyid;
+                RETURN NEW;
+            END;
+            $$ language 'plpgsql';
+        </createProcedure>
+        <sql>
+            UPDATE vacancies SET created = now() where created is null;
+            UPDATE vacancies SET modified = created where modified is null;
+
+            UPDATE vacancylocations SET created = now() where created is null;
+            UPDATE vacancylocations SET modified = created where modified is null;
+
+            DROP TRIGGER IF EXISTS add_vacancy_created ON vacancies;
+            CREATE TRIGGER add_vacancy_created BEFORE INSERT ON vacancies FOR EACH ROW EXECUTE PROCEDURE add_row_created();
+
+            DROP TRIGGER IF EXISTS update_vacancy_modified ON vacancies;
+            CREATE TRIGGER update_vacancy_modified BEFORE UPDATE ON vacancies FOR EACH ROW EXECUTE PROCEDURE update_row_modified();
+
+            DROP TRIGGER IF EXISTS add_vacancylocation_created ON vacancies;
+            CREATE TRIGGER add_vacancylocation_created BEFORE INSERT ON vacancylocations FOR EACH ROW EXECUTE PROCEDURE add_row_created();
+
+            DROP TRIGGER IF EXISTS update_vacancylocation_modified ON vacancies;
+            CREATE TRIGGER update_vacancylocation_modified BEFORE UPDATE ON vacancylocations FOR EACH ROW EXECUTE PROCEDURE update_row_modified();
+
+            DROP TRIGGER IF EXISTS update_vacancies_modified_locations ON vacancies;
+            CREATE TRIGGER update_vacancies_modified_locations BEFORE INSERT OR UPDATE ON vacancylocations FOR EACH ROW EXECUTE PROCEDURE update_vacancies_modified_from_vacancylocations();
+        </sql>
+        <rollback>
+            DROP TRIGGER IF EXISTS add_vacancy_created ON vacancies CASCADE;
+            DROP TRIGGER IF EXISTS update_vacancy_modified ON vacancies CASCADE;
+
+            DROP TRIGGER IF EXISTS add_vacancylocation_created ON vacancylocations CASCADE;
+            DROP TRIGGER IF EXISTS update_vacancylocation_modified ON vacancylocations CASCADE;
+
+            DROP TRIGGER IF EXISTS update_vacancies_modified_locations ON vacancylocations CASCADE;
+
+            DROP FUNCTION IF EXISTS add_row_created() CASCADE;
+            DROP FUNCTION IF EXISTS add_row_modified() CASCADE;
+            DROP FUNCTION IF EXISTS update_vacancies_modified_from_vacancylocations() CASCADE;
+        </rollback>
+    </changeSet>
+    <changeSet  author="Seamus Singh" id="39">
+        <comment>CHSRCP-356 - departments.identifier column has values that contain trailing spaces. Removes all spaces from column.</comment>
+        <sql>
+            UPDATE departments SET identifier = TRIM (identifier);
+            UPDATE departments SET identifier = REPLACE (identifier, ' ', '');
+        </sql>
+    </changeSet>
+    <changeSet  author="Seamus Singh" id="40">
+        <comment>CHSRCP-1691 - Set all rows where salary_max is null equal to salary-min</comment>
+        <sql>
+            UPDATE vacancies SET salary_max = salary_min where salary_max is null;
+        </sql>
     </changeSet>
 </databaseChangeLog>

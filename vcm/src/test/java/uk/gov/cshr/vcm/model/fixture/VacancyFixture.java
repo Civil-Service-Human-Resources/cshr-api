@@ -1,6 +1,5 @@
 package uk.gov.cshr.vcm.model.fixture;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -12,7 +11,8 @@ public final class VacancyFixture {
 
     private static final VacancyFixture INSTANCE = new VacancyFixture();
 
-    private VacancyFixture() {}
+    private VacancyFixture() {
+    }
 
     public static VacancyFixture getInstance() {
         return INSTANCE;

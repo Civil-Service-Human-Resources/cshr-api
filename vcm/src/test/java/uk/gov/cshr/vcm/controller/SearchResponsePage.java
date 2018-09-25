@@ -1,9 +1,10 @@
 package uk.gov.cshr.vcm.controller;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.List;
 import uk.gov.cshr.status.CSHRServiceStatus;
 import uk.gov.cshr.vcm.controller.exception.VacancyError;
 import uk.gov.cshr.vcm.model.SearchResponse;
@@ -20,9 +21,9 @@ public class SearchResponsePage extends SearchResponse {
     public SearchResponsePage(
             @JsonProperty("vacancies") VacancyPage vacancyPage,
             @JsonProperty("vacanyErrors") List<VacancyError> vacanyErrors,
-            @JsonProperty("cshrServiceStatuses") List<CSHRServiceStatus> cshrServiceStatuses,
+            @JsonProperty("cshrServiceStatus") CSHRServiceStatus cshrServiceStatus,
             @JsonProperty("authenticatedEmail") String authenticatedEmail) {
 
-        super(vacancyPage, vacanyErrors, cshrServiceStatuses, authenticatedEmail);
+        super(vacancyPage, vacanyErrors, cshrServiceStatus, authenticatedEmail);
     }
 }

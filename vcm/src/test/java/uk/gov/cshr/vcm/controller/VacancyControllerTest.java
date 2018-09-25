@@ -1,8 +1,22 @@
 package uk.gov.cshr.vcm.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import static java.lang.Math.toIntExact;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.cshr.vcm.util.TestUtils.getTime;
+
 import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -13,19 +27,16 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
+
 import javax.inject.Inject;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import org.junit.Assert;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
@@ -34,8 +45,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.testng.annotations.AfterMethod;
@@ -43,13 +52,10 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import uk.gov.cshr.vcm.VcmApplication;
 import uk.gov.cshr.vcm.controller.exception.LocationServiceException;
-import static uk.gov.cshr.vcm.controller.search.VacancySearchTests.BRISTOL_LATITUDE;
-import static uk.gov.cshr.vcm.controller.search.VacancySearchTests.BRISTOL_LONGITUDE;
 import uk.gov.cshr.vcm.model.ContractType;
 import uk.gov.cshr.vcm.model.Coordinates;
 import uk.gov.cshr.vcm.model.Department;
 import uk.gov.cshr.vcm.model.NationalityStatement;
-import uk.gov.cshr.vcm.model.SearchResponse;
 import uk.gov.cshr.vcm.model.Vacancy;
 import uk.gov.cshr.vcm.model.VacancyLocation;
 import uk.gov.cshr.vcm.model.WorkingPattern;
@@ -62,11 +68,15 @@ import uk.gov.cshr.vcm.service.LocationService;
 @WebAppConfiguration
 @TestExecutionListeners(MockitoTestExecutionListener.class)
 public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
-
     private static final SimpleDateFormat ISO_DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-    {
+
+    static {
         ISO_DATEFORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
+
+    private static final double BRISTOL_LATITUDE = 51.4549291;
+    private static final double BRISTOL_LONGITUDE = -2.6278111;
+
     private static final int TEN_DAYS_AGO = -10;
     private static final Timestamp THIRTY_DAYS_FROM_NOW = getTime(30);
     private static final int TWENTY_DAYS_AGO = -20;
@@ -87,8 +97,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
     private MockMvc mvc;
 
     private Department department1;
-    private Department department2;
-    private Department department3;
 
     final private MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(),
@@ -143,10 +151,10 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
     {
         VacancyLocation vacancyLocation = VacancyLocation.builder()
-        .latitude(BRISTOL_LATITUDE)
-        .longitude(BRISTOL_LONGITUDE)
-        .location("testLocation1 SearchQueryLocation")
-        .build();
+                .latitude(BRISTOL_LATITUDE)
+                .longitude(BRISTOL_LONGITUDE)
+                .location("testLocation1 SearchQueryLocation")
+                .build();
         vacancyLocation.setVacancy(vacancy1);
         vacancy1.getVacancyLocations().add(vacancyLocation);
     }
@@ -201,8 +209,8 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .build();
 
         department1 = departmentRepository.save(Department.builder().id(1L).name("Department One").build());
-        department2 = departmentRepository.save(Department.builder().id(2L).name("Department Two").build());
-        department3 = departmentRepository.save(Department.builder().id(3L).name("Department Three").build());
+        Department department2 = departmentRepository.save(Department.builder().id(2L).name("Department Two").build());
+        Department department3 = departmentRepository.save(Department.builder().id(3L).name("Department Three").build());
 
         vacancy1.setDepartment(department1);
         Vacancy savedVacancy1 = this.vacancyRepository.save(vacancy1);
@@ -217,7 +225,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
         vacancy3.setId(savedVacancy3.getId());
 
         given(locationService.find(any()))
-            .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
+                .willReturn(new Coordinates(BRISTOL_LONGITUDE, BRISTOL_LATITUDE, "South West"));
     }
 
     @AfterMethod
@@ -229,7 +237,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
         String path = "/departments";
         ResultActions sendRequest = mvc.perform(get(path)
-			.with(user("searchusername").password("searchpassword").roles("CRUD_ROLE")));
+                .with(user("searchusername").password("searchpassword").roles("CRUD_ROLE")));
         sendRequest.andExpect(status().isNotFound());
     }
 
@@ -238,7 +246,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
         String path = "/vacancies";
         ResultActions sendRequest = mvc.perform(get(path)
-			.with(user("searchusername").password("searchpassword").roles("CRUD_ROLE")));
+                .with(user("searchusername").password("searchpassword").roles("CRUD_ROLE")));
         sendRequest.andExpect(status().isNotFound());
     }
 
@@ -250,7 +258,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
         // When
         ResultActions sendRequest = mvc.perform(get(path)
-				.with(user("searchusername").password("searchpassword").roles("CRUD_ROLE")));
+                .with(user("searchusername").password("searchpassword").roles("CRUD_ROLE")));
 
         // Then
         sendRequest
@@ -314,7 +322,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
         // When
         ResultActions sendRequest = mvc.perform(get(path)
-			.with(user("searchusername").password("searchpassword").roles("CRUD_ROLE")));
+                .with(user("searchusername").password("searchpassword").roles("CRUD_ROLE")));
 
         // Then
         sendRequest
@@ -352,7 +360,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
         // When
         ResultActions sendRequest = mvc.perform(get(path)
-			.with(user("searchusername").password("searchpassword").roles("CRUD_ROLE")));
+                .with(user("searchusername").password("searchpassword").roles("CRUD_ROLE")));
 
         // Then
         sendRequest.andExpect(status().isNotFound());
@@ -372,8 +380,8 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
         // When
         ResultActions sendRequest = mvc.perform(post(path)
-				.with(user("searchusername").password("searchpassword").roles("CRUD_ROLE"))
-				.contentType(APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(vacancy)));
+                .with(user("searchusername").password("searchpassword").roles("CRUD_ROLE"))
+                .contentType(APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(vacancy)));
 
         MvcResult sendRequestResult = sendRequest.andReturn();
 
@@ -388,10 +396,10 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
         Vacancy storedVacancy = vacancyRepository.findOne(createdVacancyId);
 
-        Assert.assertTrue(storedVacancy.getTitle().equals("testTile1 SearchQueryTitle"));
+        assertTrue(storedVacancy.getTitle().equals("testTile1 SearchQueryTitle"));
         Assertions.assertThat(storedVacancy).isEqualToIgnoringGivenFields(vacancy, "id", "vacancyLocations", "applyURL", "department");
-        Assert.assertTrue(storedVacancy.getActive());
-        Assert.assertEquals("https://www.google.com", storedVacancy.getApplyURL());
+        assertTrue(storedVacancy.getActive());
+        assertEquals("https://www.google.com", storedVacancy.getApplyURL());
     }
 
     @Test
@@ -406,15 +414,14 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
         // When
         ResultActions sendRequest = mvc.perform(post(path)
-				.with(user("searchusername").password("searchpassword").roles("CRUD_ROLE"))
-				.contentType(APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(vacancy)));
+                .with(user("searchusername").password("searchpassword").roles("CRUD_ROLE"))
+                .contentType(APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(vacancy)));
 
-        MvcResult sendRequestResult = sendRequest.andReturn();
+        sendRequest.andReturn();
 
         // Then
         sendRequest.andExpect(status().isBadRequest());
     }
-
 
     @Test
     public void testUpdate() throws Exception {
@@ -433,8 +440,8 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
         // When
         ResultActions sendRequest = mvc.perform(put(path)
-				.with(user("searchusername").password("searchpassword").roles("CRUD_ROLE"))
-				.contentType(APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(vacancy)));
+                .with(user("searchusername").password("searchpassword").roles("CRUD_ROLE"))
+                .contentType(APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(vacancy)));
 
         // Then
         sendRequest
@@ -442,9 +449,9 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
         Optional<Vacancy> optionalVacancy = vacancyRepository.findById(vacancy1.getId());
 
-        Assert.assertEquals("title", "testUpdate", optionalVacancy.get().getTitle());
-        Assert.assertEquals("location name", "My New Location Name", optionalVacancy.get().getVacancyLocations().get(0).getLocation());
-        Assert.assertEquals(null, optionalVacancy.get().getApplyURL());
+        assertEquals("title", "testUpdate", optionalVacancy.get().getTitle());
+        assertEquals("location name", "My New Location Name", optionalVacancy.get().getVacancyLocations().get(0).getLocation());
+        assertEquals(null, optionalVacancy.get().getApplyURL());
     }
 
     @Test
@@ -458,8 +465,8 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
         // When
         ResultActions sendRequest = mvc.perform(put(path)
-				.with(user("searchusername").password("searchpassword").roles("CRUD_ROLE"))
-				.contentType(APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(vacancy)));
+                .with(user("searchusername").password("searchpassword").roles("CRUD_ROLE"))
+                .contentType(APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(vacancy)));
 
         // Then
         sendRequest.andExpect(status().isNotFound());
@@ -477,7 +484,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
         String path = "/vacancy/" + vacancy1.getId();
         // When
         ResultActions sendRequest = mvc.perform(delete(path)
-			.with(user("searchusername").password("searchpassword").roles("CRUD_ROLE")));
+                .with(user("searchusername").password("searchpassword").roles("CRUD_ROLE")));
 
         Iterable<Vacancy> vacancies = vacancyRepository.findAll();
 
@@ -488,7 +495,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
         Set<Long> validIds = new HashSet<>();
         validIds.add(vacancy2.getId());
         validIds.add(vacancy3.getId());
-        Assertions.assertThat(validIds.contains(vacancy.getId()));
+        Assertions.assertThat(validIds).contains(vacancy.getId());
     }
 
     @Test
@@ -498,7 +505,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
         // When
         ResultActions sendRequest = mvc.perform(get(path)
-			.with(user("searchusername").password("searchpassword").roles("CRUD_ROLE")));
+                .with(user("searchusername").password("searchpassword").roles("CRUD_ROLE")));
 
         // Then
         sendRequest
@@ -520,23 +527,19 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
         String path = "/vacancy/search?page=0&size=1";
 
         mvc.perform(get(path)
-				.with(user("searchusername").password("searchpassword").roles("CRUD_ROLE"))
-				.contentType(APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(vacancy)))
-            				.andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
+                .with(user("searchusername").password("searchpassword").roles("CRUD_ROLE"))
+                .contentType(APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(vacancy)))
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
     }
 
     @Test
     public void search_noSearchParametersSupplied() throws Exception {
-        performSearchError400Test("");
-    }
-
-    private void performSearchError400Test(String requestBody) throws Exception {
         // Given
         String path = "/vacancy/search?page=0&size=1";
 
         mvc.perform(post(path)
-				.with(user("searchusername").password("searchpassword").roles("CRUD_ROLE"))
-				.contentType(APPLICATION_JSON_UTF8).content(requestBody)).andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
+                .with(user("searchusername").password("searchpassword").roles("CRUD_ROLE"))
+                .contentType(APPLICATION_JSON_UTF8).content("")).andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
     }
 
     @Test
@@ -554,27 +557,14 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 "}";
 
         ResultActions sendRequest = mvc.perform(post(path)
-				.with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
-				.contentType(APPLICATION_JSON_UTF8).content(requestBody));
+                .with(user("searchusername").password("searchpassword").roles("SEARCH_ROLE"))
+                .contentType(APPLICATION_JSON_UTF8).content(requestBody));
 
         String content = sendRequest.andReturn().getResponse().getContentAsString();
 
         ObjectMapper objectMapper = new ObjectMapper();
-        SearchResponse SearchResponse = objectMapper.readValue(content, SearchResponsePage.class);
-        System.out.println("content=" + content);
-
-        // Then
-//        sendRequest
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-//                .andExpect(jsonPath("$.content.vacancies", hasSize(0)))
-//                .andExpect(jsonPath("$.totalElements", is(0)));
-
-    }
-
-    private static Timestamp getTime(int numberOfDaysFromNow) {
-        Date date = Date.from(LocalDateTime.now().plusDays(numberOfDaysFromNow).atZone(ZoneId.systemDefault()).toInstant());
-        return new Timestamp(date.getTime());
+        objectMapper.readValue(content, SearchResponsePage.class);
+        Assertions.assertThat(content).contains("\"numberOfElements\":0");
     }
 
     @Test(enabled = false)
@@ -679,62 +669,7 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.totalElements", is(0)));
     }
 
-    @Test(enabled = false)
-    public void search_publicSearchesAllowedYesterday() throws Exception {
-        doOpenPublicSearchTests(-1);
-    }
-
-    private void doOpenPublicSearchTests(int publicDateNumDaysFromNow) throws Exception {
-        vacancy3.setGovernmentOpeningDate(getTime(TEN_DAYS_AGO));
-        vacancy3.setInternalOpeningDate(getTime(TWENTY_DAYS_AGO));
-        vacancy3.setPublicOpeningDate(getTime(publicDateNumDaysFromNow));
-        this.vacancyRepository.save(vacancy3);
-
-        // Given
-        String path = "/vacancy/search?page=0&size=1";
-
-        String requestBody = "{\n" +
-                "  \"department\": [\n" +
-                "    \"3\"\n" +
-                "  ],\n" +
-                "  \"keyword\": \"search\",\n" +
-                "  \"location\": {\n" +
-                "    \"place\": \"testLocation\",\n" +
-                "    \"radius\": \"30\"\n" +
-                "  }\n" +
-                "}";
-        ResultActions sendRequest = mvc.perform(post(path).contentType(APPLICATION_JSON_UTF8).content(requestBody));
-
-        // Then
-        sendRequest
-                .andExpect(jsonPath("$.content", hasSize(1)))
-                .andExpect(jsonPath("$.totalElements", is(1)))
-                .andExpect(jsonPath("$.content[0].id", is(toIntExact(this.vacancy3.getId()))))
-                .andExpect(jsonPath("$.content[0].identifier", is(toIntExact(this.vacancy3.getIdentifier()))))
-                .andExpect(jsonPath("$.content[0].description", is(this.vacancy3.getDescription())))
-                //                .andExpect(jsonPath("$.content[0].location", is(this.vacancy3.getLocation())))
-                .andExpect(jsonPath("$.content[0].grade", is(this.vacancy3.getGrade())))
-                .andExpect(jsonPath("$.content[0].responsibilities", is(this.vacancy3.getResponsibilities())))
-                .andExpect(jsonPath("$.content[0].workingHours", is(this.vacancy3.getWorkingHours())))
-                .andExpect(jsonPath("$.content[0].closingDate", is(ISO_DATEFORMAT.format(vacancy4.getClosingDate()))))
-                .andExpect(jsonPath("$.content[0].contactName", is(this.vacancy3.getContactName())))
-                .andExpect(jsonPath("$.content[0].contactDepartment", is(this.vacancy3.getContactDepartment())))
-                .andExpect(jsonPath("$.content[0].contactEmail", is(this.vacancy3.getContactEmail())))
-                .andExpect(jsonPath("$.content[0].contactTelephone", is(this.vacancy3.getContactTelephone())))
-                .andExpect(jsonPath("$.content[0].eligibility", is(this.vacancy3.getEligibility())))
-                .andExpect(jsonPath("$.content[0].salaryMin", is(this.vacancy3.getSalaryMin())))
-                .andExpect(jsonPath("$.content[0].salaryMax", is(this.vacancy3.getSalaryMax())))
-                .andExpect(jsonPath("$.content[0].numberVacancies", is(this.vacancy3.getNumberVacancies())))
-                .andExpect(jsonPath("$.content[0].department.id", is(this.vacancy3.getDepartment().getId())))
-                .andExpect(jsonPath("$.content[0].department.name", is(this.vacancy3.getDepartment().getName())));
-    }
-
-    @Test(enabled = false)
-    public void search_publicSearchesAllowedToday() throws Exception {
-        doOpenPublicSearchTests(0);
-    }
-
-    private Vacancy createVacancyPrototype() throws JsonProcessingException {
+    private Vacancy createVacancyPrototype() {
 
         VacancyLocation vacancyLocation = VacancyLocation.builder()
                 .latitude(BRISTOL_LATITUDE)
@@ -766,4 +701,6 @@ public class VacancyControllerTest extends AbstractTestNGSpringContextTests {
 
         return vacancy;
     }
-}
+
+
+ }

@@ -1,6 +1,7 @@
 package uk.gov.cshr.vcm.controller.exception;
 
 import java.util.Arrays;
+
 import org.springframework.http.HttpStatus;
 
 public class LocationServiceException extends VacancyException {

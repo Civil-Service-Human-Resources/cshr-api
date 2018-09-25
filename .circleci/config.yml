@@ -17,12 +17,23 @@ jobs:
           name: Build image
           command: |
             cp .env_dev .env
-            export DOCKER_SERVICE_TAG="$CIRCLE_WORKFLOW_ID"
+            export DOCKER_SERVICE_TAG="${CIRCLE_WORKFLOW_ID}"
             docker-compose build api
 
       - run:
           name: Push the images to Acr
-          command: docker push ${AZURE_URL}/cshr-api:${CIRCLE_WORKFLOW_ID}
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "develop" ]; then
+              # If this is a merge develop branch build, and successful, push to bintray as latest.
+              # Release versions will be tagged as such
+              docker tag ${AZURE_URL}/cshr-api:${CIRCLE_WORKFLOW_ID} ${AZURE_URL}/cshr-api:latest
+              docker push ${AZURE_URL}/cshr-api:latest
+            else
+              docker tag ${AZURE_URL}/cshr-api:${CIRCLE_WORKFLOW_ID} ${AZURE_URL}/cshr-api:${CIRCLE_BRANCH}
+              docker push ${AZURE_URL}/cshr-api:${CIRCLE_BRANCH}
+            fi
+            docker push ${AZURE_URL}/cshr-api:${CIRCLE_WORKFLOW_ID}
+
 
       - run:
           name: tag images based on branch - temp - ship not working

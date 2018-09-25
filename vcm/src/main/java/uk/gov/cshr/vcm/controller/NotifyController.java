@@ -1,8 +1,9 @@
 package uk.gov.cshr.vcm.controller;
 
+import javax.annotation.security.RolesAllowed;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import javax.annotation.security.RolesAllowed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ import uk.gov.service.notify.NotificationClientException;
 @Api(value = "notifyservice")
 @RolesAllowed("NOTIFY_ROLE")
 public class NotifyController {
-    
+
     private static final Logger log = LoggerFactory.getLogger(NotifyController.class);
 
     @Autowired

@@ -11,8 +11,6 @@ info:
 host: 'localhost:8080'
 basePath: /
 tags:
-  - name: vacancy-tests-loader
-    description: Vacancy Tests Loader
   - name: notify-controller
     description: Notify Controller
   - name: vacancy-controller
@@ -29,7 +27,7 @@ paths:
       tags:
         - department-controller
       summary: Find all departments
-      operationId: findAll
+      operationId: findAllDepartments
       consumes:
         - application/json
       produces:
@@ -38,12 +36,12 @@ paths:
         '200':
           description: OK
           schema:
-            $ref: '#/definitions/Page%C2%ABDepartment%C2%BB'
+            $ref: '#/definitions/Page«Department»'
     post:
       tags:
         - department-controller
       summary: Create a department
-      operationId: create
+      operationId: createDepartment
       consumes:
         - application/json
       produces:
@@ -60,7 +58,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/Department'
-  /department/loademails:
+  /department/loaddepartments:
     post:
       tags:
         - department-controller
@@ -86,7 +84,7 @@ paths:
       tags:
         - department-controller
       summary: Find a specific department
-      operationId: findById
+      operationId: findDepartmentById
       consumes:
         - application/json
       produces:
@@ -107,7 +105,7 @@ paths:
       tags:
         - department-controller
       summary: Update a department
-      operationId: update
+      operationId: updateDepartment
       consumes:
         - application/json
       produces:
@@ -134,7 +132,7 @@ paths:
       tags:
         - department-controller
       summary: Delete a department
-      operationId: deleteById
+      operationId: deleteDepartmentById
       consumes:
         - application/json
       produces:
@@ -178,7 +176,7 @@ paths:
       tags:
         - vacancy-controller
       summary: Find all vacancies with support for pagination
-      operationId: findAll_1
+      operationId: findAll
       consumes:
         - application/json
       produces:
@@ -187,12 +185,12 @@ paths:
         '200':
           description: OK
           schema:
-            $ref: '#/definitions/Page%C2%ABVacancy%C2%BB'
+            $ref: '#/definitions/Page«Vacancy»'
     post:
       tags:
         - vacancy-controller
       summary: Create a Vacancy
-      operationId: create_1
+      operationId: createVacancy
       consumes:
         - application/json
       produces:
@@ -281,6 +279,33 @@ paths:
           description: The location service is unavailable.
           schema:
             $ref: '#/definitions/VacancyError'
+  /vacancy/vacancymetadata:
+    get:
+      tags:
+        - vacancy-search-controller
+      summary: Get a collection vacancies with just identifier and date modified returned for each one.
+      operationId: vacancymetadata
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Request to retrieve the metadata was successful
+          schema:
+            $ref: '#/definitions/VacancyMetadataResponse'
+        '401':
+          description: You are not authorised to use this service. Please supply the correct credentials or contact the system administrator if you believe they are correct.
+          schema:
+            $ref: '#/definitions/VacancyError'
+        '500':
+          description: An unexpected error occurred processing your request. Please contact the system administrator.
+          schema:
+            $ref: '#/definitions/VacancyError'
+        '503':
+          description: The service is currently unavailable and your request cannot be processed at this time. This may be a temporary condition and if it persists please contact the system administrator
+          schema:
+            $ref: '#/definitions/VacancyError'
   /vacancy/verifyemail:
     post:
       tags:
@@ -303,12 +328,43 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/VerifyResponse'
+  '/vacancy/{atsVendorIdentifier}/{atsReferenceIdentifier}':
+    get:
+      tags:
+        - vacancy-search-controller
+      summary: Find a specific public vacancy
+      operationId: find
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: atsVendorIdentifier
+          in: path
+          description: atsVendorIdentifier
+          required: true
+          type: string
+        - name: atsReferenceIdentifier
+          in: path
+          description: atsReferenceIdentifier
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Vacancy'
+        '410':
+          description: Vacancy closed
+          schema:
+            $ref: '#/definitions/VacancyError'
   '/vacancy/{vacancyId}':
     get:
       tags:
         - vacancy-search-controller
       summary: Find a specific vacancy
-      operationId: findById_1
+      operationId: findById
       consumes:
         - application/json
       produces:
@@ -333,7 +389,7 @@ paths:
       tags:
         - vacancy-controller
       summary: Update a Vacancy
-      operationId: update_1
+      operationId: update
       consumes:
         - application/json
       produces:
@@ -377,21 +433,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/Vacancy'
-  /vacancytests:
-    get:
-      tags:
-        - vacancy-tests-loader
-      summary: loadTestData
-      operationId: loadTestDataUsingGET
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: OK
-          schema:
-            type: object
 definitions:
   CSHRServiceStatus:
     type: object
@@ -434,6 +475,8 @@ definitions:
         type: string
       name:
         type: string
+      parent:
+        $ref: '#/definitions/Department'
   Location:
     type: object
     required:
@@ -519,14 +562,12 @@ definitions:
       authenticatedEmail:
         type: string
         description: The email which was verified to give access to non-public jobs
-      cshrServiceStatuses:
-        type: array
-        description: A list of statuses indicating the system status
-        items:
-          $ref: '#/definitions/CSHRServiceStatus'
+      cshrServiceStatus:
+        description: Business status code associated with the request
+        $ref: '#/definitions/CSHRServiceStatus'
       vacancies:
         description: 'The search results '
-        $ref: '#/definitions/Page%C2%ABVacancy%C2%BB'
+        $ref: '#/definitions/Page«Vacancy»'
       vacancyErrors:
         type: array
         description: A list of errors which may have affected the search results
@@ -581,6 +622,9 @@ definitions:
         type: integer
         format: int64
       internalOpeningDate:
+        type: string
+        example: 'yyyy-MM-dd''T''HH:mm:ss.SSSZ'
+      lastModified:
         type: string
         example: 'yyyy-MM-dd''T''HH:mm:ss.SSSZ'
       lengthOfEmployment:
@@ -733,6 +777,26 @@ definitions:
       longitude:
         type: number
         format: double
+  VacancyMetadata:
+    type: object
+    properties:
+      atsVendorId:
+        type: string
+      identifier:
+        type: integer
+        format: int64
+      lastModified:
+        type: string
+        example: 'yyyy-MM-dd''T''HH:mm:ss.SSSZ'
+  VacancyMetadataResponse:
+    type: object
+    properties:
+      responseStatus:
+        $ref: '#/definitions/CSHRServiceStatus'
+      vacancies:
+        type: array
+        items:
+          $ref: '#/definitions/VacancyMetadata'
   VacancySearchParameters:
     type: object
     properties:
