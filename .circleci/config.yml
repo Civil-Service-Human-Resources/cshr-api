@@ -35,6 +35,16 @@ jobs:
             docker push ${AZURE_URL}/cshr-api:${CIRCLE_WORKFLOW_ID}
 
 
+      - run:
+          name: tag images based on branch - temp - ship not working
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              docker_tag="latest"
+            else
+              docker_tag="${CIRCLE_BRANCH}"
+            fi
+            docker tag "${AZURE_URL}"/cshr-api:"${CIRCLE_WORKFLOW_ID}" "${AZURE_URL}"/cshr-api:"${docker_tag}"
+            docker push "${AZURE_URL}"/cshr-api:"${docker_tag}"
 
   ship:
     environment:
@@ -88,6 +98,7 @@ workflows:
               only:
                 - master
                 - develop
+                - release*
       - notify_pipeline:
           requires:
             - ship
@@ -95,3 +106,4 @@ workflows:
             branches:
               only:
                 - develop
+                - release*
